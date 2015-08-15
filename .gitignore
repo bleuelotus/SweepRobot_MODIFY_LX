@@ -216,7 +216,7 @@ pip-log.txt
 .mr.developer.cfg
 
 #IAR STM32 C
-Doc/
+*Doc/
 *.html
 *.htm
 *.pdf
@@ -229,3 +229,4 @@ Doc/
 *Documentation/
 *.out
 *.sim
+*obj/

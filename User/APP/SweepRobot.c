@@ -58,9 +58,8 @@ s8 SweepRobot_Init(void)
 
     /* Power management init */
     PM_Init();
-
-    RTC_Init();
-
+    /* Real time clock init */
+//    RTC_Init();
     /* Message Queue for processing robot state */
     MainMsgQ = MsgQueue_Create(ROBOT_MAIN_MSG_Q_SIZE);
     if(MainMsgQ == NULL){
@@ -309,8 +308,8 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
 void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
 {
     static PwrStationSigData_t RobotHomingData[10];
-    static u8 i, j, k, l, HomingDataCnt = 0, RepeatCodeFound = 0;
-    struct RobotHomingState_s HomingState;
+    static u8 i, j, k, l, HomingDataCnt = 0, RepeatCodeFound = 0, HomingStateConfirmCnt = 0;
+    struct RobotHomingState_s HomingState, LastHomingState;
 
     if(gRobotState != ROBOT_STATE_RUNNING){
         return;
@@ -468,45 +467,49 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
         RobotHomingData[HomingDataCnt].src = PwrSig->src;
         HomingDataCnt++;
 
+        if(LastHomingState.Pos!=HomingState.Pos){
+            HomingStateConfirmCnt++;
+            if(HomingStateConfirmCnt>5){
+                LastHomingState.Pos = HomingState.Pos;
+                LastHomingState.Angle = HomingState.Angle;
+            }
+            else{
+                HomingState.Pos = LastHomingState.Pos;
+                HomingState.Angle = LastHomingState.Angle;
+            }
+        }
+
         /* plan path to power station */
         if(IS_PWR_STATION_SIG_LONG(HomingState.Pos)){
             HomingStage = ROBOT_HOMING_STAGE1;
             if(IS_PWR_STATION_SIG_LEFT(HomingState.Pos)){
-                if(HomingState.Angle >= 180){
-                    MotionCtrl_MoveLeftSlowly(0);
-                }
-                else if(HomingState.Angle > 90){
-                    MotionCtrl_MoveLeftSlowly(3);
-                }
-                else if(HomingState.Angle < 0){
-                    MotionCtrl_MoveRightSlowly(0);
+                if(HomingState.Angle <= -90){
+                    MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
                 }
                 else if(HomingState.Angle < 90){
-                    MotionCtrl_MoveRightSlowly(3);
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 0);
                 }
-                else {
-                    MotionCtrl_MoveDirectly();
-                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+                else if(HomingState.Angle == 90){
+                    MotionCtrl_MoveDirTune(4, WHEEL_HOMING_SPEED);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_BLUE, 1);
+                }
+                else{
+                    MotionCtrl_MoveDirTune(1, WHEEL_HOMING_SPEED);
                 }
             }
             else {
-                if(HomingState.Angle < -90){
-                    MotionCtrl_MoveRightSlowly(3);
+                if(HomingState.Angle >= 90){
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 0);
                 }
                 else if(HomingState.Angle > -90){
-                    if(HomingState.Angle > 90){
-                        MotionCtrl_MoveRightSlowly(0);
-                    }
-                    else if(HomingState.Angle >= 0){
-                        MotionCtrl_MoveLeftSlowly(0);
-                    }
-                    else {
-                        MotionCtrl_MoveLeftSlowly(3);
-                    }
+                    MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
                 }
-                else {
-                    MotionCtrl_MoveDirectly();
-                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+                else if(HomingState.Angle == -90){
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 4);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_BLUE, 1);
+                }
+                else{
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 1);
                 }
             }
         }
@@ -514,13 +517,26 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
             HomingStage = ROBOT_HOMING_STAGE2;
             if(IS_PWR_STATION_SIG_LEFT(HomingState.Pos)){
                 if(HomingState.Angle <= 0 && HomingState.Angle >= -135){
-                    MotionCtrl_MoveLeftSlowly(0);
+                    MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
                 }
                 else if(HomingState.Angle > 0 && HomingState.Angle < 180){
-                    MotionCtrl_MoveRightSlowly(0);
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 0);
                 }
                 else {
-                    MotionCtrl_MoveDirectly();
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, WHEEL_HOMING_SPEED);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+                }
+            }
+            else{
+                if(HomingState.Angle <= 0 && HomingState.Angle >= -135){
+                    MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
+                }
+                else if(HomingState.Angle > 0 && HomingState.Angle < 180){
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 0);
+                }
+                else {
+                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, WHEEL_HOMING_SPEED);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
                 }
             }
         }
@@ -528,27 +544,25 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
         else if(PWR_STATION_HOME_SIG_CENTER==HomingState.Pos){
             HomingStage = ROBOT_HOMING_STAGE3;
             if(HomingState.Angle > 45){
-                MotionCtrl_MoveLeftSlowly(0);
+                MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
             }
             else if(HomingState.Angle > 0){
-                MotionCtrl_MoveLeftSlowly(5);
+                MotionCtrl_MoveDirTune(2, WHEEL_HOMING_SPEED-1);
             }
             else if(HomingState.Angle < -45){
-                MotionCtrl_MoveRightSlowly(0);
+                MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 0);
             }
             else if(HomingState.Angle < 0){
-                MotionCtrl_MoveRightSlowly(5);
+                MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED-1, 2);
             }
             else{
                 HomingStage = ROBOT_HOMING_STAGE_OK;
-                MotionCtrl_MoveDirectly();
+                MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED-2, WHEEL_HOMING_SPEED-2);
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, 1);
             }
         }
 
         LastHomingStage = HomingStage;
-//        LastHomingState.Pos = HomingState.Pos;
-//        LastHomingState.Angle = HomingState.Angle;
     }
     else {
         if(PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_L || PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_R){

@@ -115,8 +115,8 @@ void ProximityDetectionProc(void)
                 (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L])
                 ||
                 (!COLLISION_SIGN_LEFT)
-    //                ||
-    //                (!COLLISION_SIGN_FL)
+                ||
+                (!COLLISION_SIGN_FL)
                 ){
                 /* Send Left front and bottom path fault message */
                 Msg.expire = 0;
@@ -546,49 +546,22 @@ void MotionCtrl_RightPathFaulProc(u16 backcnt, u16 turncnt, u8 StopOnFinish)
     MotionCtrl_Proc();
 }
 
-void MotionCtrl_MoveLeftSlowly(u8 dec)
+void MotionCtrl_MoveDirTune(u8 l, u8 r)
 {
     if(!IS_MOTION_PROC_FINISH())
         return;
 
-    printf("L\r\n");
-
 //    if(dec){
-        LWHEEL_EXP_SPEED_SET(dec);
-        RWHEEL_EXP_SPEED_SET(WHEEL_HOMING_SPEED);
-//    }
-//    else{
-//        gActSequence[0].LWheelDir = 0;
-//        gActSequence[0].RWheelDir = 1;
-//        gActSequence[0].LWheelSpeed = 0;
-//        gActSequence[0].RWheelSpeed = 0;
-//        gActSequence[0].LWheelExpCnt = 5;
-//        gActSequence[0].RWheelExpCnt = 5;
-//        gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED;
-//        gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED;
-//        gActSeqDepth = 1;
-//        MotionCtrl_Proc();
-//    }
-}
-
-void MotionCtrl_MoveRightSlowly(u8 dec)
-{
-    if(!IS_MOTION_PROC_FINISH())
-        return;
-
-   printf("R\r\n");
-
-//    if(dec){
-        LWHEEL_EXP_SPEED_SET(WHEEL_HOMING_SPEED);
-        RWHEEL_EXP_SPEED_SET(dec);
+        LWHEEL_EXP_SPEED_SET(l);
+        RWHEEL_EXP_SPEED_SET(r);
 //    }
 //    else{
 //        gActSequence[0].LWheelDir = 1;
 //        gActSequence[0].RWheelDir = 0;
-//        gActSequence[0].LWheelSpeed = 0;
-//        gActSequence[0].RWheelSpeed = 0;
-//        gActSequence[0].LWheelExpCnt = 5;
-//        gActSequence[0].RWheelExpCnt = 5;
+//        gActSequence[0].LWheelSpeed = MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_LWHEEL);;
+//        gActSequence[0].RWheelSpeed = MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_RWHEEL);;
+//        gActSequence[0].LWheelExpCnt = 20;
+//        gActSequence[0].RWheelExpCnt = 20;
 //        gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED;
 //        gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED;
 //        gActSeqDepth = 1;
@@ -605,8 +578,8 @@ void MotionCtrl_MoveDirectly(void)
 
     gActSequence[0].LWheelDir = 1;
     gActSequence[0].RWheelDir = 1;
-    gActSequence[0].LWheelSpeed = 20;
-    gActSequence[0].RWheelSpeed = 20;
+    gActSequence[0].LWheelSpeed = MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_LWHEEL);;
+    gActSequence[0].RWheelSpeed = MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_RWHEEL);;
     gActSequence[0].LWheelExpCnt = 5;
     gActSequence[0].RWheelExpCnt = 5;
     gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED;

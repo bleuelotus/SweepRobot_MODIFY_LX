@@ -102,7 +102,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_TURN_360_CNT                  1500
 #define WHEEL_FAULT_BACK_CNT                240
 
-#define WHEEL_CRUISE_SPEED                  12
+#define WHEEL_CRUISE_SPEED                  10
 #define WHEEL_HOMING_SPEED                  5
 
 enum MotionEvt {
@@ -130,8 +130,6 @@ void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act);
 void MotionCtrl_LeftPathFaulProc(u16 backcnt, u16 turncnt, u8 StopOnFinish);
 void MotionCtrl_RightPathFaulProc(u16 backcnt, u16 turncnt, u8 StopOnFinish);
 void MotionCtrl_RoundedSlowly(void);
-void MotionCtrl_MoveDirectly(void);
-void MotionCtrl_MoveRightSlowly(u8 dec);
-void MotionCtrl_MoveLeftSlowly(u8 dec);
+void MotionCtrl_MoveDirTune(u8 l, u8 r);
 
 #endif /* __MITION_CTRL_H__ */

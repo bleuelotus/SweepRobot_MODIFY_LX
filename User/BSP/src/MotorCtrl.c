@@ -110,14 +110,14 @@ s8 MotorCtrl_ChanDirSet(enum MotorCtrlChannel Channel, u8 Dir)
 {
     if(MotorCtrlChan[Channel].PhasePin != 0 && MotorCtrlChan[Channel].PhaseGPIO != NULL){
         /* Phase */
-        GPIO_WriteBit(MotorCtrlChan[Channel].PhaseGPIO, MotorCtrlChan[Channel].PhasePin, (BitAction)(Dir));
+        GPIO_WriteBit(MotorCtrlChan[Channel].PhaseGPIO, MotorCtrlChan[Channel].PhasePin, (BitAction)(!Dir));
     }
     return 0;
 }
 
 u8 MotorCtrl_ChanDirGet(enum MotorCtrlChannel Channel)
 {
-    return GPIO_ReadOutputDataBit(MotorCtrlChan[Channel].PhaseGPIO, MotorCtrlChan[Channel].PhasePin);
+    return (!GPIO_ReadOutputDataBit(MotorCtrlChan[Channel].PhaseGPIO, MotorCtrlChan[Channel].PhasePin));
 }
 
 enum MotorStatus MotorCtrl_ChanStateGet(enum MotorCtrlChannel Channel)
