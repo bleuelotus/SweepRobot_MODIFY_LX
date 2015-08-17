@@ -285,6 +285,12 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
                 }
             }
             break;
+        case MOTION_EVT_EXCEPTION:
+#ifdef DEBUG_LOG
+            printf("Exception state.\r\n");
+#endif
+            MotionCtrl_Stop();
+            break;
         case MOTION_EVT_PROXIMITY_SL:
             break;
         case MOTION_EVT_PROXIMITY_SR:

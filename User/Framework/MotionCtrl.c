@@ -25,6 +25,12 @@
 #define IFRD_CHAN_BOTTOM_BL         6
 #define IFRD_CHAN_BOTTOM_BR         7
 
+#define LBRUSH_CUR_THRESHOLD        400                                         //  0.8A
+#define RBRUSH_CUR_THRESHOLD        400                                         //  0.8A
+#define MBRUSH_CUR_THRESHOLD        1000                                        //  1.6A
+#define FUN_CUR_THRESHOLD           1000                                        //  1.6A
+#define ASH_TRAY_INSTALL_CUR        3500                                        //  2.8V
+
 /* Infrared based proximity detection sensitivity */
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 500, 200, 1500, 1500 };
 
@@ -88,14 +94,35 @@ void RWheelCounterISR(void)
     }
 }
 
-void ProximityDetectionProc(void)
+void MotionStateProc(void)
 {
     u8      i = 0;
     Msg_t   Msg;
 
     if((++gtmpCnt)%2){
-        /* Update wheel floating sign */
-        /* motor overloading sign */
+        /* Update exception sign: left, right, middle brush over loading, wheel floationg and ash tray exist or not */
+        if(
+           WHEEL_FLOAT_SIGN_ALL
+           ||
+           (ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD)
+           ||
+           (ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD)
+           ||
+           (ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD)
+           ||
+           (ADCConvertedLSB[MEAS_CHAN_FUN_CUR-1] > FUN_CUR_THRESHOLD)
+//           ||
+//           (ADCConvertedLSB[MEAS_CHAN_ASH_TRAY_LVL-1] < ASH_TRAY_INSTALL_CUR)
+           ){
+            /* Send exception message */
+            Msg.expire = 0;
+            Msg.prio = MSG_PRIO_HIGHEST;
+            Msg.type = MSG_TYPE_MOTION;
+            Msg.MsgCB = NULL;
+            Msg.Data.MEvt = MOTION_EVT_EXCEPTION;
+            SweepRobot_SendMsg(&Msg);
+        }
+
         /* Save proximity condition in Tx off */
         for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
@@ -224,7 +251,7 @@ void IFRD_PathDetectInit(void)
     TIM_ClearFlag(TIM5, TIM_FLAG_Update);
     TIM_ITConfig(TIM5, TIM_IT_Update, ENABLE);
 
-    plat_int_reg_cb(STM32F10x_INT_TIM5, (void*)ProximityDetectionProc);
+    plat_int_reg_cb(STM32F10x_INT_TIM5, (void*)MotionStateProc);
 }
 
 static void IFRD_PathDetectStart(void)
