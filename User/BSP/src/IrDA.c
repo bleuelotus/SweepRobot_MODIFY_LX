@@ -23,7 +23,7 @@ static u8  IrDA_FrameData[IRDA_LIGHT_NUM] = {0};
 #define IRDA_FRAME_LEN                              (1+33)
 static u32 IrDA_FrameData[IRDA_LIGHT_NUM] = {0};
 #endif
-static u8  IrDA_FrameFlag[IRDA_LIGHT_NUM] = {0};
+//static u8  IrDA_FrameFlag[IRDA_LIGHT_NUM] = {0};
 static u8  IrDA_FrameBuf = 0, IrDA_FrameBufFlag = 0;
 
 static u8  PulsCnt[IRDA_LIGHT_NUM] = {0};
@@ -54,6 +54,7 @@ void IrDA_TimeCounterInit(void)
     TIM_Cmd(TIM6, ENABLE);
 }
 
+#ifdef IRDA_MODE_NEC
 /* NEC CODE: 9ms L + 4.5ms H + (0.56ms L + 0.565ms H) X 32 + [2.2ms H] */
 static inline void IrDA_ParseNEC(enum IRAD_Light idx)
 {
@@ -106,6 +107,7 @@ static inline void IrDA_ParseNEC(enum IRAD_Light idx)
         PulsStart[idx] = 1;
     }
 }
+#endif
 
 static inline void IrDA_ParseEJE(enum IRAD_Light idx)
 {
@@ -273,7 +275,13 @@ void IrDA_Init(void)
     mDelay(100);
 }
 
+void IrDA_DeInit(void)
+{
+//    RCC_APB2PeriphClockCmd(IRDA_LIGHT_GPIO_PERIPH_ID, DISABLE);
+    EXTI_DeInit();
+}
 
+#ifdef IRDA_MODE_NEC
 u8 IrDA_ProcessNEC(u8 idx)
 {
     u8 first_byte, sec_byte, tir_byte, fou_byte;
@@ -293,6 +301,7 @@ u8 IrDA_ProcessNEC(u8 idx)
 
     return 0;
 }
+#endif
 
 void IrDA_ProcessEJE(void (*RemoteCB)(u8 code))
 {

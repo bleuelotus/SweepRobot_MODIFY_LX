@@ -51,8 +51,6 @@
 /* user extend */
 #include "stm32f10x_it.h"
 #include "stm32f10x_UserMEM.h"
-#include "i2c.h"
-#include "spi.h"
 #include "usart.h"
 
 /* Exported types ------------------------------------------------------------*/

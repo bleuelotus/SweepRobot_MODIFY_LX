@@ -33,20 +33,13 @@ struct RobotHomingState_s {
     s16     Angle;
 };
 
-enum _RobotHomingStage {
-
-    ROBOT_HOMING_STAGE_UNKNOWN,
-    ROBOT_HOMING_STAGE1,
-    ROBOT_HOMING_STAGE2,
-    ROBOT_HOMING_STAGE3,
-    ROBOT_HOMING_STAGE_OK
-};
-
 static MsgQueue_t *MainMsgQ = NULL;
 static const s16 HomingSigSrc2AngleMap[] = { 180, 90, 45, 315, 270 };
 //static struct RobotHomingState_s LastHomingState;
-static enum _RobotHomingStage HomingStage = ROBOT_HOMING_STAGE_UNKNOWN, LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+enum _RobotHomingStage gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+static enum _RobotHomingStage LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 
+void SweepRobot_PMMsgProc(enum PM_Mode mode);
 void SweepRobot_BMMsgProc(enum BatteryEvt evt);
 void SweepRobot_CtrlMsgProc(u8 CtrlCode);
 void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig);
@@ -59,34 +52,33 @@ s8 SweepRobot_Init(void)
     /* Power management init */
     PM_Init();
     /* Real time clock init */
-//    RTC_Init();
+    RTC_Init();
     /* Message Queue for processing robot state */
     MainMsgQ = MsgQueue_Create(ROBOT_MAIN_MSG_Q_SIZE);
     if(MainMsgQ == NULL){
         err = -1;
         goto SWEEPROBOT_INIT_FAIL;
     }
-
     /* Physical state measurement */
     Meas_Init();
+    /* Start measurement */
     Meas_Start();
     /* PWM resource init */
     PWM_ControllerInit();
     /* PWM controller start */
     PWM_ControllerStart();
-
     /* Battery management init */
     BM_Init();
     /* Motor controller init */
     err = MotorCtrl_Init();
     if(err)
         goto SWEEPROBOT_INIT_FAIL;
-
+    /* Robot motion control */
     MotionCtrl_Init();
-
+    /* IrDA Rx init */
+    IrDA_Init();
     /* CtrlPanel config */
     CtrlPanel_Init();
-    IrDA_Init();
 
     gRobotState = ROBOT_STATE_IDLE;
 #ifdef DEBUG_LOG
@@ -112,16 +104,19 @@ void SweepRobot_Start(void)
                     switch(MainMsgQ->Msg.type){
                         case MSG_TYPE_PM:
 #ifdef DEBUG_LOG
-                            printf("PM msg received.\r\n");
+                            printf("PM msg %d.\r\n", MainMsgQ->Msg.Data.PMEvt);
 #endif
+                            SweepRobot_PMMsgProc(MainMsgQ->Msg.Data.PMEvt);
                             break;
                         case MSG_TYPE_BM:
+                            PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
-                            printf("BM msg received.\r\n");
+                            printf("BM msg %d.\r\n", MainMsgQ->Msg.Data.BatEvt);
 #endif
                             SweepRobot_BMMsgProc(MainMsgQ->Msg.Data.BatEvt);
                             break;
                         case MSG_TYPE_CTRL:
+                            PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
                             printf("CTRL msg code: 0x%X.\r\n", MainMsgQ->Msg.Data.ByteVal);
 #endif
@@ -134,6 +129,7 @@ void SweepRobot_Start(void)
                             SweepRobot_PwrStationMsgProc(&MainMsgQ->Msg.Data.PSSigDat);
                             break;
                         case MSG_TYPE_MOTION:
+                            PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
                             printf("MOTION msg 0x%X.\r\n", MainMsgQ->Msg.Data.MEvt);
 #endif
@@ -187,16 +183,26 @@ void SweepRobot_HomingInit(void)
     MotionCtrl_RoundedSlowly();
     gRobotMode = ROBOT_WORK_MODE_HOMING;
     /* Turn around for search power station signal */
-    HomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+    gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
     LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 }
 
 void SweepRobot_HomingSuccess(void)
 {
     MotionCtrl_Stop();
-    gRobotState = ROBOT_STATE_HOME;
-    HomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+
+    gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
     LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+}
+
+void SweepRobot_PMMsgProc(enum PM_Mode mode)
+{
+    if(gRobotState==ROBOT_STATE_IDLE){
+        PM_EnterPwrMode(mode);
+    }
+    else{
+        PM_ResetSysIdleState();
+    }
 }
 
 void SweepRobot_BMMsgProc(enum BatteryEvt evt)
@@ -218,6 +224,8 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
             if(gRobotState == ROBOT_STATE_RUNNING && gRobotMode == ROBOT_WORK_MODE_HOMING){
                 SweepRobot_HomingSuccess();
             }
+            gRobotState = ROBOT_STATE_HOME;
+            gRobotMode  = ROBOT_WORK_MODE_HOMING;
             break;
         case BM_EVT_LOW_LEVEL:
             /* Low battery condition, try to home and get charged */
@@ -315,7 +323,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
 {
     static PwrStationSigData_t RobotHomingData[10];
     static u8 i, j, k, l, HomingDataCnt = 0, RepeatCodeFound = 0, HomingStateConfirmCnt = 0;
-    struct RobotHomingState_s HomingState, LastHomingState;
+    struct RobotHomingState_s HomingState, LastHomingState = {0};
 
     if(gRobotState != ROBOT_STATE_RUNNING){
         return;
@@ -487,7 +495,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
 
         /* plan path to power station */
         if(IS_PWR_STATION_SIG_LONG(HomingState.Pos)){
-            HomingStage = ROBOT_HOMING_STAGE1;
+            gHomingStage = ROBOT_HOMING_STAGE1;
             if(IS_PWR_STATION_SIG_LEFT(HomingState.Pos)){
                 if(HomingState.Angle <= -90){
                     MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
@@ -520,35 +528,35 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
             }
         }
         else if(IS_PWR_STATION_SIG_SHORT(HomingState.Pos)){
-            HomingStage = ROBOT_HOMING_STAGE2;
+            gHomingStage = ROBOT_HOMING_STAGE2;
             if(IS_PWR_STATION_SIG_LEFT(HomingState.Pos)){
                 if(HomingState.Angle <= 0 && HomingState.Angle >= -135){
-                    MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
+                    MotionCtrl_MoveDirTune(0, WHEEL_CRUISE_SPEED);
                 }
                 else if(HomingState.Angle > 0 && HomingState.Angle < 180){
-                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 0);
+                    MotionCtrl_MoveDirTune(WHEEL_CRUISE_SPEED, 0);
                 }
                 else {
-                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, WHEEL_HOMING_SPEED);
+                    MotionCtrl_MoveDirTune(WHEEL_CRUISE_SPEED, WHEEL_CRUISE_SPEED);
                     CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
                 }
             }
             else{
                 if(HomingState.Angle <= 0 && HomingState.Angle >= -135){
-                    MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
+                    MotionCtrl_MoveDirTune(0, WHEEL_CRUISE_SPEED);
                 }
                 else if(HomingState.Angle > 0 && HomingState.Angle < 180){
-                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 0);
+                    MotionCtrl_MoveDirTune(WHEEL_CRUISE_SPEED, 0);
                 }
                 else {
-                    MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, WHEEL_HOMING_SPEED);
+                    MotionCtrl_MoveDirTune(WHEEL_CRUISE_SPEED, WHEEL_CRUISE_SPEED);
                     CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
                 }
             }
         }
         /* Center area */
         else if(PWR_STATION_HOME_SIG_CENTER==HomingState.Pos){
-            HomingStage = ROBOT_HOMING_STAGE3;
+            gHomingStage = ROBOT_HOMING_STAGE3;
             if(HomingState.Angle > 45){
                 MotionCtrl_MoveDirTune(0, WHEEL_HOMING_SPEED);
             }
@@ -562,13 +570,12 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
                 MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED-1, 2);
             }
             else{
-                HomingStage = ROBOT_HOMING_STAGE_OK;
+                gHomingStage = ROBOT_HOMING_STAGE_OK;
                 MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED-2, WHEEL_HOMING_SPEED-2);
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, 1);
             }
         }
-
-        LastHomingStage = HomingStage;
+        LastHomingStage = gHomingStage;
     }
     else {
         if(PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_L || PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_R){

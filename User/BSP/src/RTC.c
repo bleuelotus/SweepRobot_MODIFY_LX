@@ -9,6 +9,7 @@
   */
 
 #include "RTC.h"
+#include "PwrManagement.h"
 
 
 void RTC_Configuration(void)
@@ -135,7 +136,7 @@ void RTC_Init(void)
     /* Clear reset flags */
     RCC_ClearFlag();
 
-    plat_int_reg_cb(STM32F10x_INT_RTC_SEC, (void*)Time_Display);
+    plat_int_reg_cb(STM32F10x_INT_RTC_SEC, (void*)PM_SysTryToStandby);
 }
 
 void RTC_AlarmWork(void)

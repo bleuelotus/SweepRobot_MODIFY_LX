@@ -14,6 +14,7 @@
 
 extern enum RobotState     gRobotState;
 extern enum RobotWorkMode  gRobotMode;
+extern enum _RobotHomingStage gHomingStage;
 
 enum RobotState {
 
@@ -30,6 +31,15 @@ enum RobotWorkMode{
     ROBOT_WORK_MODE_SPOT,
     ROBOT_WORK_MODE_EDGE,
     ROBOT_WORK_MODE_HOMING,
+};
+
+enum _RobotHomingStage {
+
+    ROBOT_HOMING_STAGE_UNKNOWN,
+    ROBOT_HOMING_STAGE1,
+    ROBOT_HOMING_STAGE2,
+    ROBOT_HOMING_STAGE3,
+    ROBOT_HOMING_STAGE_OK
 };
 
 s8 SweepRobot_Init(void);

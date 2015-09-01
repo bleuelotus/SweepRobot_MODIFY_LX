@@ -36,7 +36,8 @@ enum BatteryLevelLSB {
                                                             /* SampleV * 6 = BATV */
     BAT_LEVEL_LOW                           = 0x0A81,       /* 2.16V  ---  13.0V */
     BAT_LEVEL_HIGH                          = 0x0AFD,       /* 2.27V  ---  13.6V */
-    BAT_LEVEL_FULL                          = 0x0D2C,       /* 2.72V  ---  16.3V */
+    BAT_LEVEL_FULL                          = 0x0D17,       /* 2.7V   ---  16.2V */
+    BAT_CHARGE_LEVEL_FULL                   = 0x0D2C,       /* 2.72V  ---  16.3V */
 };
 
 
@@ -46,6 +47,9 @@ static u32 ADC_BatLSB[ADC_BAT_CHANNEL_NUM] = {0};
 static u8 BM_StateInited = 0;
 static u8 BM_ChargeFlag = 0;
 static Msg_t Msg;
+
+static u16 Counter = 0;
+static s8 LedBrightnessSch = 0, LedBrightnessDir = 1;
 
 u8 BM_ChargeExit(void);
 u8 BM_ChargeProc(void);
@@ -79,15 +83,7 @@ void BM_ConditionUpdate(void)
     ADC_BatLSB[ADC_BAT_VOL] /= ADC_BAT_SAMPLE_AVE_CNT;
     ADC_BatLSB[ADC_BAT_CUR] /= ADC_BAT_SAMPLE_AVE_CNT;
 
-    /* State */
-    if(ADC_BatLSB[ADC_BAT_VOL] > BAT_LEVEL_LOW){
-        gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_LOW) / (float)(BAT_LEVEL_FULL - BAT_LEVEL_LOW) * 100.f );
-    }
-    else{
-        /* Shouldn't be here */
-        gBM_Cond.level = 0;
-    }
-
+    /* Update battery state */
     if(IS_CHARGE_CONNECTED()){
         switch(gBM_Cond.LastState){
             case BAT_STATE_DISCHARGING:
@@ -118,7 +114,7 @@ void BM_ConditionUpdate(void)
                     SweepRobot_SendMsg(&Msg);
                 }
 #ifdef DEBUG_LOG
-                printf("Charging lvl: %d.\r\n", gBM_Cond.level);
+                printf("Charge Lvl: %d, %d.\r\n", gBM_Cond.level, Counter);
 #endif
                 break;
             case BAT_STATE_CHARGE_COMPLETE:
@@ -132,9 +128,12 @@ void BM_ConditionUpdate(void)
                     Msg.Data.BatEvt = BM_EVT_POWER_LINK;
                     SweepRobot_SendMsg(&Msg);
                 }
+#ifdef DEBUG_LOG
+                printf("Bat Lvl: %d.\r\n", gBM_Cond.level);
+#endif
                 break;
             case BAT_STATE_UNKNOWN:
-                gBM_Cond.state = BAT_STATE_WAIT_FOR_CHARGE;
+                gBM_Cond.state = BAT_STATE_DISCHARGING;
                 break;
         }
     }
@@ -167,12 +166,33 @@ void BM_ConditionUpdate(void)
                 break;
             case BAT_STATE_CHARGE_COMPLETE:
                 gBM_Cond.state = BAT_STATE_DISCHARGING;
+                /* Send power link loss message */
+                Msg.expire = 0;
+                Msg.type = MSG_TYPE_BM;
+                Msg.prio = MSG_PRIO_LOW;
+                Msg.MsgCB = NULL;
+                Msg.Data.BatEvt = BM_EVT_POWER_LOSS;
+                SweepRobot_SendMsg(&Msg);
                 break;
             case BAT_STATE_UNKNOWN:
                 gBM_Cond.state = BAT_STATE_DISCHARGING;
                 break;
         }
     }
+
+    if(ADC_BatLSB[ADC_BAT_VOL] > BAT_LEVEL_LOW){
+        if(gBM_Cond.state!=BAT_STATE_CHARGING){
+            gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_HIGH) / (float)(BAT_LEVEL_FULL - BAT_LEVEL_HIGH) * 100.f );
+        }
+        else{
+            gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_HIGH) / (float)(BAT_CHARGE_LEVEL_FULL - BAT_LEVEL_HIGH) * 100.f );
+        }
+    }
+    else{
+        /* Shouldn't be here */
+        gBM_Cond.level = 0;
+    }
+
     gBM_Cond.LastState = gBM_Cond.state;
 }
 
@@ -200,9 +220,6 @@ s8 BM_ChargePowerInc(void)
     return PWM_DutyCycleSet(PWM_CHAN_CHARGE, DutyCycle);
 }
 
-static u16 Counter = 0;
-static s8 LedBrightnessSch = 0, LedBrightnessDir = 1;
-
 void BM_ChargeStart(void)
 {
 #ifdef DEBUG_LOG
@@ -221,6 +238,7 @@ void BM_ChargeStop(void)
 
 u8 BM_ChargeExit(void)
 {
+    Counter = 0;
     return PWM_DutyCycleSet(PWM_CHAN_CHARGE, 0);
 }
 
@@ -236,7 +254,6 @@ u8 BM_ChargeProc(void)
     LedBrightnessSch += LedBrightnessDir;
 
     if (ADC_BatLSB[ADC_BAT_VOL] <= BAT_LEVEL_HIGH){
-        Counter = 0;
         if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_100MA-3)){
             BM_ChargePowerInc();
         }
@@ -244,8 +261,7 @@ u8 BM_ChargeProc(void)
             BM_ChargePowerDec();
         }
     }
-    else if (ADC_BatLSB[ADC_BAT_VOL] < BAT_LEVEL_FULL){
-        Counter = 0;
+    else if (ADC_BatLSB[ADC_BAT_VOL] < BAT_CHARGE_LEVEL_FULL){
         if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_1000MA-5)){
             BM_ChargePowerInc();
         }
@@ -256,12 +272,9 @@ u8 BM_ChargeProc(void)
     else{
         BM_ChargePowerDec();
         if (ADC_BatLSB[ADC_BAT_CUR] <= BM_CHARGE_CUR_50MA){
-            if ((Counter++) >= 1000){
+            if ((Counter++) >= 100){
                 return 1;
             }
-        }
-        else{
-            Counter = 0;
         }
     }
     return 0;

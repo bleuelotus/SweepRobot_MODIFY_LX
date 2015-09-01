@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-478807628
+Checksum=-301555622
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]
@@ -91,12 +91,7 @@ SumSortOrder=0
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\Framework\MotionCtrl.c}.407.5" 0 0 1 "" 0 "" 0
-Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\Framework\MotionCtrl.c}.378.5" 0 0 1 "" 0 "" 0
-Bp2=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\Framework\MotionCtrl.c}.509.5" 0 0 1 "" 0 "" 0
-Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\Framework\MotionCtrl.c}.371.5" 0 0 1 "" 0 "" 0
-Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\Framework\MotionCtrl.c}.365.5" 0 0 1 "" 0 "" 0
-Count=5
+Count=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

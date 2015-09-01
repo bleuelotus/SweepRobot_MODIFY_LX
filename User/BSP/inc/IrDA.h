@@ -103,6 +103,7 @@ typedef struct PwrStationSignalData{
 } PwrStationSigData_t;
 
 void IrDA_Init(void);
+void IrDA_DeInit(void);
 u8 IrDA_ProcessNEC(u8 idx);
 void IrDA_ProcessEJE(void (*RemoteCB)(u8 code));
 void PwrStationHomingSigProc(u8 idx, u8 code);

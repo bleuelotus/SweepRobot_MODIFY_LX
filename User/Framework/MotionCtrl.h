@@ -96,13 +96,14 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_1CYCLE_CNT                    500                                 //(WHEEL_GEAR_RATIO*8)
 #define WHEEL_BASE_LEN                      204                                 // mm
 #define WHEEL_DIAMETER                      68                                  // mm
+#define WHEEL_TURN_15_CNT                   63
 #define WHEEL_TURN_45_CNT                   188
 #define WHEEL_TURN_90_CNT                   375
 #define WHEEL_TURN_180_CNT                  750
 #define WHEEL_TURN_360_CNT                  1500
 #define WHEEL_FAULT_BACK_CNT                240
 
-#define WHEEL_CRUISE_SPEED                  10
+#define WHEEL_CRUISE_SPEED                  12
 #define WHEEL_HOMING_SPEED                  5
 
 enum MotionEvt {

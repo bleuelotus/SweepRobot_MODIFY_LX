@@ -25,14 +25,14 @@
 #define IFRD_CHAN_BOTTOM_BL         6
 #define IFRD_CHAN_BOTTOM_BR         7
 
-#define LBRUSH_CUR_THRESHOLD        400                                         //  0.8A
-#define RBRUSH_CUR_THRESHOLD        400                                         //  0.8A
+#define LBRUSH_CUR_THRESHOLD        300                                         //  0.5A
+#define RBRUSH_CUR_THRESHOLD        300                                         //  0.5A
 #define MBRUSH_CUR_THRESHOLD        1000                                        //  1.6A
 #define FUN_CUR_THRESHOLD           1000                                        //  1.6A
 #define ASH_TRAY_INSTALL_CUR        3500                                        //  2.8V
 
 /* Infrared based proximity detection sensitivity */
-const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 500, 200, 1500, 1500 };
+const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 500, 200, 150, 150 };
 
 static u16 gWheelCnt[WHEEL_NUM] = {0};
 static u16 gLWheelExpCnt = 0xFFFF, gRWheelExpCnt = 0xFFFF;
@@ -102,15 +102,15 @@ void MotionStateProc(void)
     if((++gtmpCnt)%2){
         /* Update exception sign: left, right, middle brush over loading, wheel floationg and ash tray exist or not */
         if(
-           WHEEL_FLOAT_SIGN_ALL
-           ||
+//           WHEEL_FLOAT_SIGN_ALL
+//           ||
            (ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD)
            ||
            (ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD)
-           ||
-           (ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD)
-           ||
-           (ADCConvertedLSB[MEAS_CHAN_FUN_CUR-1] > FUN_CUR_THRESHOLD)
+//           ||
+//           (ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD)
+//           ||
+//           (ADCConvertedLSB[MEAS_CHAN_FUN_CUR-1] > FUN_CUR_THRESHOLD)
 //           ||
 //           (ADCConvertedLSB[MEAS_CHAN_ASH_TRAY_LVL-1] < ASH_TRAY_INSTALL_CUR)
            ){
@@ -137,7 +137,10 @@ void MotionStateProc(void)
     else{
         if(IS_MOTION_PROC_FINISH()){
             if( /* Update front and bottom of LEFT proximity condition in Tx on */
-                ((gIFRDTxOffRxVal[IFRD_CHAN_FRONT_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_L-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_L])&&(gRobotMode!=ROBOT_WORK_MODE_HOMING))
+                ( (gIFRDTxOffRxVal[IFRD_CHAN_FRONT_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_L-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_L])
+                  &&
+                  (gHomingStage < ROBOT_HOMING_STAGE3)
+                  )
                 ||
                 (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L])
                 ||
@@ -154,7 +157,10 @@ void MotionStateProc(void)
                 SweepRobot_SendMsg(&Msg);
             }
             else if(/* Update front and bottom of RIGHT proximity condition in Tx on */
-                ((gIFRDTxOffRxVal[IFRD_CHAN_FRONT_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_R-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_R])&&(gRobotMode!=ROBOT_WORK_MODE_HOMING))
+                ( (gIFRDTxOffRxVal[IFRD_CHAN_FRONT_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_R-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_R])
+                  &&
+                  (gHomingStage < ROBOT_HOMING_STAGE3)
+                  )
                 ||
                 (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R])
                 ||
@@ -359,16 +365,38 @@ void MotionCtrl_Init(void)
     IFRD_PathDetectInit();
 }
 
-static inline void MotionCtrl_LWheelDefProc(void)
+static inline void MotionCtrl_LWheelProcExitOn(void)
 {
     LWHEEL_EXP_CB_REG(NULL);
     gActSeqDepLIndicator--;
 }
 
-static inline void MotionCtrl_RWheelDefProc(void)
+static inline void MotionCtrl_RWheelProcExitOn(void)
 {
     RWHEEL_EXP_CB_REG(NULL);
     gActSeqDepRIndicator--;
+}
+
+static inline void MotionCtrl_LWheelProcExitOff(void)
+{
+    LWHEEL_EXP_CB_REG(NULL);
+//    LWHEEL_EXP_SPEED_SET(0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
+    gActSeqDepLIndicator--;
+    if(gActSeqDepRIndicator==0){
+        MotionCtrl_Stop();
+    }
+}
+
+static inline void MotionCtrl_RWheelProcExitOff(void)
+{
+    RWHEEL_EXP_CB_REG(NULL);
+//    RWHEEL_EXP_SPEED_SET(0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
+    gActSeqDepRIndicator--;
+    if(gActSeqDepLIndicator==0){
+        MotionCtrl_Stop();
+    }
 }
 
 static inline void MotionCtrl_RWheelSubProc(void)
@@ -392,7 +420,7 @@ static inline void MotionCtrl_RWheelSubProc(void)
         RWHEEL_EXP_CB_REG(MotionCtrl_RWheelSubProc);
     }
     else{
-        RWHEEL_EXP_CB_REG(gActSequence[idx].RWheelExpSpeed > 0 ? MotionCtrl_RWheelDefProc : MotionCtrl_Stop);
+        RWHEEL_EXP_CB_REG(gActSequence[idx].RWheelExpSpeed > 0 ? MotionCtrl_RWheelProcExitOn : MotionCtrl_RWheelProcExitOff);
     }
 
     RWHEEL_EXP_SPEED_SET(gActSequence[idx].RWheelExpSpeed);
@@ -421,7 +449,7 @@ static inline void MotionCtrl_LWheelSubProc(void)
         LWHEEL_EXP_CB_REG(MotionCtrl_LWheelSubProc);
     }
     else{
-        LWHEEL_EXP_CB_REG(gActSequence[idx].LWheelExpSpeed > 0 ? MotionCtrl_LWheelDefProc : MotionCtrl_Stop);
+        LWHEEL_EXP_CB_REG(gActSequence[idx].LWheelExpSpeed > 0 ? MotionCtrl_LWheelProcExitOn : MotionCtrl_LWheelProcExitOff);
     }
 
     LWHEEL_EXP_SPEED_SET(gActSequence[idx].LWheelExpSpeed);
@@ -457,14 +485,14 @@ void MotionCtrl_Proc(void)
         LWHEEL_EXP_CB_REG(MotionCtrl_LWheelSubProc);
     }
     else{
-        LWHEEL_EXP_CB_REG(MotionCtrl_LWheelDefProc);
+        LWHEEL_EXP_CB_REG(MotionCtrl_LWheelProcExitOn);
     }
 
     if(gActSeqDepRIndicator > 1){
         RWHEEL_EXP_CB_REG(MotionCtrl_RWheelSubProc);
     }
     else{
-        RWHEEL_EXP_CB_REG(MotionCtrl_RWheelDefProc);
+        RWHEEL_EXP_CB_REG(MotionCtrl_RWheelProcExitOn);
     }
 
     LWHEEL_EXP_SPEED_SET(gActSequence[0].LWheelExpSpeed);
@@ -503,6 +531,7 @@ void MotionCtrl_Stop(void)
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
 
     gActSeqDepth = 0;
     gActSeqDepLIndicator = 0;
@@ -601,14 +630,12 @@ void MotionCtrl_MoveDirectly(void)
     if(!IS_MOTION_PROC_FINISH())
         return;
 
-    printf("S\r\n");
-
     gActSequence[0].LWheelDir = 1;
     gActSequence[0].RWheelDir = 1;
     gActSequence[0].LWheelSpeed = MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_LWHEEL);;
     gActSequence[0].RWheelSpeed = MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_RWHEEL);;
-    gActSequence[0].LWheelExpCnt = 5;
-    gActSequence[0].RWheelExpCnt = 5;
+    gActSequence[0].LWheelExpCnt = 2;
+    gActSequence[0].RWheelExpCnt = 2;
     gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED;
     gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED;
     gActSeqDepth = 1;
@@ -657,11 +684,13 @@ void MotionCtrl_AutoMotionInit(void)
         gActSequence[0].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
         gActSeqDepth = 1;
     }
+
     MotionCtrl_Proc();
 
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FUN_CHAN_STARTUP_SPEED);
 }
 
 void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act)
@@ -673,14 +702,14 @@ void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act)
             gActSequence[0].LWheelDir = 1;
             gActSequence[0].RWheelDir = 1;
             gActSequence[0].LWheelExpCnt = 0x1;
-            gActSequence[0].RWheelExpCnt = 0x1;
+            gActSequence[0].RWheelExpCnt = 0x2;
             gActSeqDepth = 1;
             break;
         case MANUAL_ACT_LEFT:
             gActSequence[0].LWheelDir = 0;
             gActSequence[0].RWheelDir = 1;
-            gActSequence[0].LWheelExpCnt = WHEEL_TURN_45_CNT;
-            gActSequence[0].RWheelExpCnt = WHEEL_TURN_45_CNT;
+            gActSequence[0].LWheelExpCnt = WHEEL_TURN_15_CNT;
+            gActSequence[0].RWheelExpCnt = WHEEL_TURN_15_CNT;
             gActSeqDepth = 2;
             break;
         case MANUAL_ACT_DOWN:
@@ -693,8 +722,8 @@ void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act)
         case MANUAL_ACT_RIGHT:
             gActSequence[0].LWheelDir = 1;
             gActSequence[0].RWheelDir = 0;
-            gActSequence[0].LWheelExpCnt = WHEEL_TURN_45_CNT;
-            gActSequence[0].RWheelExpCnt = WHEEL_TURN_45_CNT;
+            gActSequence[0].LWheelExpCnt = WHEEL_TURN_15_CNT;
+            gActSequence[0].RWheelExpCnt = WHEEL_TURN_15_CNT;
             gActSeqDepth = 2;
             break;
     }
@@ -703,8 +732,10 @@ void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act)
     gActSequence[0].RWheelSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
     gActSequence[0].LWheelExpSpeed = WHEEL_CRUISE_SPEED;
     gActSequence[0].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
-    gActSequence[0].LWheelSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
-    gActSequence[0].RWheelSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[1].LWheelDir = gActSequence[0].LWheelDir;
+    gActSequence[1].RWheelDir = gActSequence[0].RWheelDir;
+    gActSequence[1].LWheelSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[1].RWheelSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
     gActSequence[1].LWheelExpCnt = 0x1;
     gActSequence[1].RWheelExpCnt = 0x2;
     gActSequence[1].LWheelExpSpeed = 0;
@@ -714,6 +745,7 @@ void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act)
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FUN_CHAN_STARTUP_SPEED);
 }
 
 void MotionCtrl_RoundedSlowly(void)
@@ -728,8 +760,8 @@ void MotionCtrl_RoundedSlowly(void)
     gActSequence[0].RWheelSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
     gActSequence[0].LWheelExpCnt = 0x1; //WHEEL_TURN_360_CNT;
     gActSequence[0].RWheelExpCnt = 0x2; //WHEEL_TURN_360_CNT;
-    gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED;
-    gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED;
+    gActSequence[0].LWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[0].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
     gActSeqDepth = 1;
     MotionCtrl_Proc();
 }

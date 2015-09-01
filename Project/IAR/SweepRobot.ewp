@@ -1014,37 +1014,10 @@
     <group>
       <name>STM32F10x_Ext</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\i2c_hw.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\i2c_sw.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\spi.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\spi_sw.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_UserMEM.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\Usart.c</name>
@@ -1137,12 +1110,6 @@
         <name>$PROJ_DIR$\..\..\User\BSP\src\BatteryManage.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\User\BSP\src\ET6204.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\..\User\BSP\src\IrDA.c</name>
       </file>
       <file>
@@ -1152,22 +1119,10 @@
         <name>$PROJ_DIR$\..\..\User\BSP\src\MotorCtrl.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\User\BSP\src\nrf24l01.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\..\User\BSP\src\PWM.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\User\BSP\src\RTC.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\..\User\BSP\src\WTV040.c</name>
-        <excluded>
-          <configuration>DB-ROBOT-S1</configuration>
-        </excluded>
       </file>
     </group>
     <group>
@@ -1179,9 +1134,6 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\User\Framework\Common\src\nvram.c</name>
-          <excluded>
-            <configuration>DB-ROBOT-S1</configuration>
-          </excluded>
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\User\Framework\Common\src\PwrManagement.c</name>

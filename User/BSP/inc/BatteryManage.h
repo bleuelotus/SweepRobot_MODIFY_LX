@@ -44,7 +44,7 @@ typedef struct _BatteryCond_s {
 
 extern BatteryCond_t gBM_Cond;
 
-#define BM_BAT_CRITCAL_LVL                      20       /* 20 Percent */
+#define BM_BAT_CRITCAL_LVL                      10       /* 10 Percent */
 #define BM_BAT_FULL_LVL                         100      /* 100 Percent */
 
 void BM_Init(void);

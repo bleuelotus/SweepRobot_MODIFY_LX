@@ -15,6 +15,7 @@
 #include "BatteryManage.h"
 #include "MotionCtrl.h"
 #include "IrDA.h"
+#include "PwrManagement.h"
 
 enum {
 
@@ -36,6 +37,7 @@ typedef enum {
 
 typedef union _DataType_s{
 
+    enum PM_Mode        PMEvt;
     u8                  ByteVal;
     enum BatteryEvt     BatEvt;
     enum MotionEvt      MEvt;
