@@ -276,20 +276,20 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
         case MOTION_EVT_PATH_FAULT_L:
             if(gRobotState == ROBOT_STATE_RUNNING && IS_MOTION_PROC_FINISH()){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 1);
+                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 1);
                 }
                 else{
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 0);
+                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 0);
                 }
             }
             break;
         case MOTION_EVT_PATH_FAULT_R:
             if(gRobotState == ROBOT_STATE_RUNNING && IS_MOTION_PROC_FINISH()){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 1);
+                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 1);
                 }
                 else{
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 0);
+                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 0);
                 }
             }
             break;
@@ -581,18 +581,18 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
         if(PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_L || PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_R){
             if(IS_MOTION_PROC_FINISH() && (PwrSig->src==IRDA_RECV_POS_L || PwrSig->src==IRDA_RECV_POS_FL)){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 1);
+                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 1);
                 }
                 else{
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 0);
+                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 0);
                 }
             }
             else if(IS_MOTION_PROC_FINISH() && (PwrSig->src==IRDA_RECV_POS_R || PwrSig->src==IRDA_RECV_POS_FR)){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 1);
+                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 1);
                 }
                 else{
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_90_CNT, 0);
+                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 0);
                 }
             }
         }

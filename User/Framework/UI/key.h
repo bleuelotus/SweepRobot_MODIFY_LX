@@ -14,7 +14,7 @@
 #include "stm32f10x_conf.h"
 
 #define KEY_SCAN_TIM_PERIOD_MSx10   20          //2ms
-#define KEY_SCAN_INTERVAL_MS        200
+#define KEY_SCAN_INTERVAL_MS        100
 
 typedef struct{
     void (*Down)(void);

@@ -30,13 +30,14 @@
 
 #define BM_CHARGE_CUR_50MA                  0x1F
 #define BM_CHARGE_CUR_100MA                 0x3E
+#define BM_CHARGE_CUR_600MA                 0x175
 #define BM_CHARGE_CUR_1000MA                0x26C
 
 enum BatteryLevelLSB {
                                                             /* SampleV * 6 = BATV */
     BAT_LEVEL_LOW                           = 0x0A81,       /* 2.16V  ---  13.0V */
     BAT_LEVEL_HIGH                          = 0x0AFD,       /* 2.27V  ---  13.6V */
-    BAT_LEVEL_FULL                          = 0x0D17,       /* 2.7V   ---  16.2V */
+    BAT_LEVEL_FULL                          = 0x0CEE,       /* 2.67V   --- 16.0V */
     BAT_CHARGE_LEVEL_FULL                   = 0x0D2C,       /* 2.72V  ---  16.3V */
 };
 
@@ -128,9 +129,6 @@ void BM_ConditionUpdate(void)
                     Msg.Data.BatEvt = BM_EVT_POWER_LINK;
                     SweepRobot_SendMsg(&Msg);
                 }
-#ifdef DEBUG_LOG
-                printf("Bat Lvl: %d.\r\n", gBM_Cond.level);
-#endif
                 break;
             case BAT_STATE_UNKNOWN:
                 gBM_Cond.state = BAT_STATE_DISCHARGING;
@@ -188,12 +186,17 @@ void BM_ConditionUpdate(void)
             gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_HIGH) / (float)(BAT_CHARGE_LEVEL_FULL - BAT_LEVEL_HIGH) * 100.f );
         }
     }
+    else if(ADC_BatLSB[ADC_BAT_VOL] > BAT_LEVEL_FULL){
+        gBM_Cond.level = 100;
+    }
     else{
         /* Shouldn't be here */
         gBM_Cond.level = 0;
     }
 
     gBM_Cond.LastState = gBM_Cond.state;
+
+//    printf("Bat Vol: %2.1f\r\n", (((float)ADC_BatLSB[ADC_BAT_VOL]*3.3f*6.f)/4096.f));
 }
 
 s8 BM_ChargePowerDec(void)
@@ -262,10 +265,10 @@ u8 BM_ChargeProc(void)
         }
     }
     else if (ADC_BatLSB[ADC_BAT_VOL] < BAT_CHARGE_LEVEL_FULL){
-        if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_1000MA-5)){
+        if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_600MA-5)){
             BM_ChargePowerInc();
         }
-        else if (ADC_BatLSB[ADC_BAT_CUR] > (BM_CHARGE_CUR_1000MA+5)){
+        else if (ADC_BatLSB[ADC_BAT_CUR] > (BM_CHARGE_CUR_600MA+5)){
             BM_ChargePowerDec();
         }
     }

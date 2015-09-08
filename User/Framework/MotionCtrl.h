@@ -20,15 +20,36 @@
 #define IFRD_BOTTOM_CHAN_NUM                2
 #define MCTRL_ACT_MAX_DEPTH                 3
 
+enum MotionEvt {
+
+    MOTION_EVT_PATH_FAULT_L,
+    MOTION_EVT_PATH_FAULT_R,
+    MOTION_EVT_EXCEPTION,
+    MOTION_EVT_PROXIMITY_SL,
+    MOTION_EVT_PROXIMITY_SR,
+};
+
+enum MotionCtrlManualAct {
+
+    MANUAL_ACT_UP,
+    MANUAL_ACT_LEFT,
+    MANUAL_ACT_DOWN,
+    MANUAL_ACT_RIGHT,
+};
+
 typedef struct MotionCtrl_Action_s{
-    u8              LWheelDir;
-    u8              RWheelDir;
-    u8              LWheelSpeed;
-    u8              RWheelSpeed;
+    u8              LWheelDefDir;
+    u8              RWheelDefDir;
+    u8              LWheelInitSpeed;
+    u8              RWheelInitSpeed;
     u8              LWheelExpSpeed;
     u8              RWheelExpSpeed;
     u16             LWheelExpCnt;
     u16             RWheelExpCnt;
+    u8              LWheelSync;
+    u8              RWheelSync;
+    void            (*PreCond)(struct MotionCtrl_Action_s *node);
+    u8              (*CompleteCond)(void);
 } MCtrl_Act_t;
 
 extern u8 gProximitySign[IFRD_TxRx_CHAN_NUM];
@@ -96,32 +117,35 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_1CYCLE_CNT                    500                                 //(WHEEL_GEAR_RATIO*8)
 #define WHEEL_BASE_LEN                      204                                 // mm
 #define WHEEL_DIAMETER                      68                                  // mm
-#define WHEEL_TURN_15_CNT                   63
-#define WHEEL_TURN_45_CNT                   188
-#define WHEEL_TURN_90_CNT                   375
-#define WHEEL_TURN_180_CNT                  750
-#define WHEEL_TURN_360_CNT                  1500
-#define WHEEL_FAULT_BACK_CNT                240
+#define WHEEL_TURN_15_CNT                   60//63
+#define WHEEL_TURN_30_CNT                   120//128
+#define WHEEL_TURN_45_CNT                   175//188
+#define WHEEL_TURN_90_CNT                   350//375
+#define WHEEL_TURN_180_CNT                  700//750
+#define WHEEL_TURN_360_CNT                  1400//1500
+#define WHEEL_FAULT_BACK_CNT                180
 
 #define WHEEL_CRUISE_SPEED                  12
 #define WHEEL_HOMING_SPEED                  5
 
-enum MotionEvt {
+#define PATH_COND_PROXIMITY_FLAG_FL_POS     0
+#define PATH_COND_PROXIMITY_FLAG_BL_POS     1
+#define PATH_COND_PROXIMITY_FLAG_SL_POS     2
+#define PATH_COND_COLLISION_FLAG_FL_POS     3
+#define PATH_COND_COLLISION_FLAG_SL_POS     4
 
-    MOTION_EVT_PATH_FAULT_L,
-    MOTION_EVT_PATH_FAULT_R,
-    MOTION_EVT_EXCEPTION,
-    MOTION_EVT_PROXIMITY_SL,
-    MOTION_EVT_PROXIMITY_SR,
-};
+#define PATH_COND_PROXIMITY_FLAG_FR_POS     8
+#define PATH_COND_PROXIMITY_FLAG_BR_POS     9
+#define PATH_COND_PROXIMITY_FLAG_SR_POS     10
+#define PATH_COND_COLLISION_FLAG_FR_POS     11
+#define PATH_COND_COLLISION_FLAG_SR_POS     12
 
-enum MotionCtrlManualAct {
-
-    MANUAL_ACT_UP,
-    MANUAL_ACT_LEFT,
-    MANUAL_ACT_DOWN,
-    MANUAL_ACT_RIGHT,
-};
+#define PATH_FAULT_LEFT_MASK                0x001B
+#define PATH_FAULT_RIGHT_MASK               0x1B00
+#define PATH_FAULT_PROXIMITY_MASK           0x0303
+#define PATH_FAULT_COLLISION_MASK           0x1818
+#define PATH_PROXIMITY_SIDE_L_MASK          0x0004
+#define PATH_PROXIMITY_SIDE_R_MASK          0x0400
 
 void MotionCtrl_Init(void);
 void MotionCtrl_Stop(void);
