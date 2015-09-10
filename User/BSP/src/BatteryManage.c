@@ -180,10 +180,10 @@ void BM_ConditionUpdate(void)
 
     if(ADC_BatLSB[ADC_BAT_VOL] > BAT_LEVEL_LOW){
         if(gBM_Cond.state!=BAT_STATE_CHARGING){
-            gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_HIGH) / (float)(BAT_LEVEL_FULL - BAT_LEVEL_HIGH) * 100.f );
+            gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_LOW) / (float)(BAT_LEVEL_FULL - BAT_LEVEL_LOW) * 100.f );
         }
         else{
-            gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_HIGH) / (float)(BAT_CHARGE_LEVEL_FULL - BAT_LEVEL_HIGH) * 100.f );
+            gBM_Cond.level = (u8)( (float)(ADC_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_LOW) / (float)(BAT_CHARGE_LEVEL_FULL - BAT_LEVEL_LOW) * 100.f );
         }
     }
     else if(ADC_BatLSB[ADC_BAT_VOL] > BAT_LEVEL_FULL){

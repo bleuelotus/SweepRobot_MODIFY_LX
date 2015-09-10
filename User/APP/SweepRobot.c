@@ -273,23 +273,13 @@ void SweepRobot_CtrlMsgProc(u8 CtrlCode)
 void SweepRobot_MotionMsgProc(enum MotionEvt evt)
 {
     switch(evt){
-        case MOTION_EVT_PATH_FAULT_L:
-            if(gRobotState == ROBOT_STATE_RUNNING && IS_MOTION_PROC_FINISH()){
+        case MOTION_EVT_PATH_FAULT:
+            if(gRobotState == ROBOT_STATE_RUNNING){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 1);
+                    MotionCtrl_PathFaultProc(1);
                 }
                 else{
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 0);
-                }
-            }
-            break;
-        case MOTION_EVT_PATH_FAULT_R:
-            if(gRobotState == ROBOT_STATE_RUNNING && IS_MOTION_PROC_FINISH()){
-                if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 1);
-                }
-                else{
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_30_CNT, 0);
+                    MotionCtrl_PathFaultProc(0);
                 }
             }
             break;
@@ -298,10 +288,6 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
             printf("Exception state.\r\n");
 #endif
             MotionCtrl_Stop();
-            break;
-        case MOTION_EVT_PROXIMITY_SL:
-            break;
-        case MOTION_EVT_PROXIMITY_SR:
             break;
     }
 }
@@ -578,21 +564,21 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
         LastHomingStage = gHomingStage;
     }
     else {
-        if(PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_L || PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_R){
-            if(IS_MOTION_PROC_FINISH() && (PwrSig->src==IRDA_RECV_POS_L || PwrSig->src==IRDA_RECV_POS_FL)){
+        if( IS_MOTION_PROC_FINISH() && (PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_L || PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_R) ){
+            if( (PwrSig->src==IRDA_RECV_POS_L || PwrSig->src==IRDA_RECV_POS_FL) ){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 1);
+//                    MotionCtrl_PathFaultProc(1);
                 }
                 else{
-                    MotionCtrl_LeftPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 0);
+//                    MotionCtrl_PathFaultProc(0);
                 }
             }
-            else if(IS_MOTION_PROC_FINISH() && (PwrSig->src==IRDA_RECV_POS_R || PwrSig->src==IRDA_RECV_POS_FR)){
+            else if( (PwrSig->src==IRDA_RECV_POS_R || PwrSig->src==IRDA_RECV_POS_FR) ){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 1);
+//                    MotionCtrl_PathFaultProc(1);
                 }
                 else{
-                    MotionCtrl_RightPathFaulProc(WHEEL_FAULT_BACK_CNT, WHEEL_TURN_45_CNT, 0);
+//                    MotionCtrl_PathFaultProc(0);
                 }
             }
         }

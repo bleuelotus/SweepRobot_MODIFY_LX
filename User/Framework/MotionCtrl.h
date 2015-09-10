@@ -22,11 +22,10 @@
 
 enum MotionEvt {
 
-    MOTION_EVT_PATH_FAULT_L,
-    MOTION_EVT_PATH_FAULT_R,
+    MOTION_EVT_PATH_FAULT,
     MOTION_EVT_EXCEPTION,
-    MOTION_EVT_PROXIMITY_SL,
-    MOTION_EVT_PROXIMITY_SR,
+    MOTION_EVT_EDGE_LOSS,
+    MOTION_EVT_EDGE_GET,
 };
 
 enum MotionCtrlManualAct {
@@ -48,8 +47,9 @@ typedef struct MotionCtrl_Action_s{
     u16             RWheelExpCnt;
     u8              LWheelSync;
     u8              RWheelSync;
-    void            (*PreCond)(struct MotionCtrl_Action_s *node);
-    u8              (*CompleteCond)(void);
+    void            (*PreAct)(struct MotionCtrl_Action_s *node);
+    void            (*ProcAct)(struct MotionCtrl_Action_s *node);
+    u8              (*PostAct)(void);
 } MCtrl_Act_t;
 
 extern u8 gProximitySign[IFRD_TxRx_CHAN_NUM];
@@ -59,6 +59,7 @@ extern u8 gActSeqDepRIndicator;
 extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 
 #define IS_MOTION_PROC_FINISH()             ((gActSeqDepLIndicator==0)&&(gActSeqDepRIndicator==0))
+#define MOTION_PROC_STATE_SET()             do{gActSeqDepLIndicator++;}while(0);
 
 #define IFRD_TX_CTRL_GPIO_PERIPH_ID         (RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOE)
 #define IFRD_LEFT_TX_CTRL_GPIO              GPIOC
@@ -75,8 +76,8 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define COLLISION_DETECT_FR_GPIO            GPIOC
 #define COLLISION_DETECT_LEFT_PIN           GPIO_Pin_3
 #define COLLISION_DETECT_FL_PIN             GPIO_Pin_2
-#define COLLISION_DETECT_RIGHT_PIN          GPIO_Pin_9
-#define COLLISION_DETECT_FR_PIN             GPIO_Pin_8
+#define COLLISION_DETECT_RIGHT_PIN          GPIO_Pin_8
+#define COLLISION_DETECT_FR_PIN             GPIO_Pin_9
 #define COLLISION_SIGN_LEFT                 GPIO_ReadInputDataBit(COLLISION_DETECT_LEFT_GPIO, COLLISION_DETECT_LEFT_PIN)
 #define COLLISION_SIGN_FL                   GPIO_ReadInputDataBit(COLLISION_DETECT_FL_GPIO, COLLISION_DETECT_FL_PIN)
 #define COLLISION_SIGN_RIGHT                GPIO_ReadInputDataBit(COLLISION_DETECT_RIGHT_GPIO, COLLISION_DETECT_RIGHT_PIN)
@@ -122,10 +123,12 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_TURN_45_CNT                   175//188
 #define WHEEL_TURN_90_CNT                   350//375
 #define WHEEL_TURN_180_CNT                  700//750
+#define WHEEL_BODY_THROUGH_CNT              900
 #define WHEEL_TURN_360_CNT                  1400//1500
 #define WHEEL_FAULT_BACK_CNT                180
 
 #define WHEEL_CRUISE_SPEED                  12
+#define WHEEL_FAULT_PROC_SPEED              9
 #define WHEEL_HOMING_SPEED                  5
 
 #define PATH_COND_PROXIMITY_FLAG_FL_POS     0
@@ -146,6 +149,9 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define PATH_FAULT_COLLISION_MASK           0x1818
 #define PATH_PROXIMITY_SIDE_L_MASK          0x0004
 #define PATH_PROXIMITY_SIDE_R_MASK          0x0400
+#define PATH_FAULT_FRONT_MASK               0x0909
+#define PATH_FAULT_BOTTOM_MASK              0x0202
+#define PATH_FAULT_SIDE_MASK                0x1414
 
 void MotionCtrl_Init(void);
 void MotionCtrl_Stop(void);
@@ -153,8 +159,7 @@ void MotionCtrl_Start(void);
 void MotionCtrl_Proc(void);
 void MotionCtrl_AutoMotionInit(void);
 void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act);
-void MotionCtrl_LeftPathFaulProc(u16 backcnt, u16 turncnt, u8 StopOnFinish);
-void MotionCtrl_RightPathFaulProc(u16 backcnt, u16 turncnt, u8 StopOnFinish);
+void MotionCtrl_PathFaultProc(u8 StopOnFinish);
 void MotionCtrl_RoundedSlowly(void);
 void MotionCtrl_MoveDirTune(u8 l, u8 r);
 
