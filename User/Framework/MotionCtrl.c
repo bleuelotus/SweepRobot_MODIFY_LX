@@ -60,7 +60,6 @@ static enum _PathFaultProcMode gPathFaultProcMode = PATH_FAULT_PROC_MODE_NORMAL;
 static s16 gLastPathCondSLDiff = 0, gLastPathCondSRDiff = 0;
 static s16 gCurPathCondSLDiff = 0, gCurPathCondSRDiff = 0;
 //static s8 gPathCondSideProxmityStrength = 0; /* 0: stable, 1: far, -1: closer */
-//static u8 gPathFaultProcEdgeModeCnt = 0;
 
 MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH] = {0};
 u8 gActSeqDepth = 0;
@@ -101,7 +100,6 @@ void LWheelCounterISR(void)
     if(LWHEEL_CNT > WHEEL_BODY_THROUGH_CNT){
         gLastPathFault = 0;
         gConsecutivePathFaultCnt = 0;
-//        printf("L\r\n");
     }
     if(LWHEEL_CNT >= gLWheelExpCnt){
         if(NULL != gLWheelExpCB){
@@ -116,7 +114,6 @@ void RWheelCounterISR(void)
     if(RWHEEL_CNT > WHEEL_BODY_THROUGH_CNT){
         gLastPathFault = 0;
         gConsecutivePathFaultCnt = 0;
-//        printf("R\r\n");
     }
     if(RWHEEL_CNT >= gRWheelExpCnt){
         if(NULL != gRWheelExpCB){
@@ -294,16 +291,19 @@ void MotionStateProc(void)
 //        printf("map1: 0x%X\r\n", gPathCondMap);
 
         if(IS_MOTION_PROC_FINISH()){
-            if( gPathCondMap & (PATH_FAULT_LEFT_MASK | PATH_FAULT_RIGHT_MASK) ){
-                /* Send Left front and bottom path fault message */
-                Msg.expire = 0;
-                Msg.prio = MSG_PRIO_HIGH;
-                Msg.type = MSG_TYPE_MOTION;
-                Msg.MsgCB = NULL;
-                Msg.Data.MEvt = MOTION_EVT_PATH_FAULT;
-                if(!SweepRobot_SendMsg(&Msg)){
-                    MOTION_PROC_STATE_SET();
-                }
+            if( ((gPathFaultProcMode == PATH_FAULT_PROC_MODE_NORMAL) && (gPathCondMap & (PATH_FAULT_LEFT_MASK | PATH_FAULT_RIGHT_MASK)))
+                ||
+                ((gPathFaultProcMode > PATH_FAULT_PROC_MODE_EDGE) && (gPathCondMap & (PATH_FAULT_COLLISION_MASK | PATH_FAULT_FRONT_MASK)))
+                ){
+                    /* Send Left front and bottom path fault message */
+                    Msg.expire = 0;
+                    Msg.prio = MSG_PRIO_HIGH;
+                    Msg.type = MSG_TYPE_MOTION;
+                    Msg.MsgCB = NULL;
+                    Msg.Data.MEvt = MOTION_EVT_PATH_FAULT;
+                    if(!SweepRobot_SendMsg(&Msg)){
+                        MOTION_PROC_STATE_SET();
+                    }
             }
         }
 
@@ -758,8 +758,6 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
 
     gActSeqDepth = 0;
 
-//    printf("map2: 0x%X\r\n", gPathCondMap);
-
     if(gPathCondMap & PATH_FAULT_FRONT_MASK){
 
         if( (gPathFaultProcMode == PATH_FAULT_PROC_MODE_NORMAL) ||
@@ -782,9 +780,18 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
         }
 
         if(gPathFaultProcMode == PATH_FAULT_PROC_MODE_NORMAL){
-            if( gConsecutivePathFaultCnt++ > 4 ){
+            if( gConsecutivePathFaultCnt++ > 3 ){
                 gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE;
                 printf("Edge mode on\r\n");
+            }
+        }
+        else if(gPathFaultProcMode > PATH_FAULT_PROC_MODE_EDGE){
+            if( !gConsecutivePathFaultCnt ){
+                gPathFaultProcMode = PATH_FAULT_PROC_MODE_NORMAL;
+                printf("Edge mode off\r\n");
+            }
+            else{
+                gConsecutivePathFaultCnt--;
             }
         }
     }
