@@ -1111,6 +1111,9 @@
         <name>$PROJ_DIR$\..\..\User\BSP\src\BatteryManage.c</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\..\..\User\BSP\src\Buzzer.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\..\User\BSP\src\IrDA.c</name>
       </file>
       <file>

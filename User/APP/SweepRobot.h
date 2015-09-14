@@ -44,7 +44,6 @@ enum _RobotHomingStage {
 
 s8 SweepRobot_Init(void);
 void SweepRobot_Start(void);
-void SweepRobot_Stop(void);
 s8 SweepRobot_SendMsg(Msg_t *Msg);
 
 

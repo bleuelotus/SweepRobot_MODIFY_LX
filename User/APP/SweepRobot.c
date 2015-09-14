@@ -21,6 +21,7 @@
 #include "Measurement.h"
 #include "CtrlPanel.h"
 #include "RTC.h"
+#include "Buzzer.h"
 
 enum RobotState     gRobotState;
 enum RobotWorkMode  gRobotMode;
@@ -69,6 +70,8 @@ s8 SweepRobot_Init(void)
     PWM_ControllerStart();
     /* Battery management init */
     BM_Init();
+    /* Buzzer init */
+    Buzzer_Init();
     /* Motor controller init */
     err = MotorCtrl_Init();
     if(err)
@@ -158,6 +161,14 @@ void SweepRobot_AutoModeProc(void)
     }
     else{
         MotionCtrl_Stop();
+    }
+}
+
+void SweepRobot_SpotModeProc(void)
+{
+    if(gRobotMode != ROBOT_WORK_MODE_SPOT){
+        MotionCtrl_SpotMotionInit();
+        gRobotState = ROBOT_STATE_RUNNING;
     }
 }
 
@@ -252,6 +263,21 @@ void SweepRobot_CtrlMsgProc(u8 CtrlCode)
         case REMOTE_CMD_RUN_STOP:
             SweepRobot_AutoModeProc();
             break;
+        case REMOTE_CMD_SPOT:
+            SweepRobot_SpotModeProc();
+            break;
+        case REMOTE_CMD_MODE_1:
+            /* work mode switch */
+            break;
+        case REMOTE_CMD_MODE_2:
+            /* work mode switch */
+            break;
+        case REMOTE_CMD_MODE_3:
+            /* work mode switch */
+            break;
+        case REMOTE_CMD_MODE_4:
+            /* work mode switch */
+            break;
         case REMOTE_CMD_UP:
             SweepRobot_ManualModeProc(MANUAL_ACT_UP);
             break;
@@ -288,6 +314,9 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
             printf("Exception state.\r\n");
 #endif
             MotionCtrl_Stop();
+            break;
+        case MOTION_EVT_TRAPPED:
+            MotionCtrl_TrapProc();
             break;
     }
 }
@@ -567,26 +596,22 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
         if( IS_MOTION_PROC_FINISH() && (PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_L || PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_R) ){
             if( (PwrSig->src==IRDA_RECV_POS_L || PwrSig->src==IRDA_RECV_POS_FL) ){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-//                    MotionCtrl_PathFaultProc(1);
+                    MotionCtrl_ChargeStationAvoid(1, WHEEL_TURN_30_CNT, 1);
                 }
                 else{
-//                    MotionCtrl_PathFaultProc(0);
+                    MotionCtrl_ChargeStationAvoid(1, WHEEL_TURN_30_CNT, 0);
                 }
             }
             else if( (PwrSig->src==IRDA_RECV_POS_R || PwrSig->src==IRDA_RECV_POS_FR) ){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
-//                    MotionCtrl_PathFaultProc(1);
+                    MotionCtrl_ChargeStationAvoid(0, WHEEL_TURN_30_CNT, 1);
                 }
                 else{
-//                    MotionCtrl_PathFaultProc(0);
+                    MotionCtrl_ChargeStationAvoid(0, WHEEL_TURN_30_CNT, 0);
                 }
             }
         }
     }
-}
-
-void SweepRobot_Stop(void)
-{
 }
 
 s8 SweepRobot_SendMsg(Msg_t *Msg)

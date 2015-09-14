@@ -24,8 +24,7 @@ enum MotionEvt {
 
     MOTION_EVT_PATH_FAULT,
     MOTION_EVT_EXCEPTION,
-    MOTION_EVT_EDGE_LOSS,
-    MOTION_EVT_EDGE_GET,
+    MOTION_EVT_TRAPPED,
 };
 
 enum MotionCtrlManualAct {
@@ -114,6 +113,8 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define LWHEEL_COUNTER_EXTI_IRQN            EXTI9_5_IRQn
 #define WHEEL_CNT_EXTI_LINES                (EXTI_Line7|EXTI_Line14)            //(EXTI_Line7|EXTI_Line12|EXTI_Line14)
 
+#define FWHEEL_ACTIVE_SIGH                  GPIO_ReadInputDataBit(FWHEEL_COUNTER_GPIO, FWHEEL_COUNTER_PIN)
+
 #define WHEEL_GEAR_RATIO                    62.5
 #define WHEEL_1CYCLE_CNT                    500                                 //(WHEEL_GEAR_RATIO*8)
 #define WHEEL_BASE_LEN                      204                                 // mm
@@ -128,6 +129,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_FAULT_BACK_CNT                180
 
 #define WHEEL_CRUISE_SPEED                  12
+#define WHEEL_MODE_SPOT_SPEED               10
 #define WHEEL_FAULT_PROC_SPEED              9
 #define WHEEL_HOMING_SPEED                  5
 
@@ -158,8 +160,11 @@ void MotionCtrl_Stop(void);
 void MotionCtrl_Start(void);
 void MotionCtrl_Proc(void);
 void MotionCtrl_AutoMotionInit(void);
+void MotionCtrl_SpotMotionInit(void);
 void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act);
 void MotionCtrl_PathFaultProc(u8 StopOnFinish);
+void MotionCtrl_TrapProc(void);
+void MotionCtrl_ChargeStationAvoid(u8 dir, u8 turnCnt, u8 StopOnFinish);
 void MotionCtrl_RoundedSlowly(void);
 void MotionCtrl_MoveDirTune(u8 l, u8 r);
 
