@@ -36,7 +36,7 @@ typedef struct {
 
 extern u8 gSystemIdleCnt;
 
-#define PM_SYS_SB_SEC                       15
+#define PM_SYS_SB_SEC                       30
 
 #define POWER_SUPPLY_CTRL_GPIO_PERIPH_ID    RCC_APB2Periph_GPIOA
 #define POWER_SUPPLY_CTRL_GPIO              GPIOA

@@ -18,7 +18,7 @@
 #endif
 #ifdef KEY_PROC_WITH_LED
 #include "CtrlPanel.h"
-#define KEY_SCAN_RATIO              (KEY_SCAN_INTERVAL_MS*10/KEY_SCAN_TIM_PERIOD_MSx10)
+#define KEY_SCAN_RATIO                      (KEY_SCAN_INTERVAL_MS*10/KEY_SCAN_TIM_PERIOD_MSx10)
 static u16 KeyScanCnt = 0;
 #endif
 
@@ -45,34 +45,34 @@ void Key_CoreInit(void)
     TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
     NVIC_InitTypeDef            NVIC_InitStructure;
 
-    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannel = KEY_POLLING_TIM_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = KEY_POLLING_TIM_IRQ_PP;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = KEY_POLLING_TIM_IRQ_SP;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 , ENABLE);
-    TIM_DeInit(TIM2);
+    RCC_APB1PeriphClockCmd(KEY_POLLING_TIM_PERIPH_ID , ENABLE);
+    TIM_DeInit(KEY_POLLING_TIM);
     TIM_TimeBaseStructure.TIM_Period = KEY_SCAN_TIM_PERIOD_MSx10*10-1;          //ms
     TIM_TimeBaseStructure.TIM_Prescaler = 720-1;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
-    TIM_ClearFlag(TIM2, TIM_FLAG_Update);
-    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+    TIM_TimeBaseInit(KEY_POLLING_TIM, &TIM_TimeBaseStructure);
+    TIM_ClearFlag(KEY_POLLING_TIM, TIM_FLAG_Update);
+    TIM_ITConfig(KEY_POLLING_TIM, TIM_IT_Update, ENABLE);
 
-    plat_int_reg_cb(STM32F10x_INT_TIM2, (void*)Key_EvtProccess);
+    plat_int_reg_cb(KEY_POLLING_TIM_INT_IDX, (void*)Key_EvtProccess);
 }
 /******************************************************************************/
 
 void Key_StartListen(void)
 {
-    TIM_Cmd(TIM2, ENABLE);
+    TIM_Cmd(KEY_POLLING_TIM, ENABLE);
 }
 
 void Key_StopListen(void)
 {
-    TIM_Cmd(TIM2, DISABLE);
+    TIM_Cmd(KEY_POLLING_TIM, DISABLE);
 }
 
 s8 Key_Register(Key_t *key)

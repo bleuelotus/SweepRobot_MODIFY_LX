@@ -26,7 +26,7 @@ void RTC_Configuration(void)
     /* Enable LSE */
     RCC_LSEConfig(RCC_LSE_ON);
 
-    /* Wait till LSE is ready */
+    /* Wait till LSE is ready TODO: timeout proc */
     while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
     {}
 

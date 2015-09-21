@@ -16,50 +16,73 @@
 #define IRDA_MODE_EJE
 
 
-#define IRDA_LIGHT_GPIO_PERIPH_ID                   (RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO)
+#define IRDA_BACK_LIGHT_GPIO_PERIPH_ID              RCC_APB2Periph_GPIOD
 #define IRDA_BACK_LIGHT_GPIO                        GPIOD
-#define IRDA_LEFT_LIGHT_GPIO                        GPIOE
-#define IRDA_FRONT_L_LIGHT_GPIO                     GPIOD
-#define IRDA_FRONT_R_LIGHT_GPIO                     GPIOD
-#define IRDA_RIGHT_LIGHT_GPIO                       GPIOA
-
 #define IRDA_BACK_LIGHT_PIN                         GPIO_Pin_12
-#define IRDA_LEFT_LIGHT_PIN                         GPIO_Pin_4
-#define IRDA_FRONT_L_LIGHT_PIN                      GPIO_Pin_5
-#define IRDA_FRONT_R_LIGHT_PIN                      GPIO_Pin_1
-#define IRDA_RIGHT_LIGHT_PIN                        GPIO_Pin_8
-
 #define IRDA_BACK_LIGHT_EXTI_GPIO                   GPIO_PortSourceGPIOD
-#define IRDA_LEFT_LIGHT_EXTI_GPIO                   GPIO_PortSourceGPIOE
-#define IRDA_FRONT_L_LIGHT_EXTI_GPIO                GPIO_PortSourceGPIOD
-#define IRDA_FRONT_R_LIGHT_EXTI_GPIO                GPIO_PortSourceGPIOD
-#define IRDA_RIGHT_LIGHT_EXTI_GPIO                  GPIO_PortSourceGPIOA
-
 #define IRDA_BACK_LIGHT_EXTI_PIN                    GPIO_PinSource12
-#define IRDA_LEFT_LIGHT_EXTI_PIN                    GPIO_PinSource4
-#define IRDA_FRONT_L_LIGHT_EXTI_PIN                 GPIO_PinSource5
-#define IRDA_FRONT_R_LIGHT_EXTI_PIN                 GPIO_PinSource1
-#define IRDA_RIGHT_LIGHT_EXTI_PIN                   GPIO_PinSource8
-
 #define IRDA_BACK_LIGHT_EXTI_IRQ                    EXTI15_10_IRQn
-#define IRDA_LEFT_LIGHT_EXTI_IRQ                    EXTI4_IRQn
-#define IRDA_FRONT_L_LIGHT_EXTI_IRQ                 EXTI9_5_IRQn
-#define IRDA_FRONT_R_LIGHT_EXTI_IRQ                 EXTI1_IRQn
-#define IRDA_RIGHT_LIGHT_EXTI_IRQ                   EXTI9_5_IRQn
-
-#define IRDA_LIGHT_EXTI_LINES                       (EXTI_Line12|EXTI_Line8|EXTI_Line5|EXTI_Line4|EXTI_Line1)
 #define IRDA_BACK_LIGHT_EXTI_LINE                   EXTI_Line12
-#define IRDA_LEFT_LIGHT_EXTI_LINE                   EXTI_Line4
-#define IRDA_FRONT_L_LIGHT_EXTI_LINE                EXTI_Line5
-#define IRDA_FRONT_R_LIGHT_EXTI_LINE                EXTI_Line1
-#define IRDA_RIGHT_LIGHT_EXTI_LINE                  EXTI_Line8
-
 #define IRDA_BACK_LIGHT_INT_INDEX                   STM32F10x_INT_EXTI15_10_12
-#define IRDA_LEFT_LIGHT_INT_INDEX                   STM32F10x_INT_EXTI4
-#define IRDA_FRONT_L_LIGHT_INT_INDEX                STM32F10x_INT_EXTI9_5_5
-#define IRDA_FRONT_R_LIGHT_INT_INDEX                STM32F10x_INT_EXTI1
-#define IRDA_RIGHT_LIGHT_INT_INDEX                  STM32F10x_INT_EXTI9_5_8
 
+#define IRDA_LEFT_LIGHT_GPIO_PERIPH_ID              RCC_APB2Periph_GPIOE
+#define IRDA_LEFT_LIGHT_GPIO                        GPIOE
+#define IRDA_LEFT_LIGHT_PIN                         GPIO_Pin_4
+#define IRDA_LEFT_LIGHT_EXTI_GPIO                   GPIO_PortSourceGPIOE
+#define IRDA_LEFT_LIGHT_EXTI_PIN                    GPIO_PinSource4
+#define IRDA_LEFT_LIGHT_EXTI_IRQ                    EXTI4_IRQn
+#define IRDA_LEFT_LIGHT_EXTI_LINE                   EXTI_Line4
+#define IRDA_LEFT_LIGHT_INT_INDEX                   STM32F10x_INT_EXTI4
+
+#define IRDA_FRONT_L_LIGHT_GPIO_PERIPH_ID           RCC_APB2Periph_GPIOD
+#define IRDA_FRONT_L_LIGHT_GPIO                     GPIOD
+#define IRDA_FRONT_L_LIGHT_PIN                      GPIO_Pin_5
+#define IRDA_FRONT_L_LIGHT_EXTI_GPIO                GPIO_PortSourceGPIOD
+#define IRDA_FRONT_L_LIGHT_EXTI_PIN                 GPIO_PinSource5
+#define IRDA_FRONT_L_LIGHT_EXTI_IRQ                 EXTI9_5_IRQn
+#define IRDA_FRONT_L_LIGHT_EXTI_LINE                EXTI_Line5
+#define IRDA_FRONT_L_LIGHT_INT_INDEX                STM32F10x_INT_EXTI9_5_5
+
+#define IRDA_FRONT_R_LIGHT_GPIO_PERIPH_ID           RCC_APB2Periph_GPIOD
+#define IRDA_FRONT_R_LIGHT_GPIO                     GPIOD
+#define IRDA_FRONT_R_LIGHT_PIN                      GPIO_Pin_1
+#define IRDA_FRONT_R_LIGHT_EXTI_GPIO                GPIO_PortSourceGPIOD
+#define IRDA_FRONT_R_LIGHT_EXTI_PIN                 GPIO_PinSource1
+#define IRDA_FRONT_R_LIGHT_EXTI_IRQ                 EXTI1_IRQn
+#define IRDA_FRONT_R_LIGHT_EXTI_LINE                EXTI_Line1
+#define IRDA_FRONT_R_LIGHT_INT_INDEX                STM32F10x_INT_EXTI1
+
+#ifdef REVISION_1_0
+#define IRDA_RIGHT_LIGHT_GPIO_PERIPH_ID             RCC_APB2Periph_GPIOA
+#define IRDA_RIGHT_LIGHT_GPIO                       GPIOA
+#define IRDA_RIGHT_LIGHT_PIN                        GPIO_Pin_8
+#define IRDA_RIGHT_LIGHT_EXTI_GPIO                  GPIO_PortSourceGPIOA
+#define IRDA_RIGHT_LIGHT_EXTI_PIN                   GPIO_PinSource8
+#define IRDA_RIGHT_LIGHT_EXTI_IRQ                   EXTI9_5_IRQn
+#define IRDA_RIGHT_LIGHT_EXTI_LINE                  EXTI_Line8
+#define IRDA_RIGHT_LIGHT_INT_INDEX                  STM32F10x_INT_EXTI9_5_8
+#elif defined REVISION_1_1
+#define IRDA_RIGHT_LIGHT_GPIO_PERIPH_ID             RCC_APB2Periph_GPIOD
+#define IRDA_RIGHT_LIGHT_GPIO                       GPIOD
+#define IRDA_RIGHT_LIGHT_PIN                        GPIO_Pin_6
+#define IRDA_RIGHT_LIGHT_EXTI_GPIO                  GPIO_PortSourceGPIOD
+#define IRDA_RIGHT_LIGHT_EXTI_PIN                   GPIO_PinSource6
+#define IRDA_RIGHT_LIGHT_EXTI_IRQ                   EXTI9_5_IRQn
+#define IRDA_RIGHT_LIGHT_EXTI_LINE                  EXTI_Line6
+#define IRDA_RIGHT_LIGHT_INT_INDEX                  STM32F10x_INT_EXTI9_5_6
+#endif
+
+#define IRDA_LIGHT_GPIO_PERIPH_ID                   (IRDA_BACK_LIGHT_GPIO_PERIPH_ID|        \
+                                                     IRDA_LEFT_LIGHT_GPIO_PERIPH_ID|        \
+                                                     IRDA_FRONT_L_LIGHT_GPIO_PERIPH_ID|     \
+                                                     IRDA_FRONT_R_LIGHT_GPIO_PERIPH_ID|     \
+                                                     IRDA_RIGHT_LIGHT_GPIO_PERIPH_ID)
+
+#define IRDA_LIGHT_EXTI_LINES                       (IRDA_BACK_LIGHT_EXTI_LINE|             \
+                                                     IRDA_LEFT_LIGHT_EXTI_LINE|             \
+                                                     IRDA_FRONT_L_LIGHT_EXTI_LINE|          \
+                                                     IRDA_FRONT_R_LIGHT_EXTI_LINE|          \
+                                                     IRDA_RIGHT_LIGHT_EXTI_LINE)
 
 #define IRDA_HOMING_CODE_BOUND_UPPER                0x47
 #define IRDA_HOMING_CODE_BOUND_LOWER                0x39

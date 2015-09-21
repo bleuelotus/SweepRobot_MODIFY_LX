@@ -24,7 +24,7 @@ typedef struct _MotorCtrlChannel_s {
 
                                                        /* Chan                  PhaseGPIO   PhasePin    */
 static const MotorCtrlChannel_t     MotorCtrlChan[] = {
-                                                        { PWM_CHAN_FAN,         NULL,       0,              MOTOR_FUN_CHAN_MAX_SPEED    },                              /* Dust cleaner fan     */
+                                                        { PWM_CHAN_FAN,         NULL,       0,              MOTOR_FAN_CHAN_MAX_SPEED    },                              /* Dust cleaner fan     */
                                                         { PWM_CHAN_RWHEEL,      GPIOD,      GPIO_Pin_13,    MOTOR_WHEEL_CHAN_MAX_SPEED  },                              /* Left wheel           */
                                                         { PWM_CHAN_LWHEEL,      GPIOE,      GPIO_Pin_5,     MOTOR_WHEEL_CHAN_MAX_SPEED  },                              /* Right wheel          */
                                                         { PWM_CHAN_LBRUSH,      NULL,       0,              MOTOR_BRUSH_CHAN_MAX_SPEED  },                              /* Left brush           */

@@ -13,8 +13,8 @@
 #include "CtrlPanel.h"
 #include "MsgQueue.h"
 
-
-#define TIME_VAL                                    (TIM6->CNT)
+#define TIME_PERIOD                                 10000
+#define TIME_VAL                                    (BAT_MONITOR_TIM->CNT)
 
 #ifdef IRDA_MODE_EJE
 #define IRDA_FRAME_LEN                              (1+8)
@@ -40,6 +40,7 @@ void IrDA_FrontRLightIsr(void);
 void IrDA_RightLightIsr(void);
 void PwrStationHomingSigProc(u8 idx, u8 code);
 
+#if 0
 void IrDA_TimeCounterInit(void)
 {
     TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
@@ -53,6 +54,7 @@ void IrDA_TimeCounterInit(void)
     TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStructure);
     TIM_Cmd(TIM6, ENABLE);
 }
+#endif
 
 #ifdef IRDA_MODE_NEC
 /* NEC CODE: 9ms L + 4.5ms H + (0.56ms L + 0.565ms H) X 32 + [2.2ms H] */
@@ -63,7 +65,7 @@ static inline void IrDA_ParseNEC(enum IRAD_Light idx)
     /* Second falling edge of cycle end */
     if(PulsStart[idx]){
         PulsTimeE[idx] = TIME_VAL;
-        PulsLen[idx] = (PulsTimeE[idx] > PulsTimeS[idx]) ? (PulsTimeE[idx] - PulsTimeS[idx]) : ((u16)0xFFFF - PulsTimeS[idx] + PulsTimeE[idx]);
+        PulsLen[idx] = (PulsTimeE[idx] > PulsTimeS[idx]) ? (PulsTimeE[idx] - PulsTimeS[idx]) : ((u16)TIME_PERIOD - PulsTimeS[idx] + PulsTimeE[idx]);
         PulsStart[idx] = 0;
         if(HeadPuls[idx]){
             if(PulsLen[idx] > 100 && PulsLen[idx] < 150){                       // 0.56ms+0.565ms=1.125ms: 1.0ms~ 1.5ms
@@ -116,7 +118,7 @@ static inline void IrDA_ParseEJE(enum IRAD_Light idx)
     /* Rising */
     if(PulsStart[idx]){
         PulsTimeE[idx] = TIME_VAL;
-        PulsLen[idx] = (PulsTimeE[idx] > PulsTimeS[idx]) ? (PulsTimeE[idx] - PulsTimeS[idx]) : ((u16)0xFFFF - PulsTimeS[idx] + PulsTimeE[idx]);
+        PulsLen[idx] = (PulsTimeE[idx] > PulsTimeS[idx]) ? (PulsTimeE[idx] - PulsTimeS[idx]) : ((u16)TIME_PERIOD - PulsTimeS[idx] + PulsTimeE[idx]);
         PulsStart[idx] = 0;
         if(HeadPuls[idx]){
             if(PulsLen[idx] > 130 && PulsLen[idx] < 180){                       // 1.6ms: 1.3ms~ 1.8ms
@@ -215,7 +217,7 @@ void IrDA_Init(void)
     NVIC_InitTypeDef NVIC_InitStructure;
     EXTI_InitTypeDef EXTI_InitStructure;
 
-    IrDA_TimeCounterInit();
+//    IrDA_TimeCounterInit();
 
     RCC_APB2PeriphClockCmd(IRDA_LIGHT_GPIO_PERIPH_ID, ENABLE);
 

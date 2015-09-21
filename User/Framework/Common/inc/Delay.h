@@ -20,15 +20,19 @@
   * @retval : None
 **/
 /********************************************************************************/
-void uDelay(u16 count);
+void uDelay(u16 nus);
 /********************************************************************************/
 /**
   * @brief: inaccurate ms delay
   * @param: ms to delay
   * @retval : None
+  * @Note: please use sDelay() if nms > 1800ms
 **/
 /********************************************************************************/
-void mDelay(u16 count);
+void mDelay(u16 nms);
+
+/* Second level delay */
+void sDelay(u8 ns);
 
 #endif /* !__DELAY_H__ */
 

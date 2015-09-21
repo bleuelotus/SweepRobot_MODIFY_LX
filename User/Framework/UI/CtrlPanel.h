@@ -18,7 +18,11 @@
 
 #define CTRL_BTN_ALL_IN_ONE_GPIO_PERIPH_ID  RCC_APB2Periph_GPIOD
 #define CTRL_BTN_ALL_IN_ONE_GPIO            GPIOD
+#ifdef REVISION_1_0
 #define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_6
+#elif defined REVISION_1_1
+#define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_7
+#endif
 #define CTRL_BTN_ALL_IN_ONE_EXTI_GPIO       GPIO_PortSourceGPIOD
 #define CTRL_BTN_ALL_IN_ONE_EXTI_PIN        GPIO_PinSource6
 #define CTRL_BTN_ALL_IN_ONE_EXTI_IRQ        EXTI9_5_IRQn
@@ -80,6 +84,8 @@ enum CtrlPanelLED {
     CTRL_PANEL_LED_GB       = 0x06,
     CTRL_PANEL_LED_RGB      = 0x07,
 };
+
+#define CTRL_PANEL_LED_BR_LVL               5
 
 void CtrlPanel_Init(void);
 void CtrlPanel_LEDCtrl(enum CtrlPanelLED, u8 Brightness);

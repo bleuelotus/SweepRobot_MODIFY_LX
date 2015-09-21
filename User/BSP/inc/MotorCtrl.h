@@ -14,11 +14,11 @@
 
 #include "stm32f10x_conf.h"
 
-#define MOTOR_FUN_CHAN_MAX_SPEED                90
+#define MOTOR_FAN_CHAN_MAX_SPEED                90
 #define MOTOR_BRUSH_CHAN_MAX_SPEED              90
 #define MOTOR_WHEEL_CHAN_MAX_SPEED              80
 
-#define MOTOR_FUN_CHAN_STARTUP_SPEED            70
+#define MOTOR_FAN_CHAN_STARTUP_SPEED            70
 #define MOTOR_LWHEEL_CHAN_STARTUP_SPEED         30
 #define MOTOR_RWHEEL_CHAN_STARTUP_SPEED         30
 #define MOTOR_LBRUSH_CHAN_STARTUP_SPEED         80

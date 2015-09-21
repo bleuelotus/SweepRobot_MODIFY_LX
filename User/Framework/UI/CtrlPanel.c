@@ -12,6 +12,7 @@
 #include "CtrlPanel.h"
 #include "SweepRobot.h"
 #include "key.h"
+#include "IrDA.h"
 
 struct CtrlPanel_LEDObj_s {
 
@@ -111,7 +112,7 @@ void CtrlPanel_Init(void)
     GPIO_InitStructure.GPIO_Pin = CTRL_LED_B_CTRL_PIN;
     GPIO_Init(CTRL_LED_B_CTRL_GPIO, &GPIO_InitStructure);
 
-    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
 
     Key_CoreInit();
 

@@ -14,7 +14,11 @@
 #include "stm32f10x_conf.h"
 #include "MotorCtrl.h"
 
-#define IFRD_TxRx_CHAN_NUM                  15                                   // Total:8, but 2 back lights of bottom are not used
+#ifdef REVISION_1_0
+#define IFRD_TxRx_CHAN_NUM                  8                                   // Total:8, but 2 back lights of bottom are not used
+#elif defined REVISION_1_1
+#define IFRD_TxRx_CHAN_NUM                  6                                   // 2 back lights of bottom are not used
+#endif
 #define IFRD_FRONT_CHAN_NUM                 2
 #define IFRD_SIDE_CHAN_NUM                  2
 #define IFRD_BOTTOM_CHAN_NUM                2
@@ -25,6 +29,7 @@ enum MotionEvt {
     MOTION_EVT_PATH_FAULT,
     MOTION_EVT_EXCEPTION,
     MOTION_EVT_TRAPPED,
+    MOTION_EVT_STATE_SYNC,
 };
 
 enum MotionCtrlManualAct {
@@ -91,29 +96,50 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define RWHEEL_FLOAT_SIGN                   GPIO_ReadInputDataBit(WHEEL_FLOAT_DETECT_R_GPIO, WHEEL_FLOAT_DETECT_R_PIN)
 #define WHEEL_FLOAT_SIGN_ALL                (!(LWHEEL_FLOAT_SIGN && RWHEEL_FLOAT_SIGN))
 
+#define ASH_TRAY_DETECT_GPIO_PERIPH_ID      (RCC_APB2Periph_GPIOE)
+#define ASH_TRAY_DETECT_GPIO                GPIOE
+#define ASH_TRAY_DETECT_PIN                 GPIO_Pin_9
+#define ASH_TRAY_INSTALL_SIGN               GPIO_ReadInputDataBit(ASH_TRAY_DETECT_GPIO, ASH_TRAY_DETECT_PIN)
+
 #define WHEEL_CNT_GPIO_PERIPH_ID            (RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOD|RCC_APB2Periph_GPIOE)
 #define WHEEL_NUM                           3
-#define FWHEEL_COUNTER_GPIO                 GPIOA
-#define RWHEEL_COUNTER_GPIO                 GPIOD
-#define LWHEEL_COUNTER_GPIO                 GPIOE
-#define FWHEEL_COUNTER_PIN                  GPIO_Pin_12
-#define RWHEEL_COUNTER_PIN                  GPIO_Pin_14
-#define LWHEEL_COUNTER_PIN                  GPIO_Pin_7
-#define FWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOA
-#define RWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOD
-#define LWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOE
-#define FWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource12
-#define RWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource14
-#define LWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource7
-#define FWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI15_10_12
-#define RWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI15_10_14
-#define LWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI9_5_7
-#define FWHEEL_COUNTER_EXTI_IRQN            EXTI15_10_IRQn
-#define RWHEEL_COUNTER_EXTI_IRQN            EXTI15_10_IRQn
-#define LWHEEL_COUNTER_EXTI_IRQN            EXTI9_5_IRQn
-#define WHEEL_CNT_EXTI_LINES                (EXTI_Line7|EXTI_Line14)            //(EXTI_Line7|EXTI_Line12|EXTI_Line14)
 
-#define FWHEEL_ACTIVE_SIGH                  GPIO_ReadInputDataBit(FWHEEL_COUNTER_GPIO, FWHEEL_COUNTER_PIN)
+#ifdef REVISION_1_0
+#define FWHEEL_COUNTER_GPIO                 GPIOA
+#define FWHEEL_COUNTER_PIN                  GPIO_Pin_12
+#define FWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOA
+#define FWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource12
+#define FWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI15_10_12
+#define FWHEEL_COUNTER_EXTI_IRQN            EXTI15_10_IRQn
+#elif defined REVISION_1_1
+#define FWHEEL_COUNTER_GPIO                 GPIOC
+#define FWHEEL_COUNTER_PIN                  GPIO_Pin_5
+#define FWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOC
+#define FWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource5
+#define FWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI9_5_5
+#define FWHEEL_COUNTER_EXTI_IRQN            EXTI9_5_IRQn
+#endif
+
+#define LWHEEL_COUNTER_GPIO                 GPIOE
+#define LWHEEL_COUNTER_PIN                  GPIO_Pin_7
+#define LWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOE
+#define LWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource7
+#define LWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI9_5_7
+#define LWHEEL_COUNTER_EXTI_IRQN            EXTI9_5_IRQn
+
+#define RWHEEL_COUNTER_GPIO                 GPIOD
+#define RWHEEL_COUNTER_PIN                  GPIO_Pin_14
+#define RWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOD
+#define RWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource14
+#define RWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI15_10_14
+#define RWHEEL_COUNTER_EXTI_IRQN            EXTI15_10_IRQn
+
+#define WHEEL_CNT_EXTI_LINES                (EXTI_Line7|EXTI_Line14)            //(EXTI_Line7|EXTI_Line12|EXTI_Line14)
+#ifdef REVISION_1_0
+#define FWHEEL_ACTIVE_VAL                   GPIO_ReadInputDataBit(FWHEEL_COUNTER_GPIO, FWHEEL_COUNTER_PIN)
+#elif REVISION_1_1
+#define FWHEEL_ACTIVE_VAL                   ADCConvertedLSB[MEAS_CHAN_UNIVERSAL_WHEEL_SIG-1]
+#endif
 
 #define WHEEL_GEAR_RATIO                    62.5
 #define WHEEL_1CYCLE_CNT                    500                                 //(WHEEL_GEAR_RATIO*8)
@@ -124,7 +150,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_TURN_45_CNT                   175//188
 #define WHEEL_TURN_90_CNT                   350//375
 #define WHEEL_TURN_180_CNT                  700//750
-#define WHEEL_BODY_THROUGH_CNT              900
+#define WHEEL_BODY_THROUGH_CNT              1400
 #define WHEEL_TURN_360_CNT                  1400//1500
 #define WHEEL_FAULT_BACK_CNT                180
 
@@ -155,17 +181,35 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define PATH_FAULT_BOTTOM_MASK              0x0202
 #define PATH_FAULT_SIDE_MASK                0x1414
 
+#define EXCEPTION_MASK_WHEEL_FLOAT_POS      0
+#define EXCEPTION_MASK_ASHTRAY_INS_POS      1
+#define EXCEPTION_MASK_LWHEEL_STUCK_POS     2
+#define EXCEPTION_MASK_RWHEEL_STUCK_POS     3
+#define EXCEPTION_MASK_LBRUSH_OC_POS        4
+#define EXCEPTION_MASK_RBRUSH_OC_POS        5
+#define EXCEPTION_MASK_MBRUSH_OC_POS        6
+#define EXCEPTION_MASK_FAN_OC_POS           7
+
+#define MOTION_MONITOR_TIM_PERIPH_ID        RCC_APB1Periph_TIM2
+#define MOTION_MONITOR_TIM                  TIM2
+#define MOTION_MONITOR_TIM_IRQn             TIM2_IRQn
+#define MOTION_MONITOR_TIM_IRQ_PP           2
+#define MOTION_MONITOR_TIM_IRQ_SP           1
+#define MOTION_MONITOR_TIM_INT_IDX          STM32F10x_INT_TIM2
+
 void MotionCtrl_Init(void);
 void MotionCtrl_Stop(void);
 void MotionCtrl_Start(void);
 void MotionCtrl_Proc(void);
 void MotionCtrl_AutoMotionInit(void);
 void MotionCtrl_SpotMotionInit(void);
+void MotionCtrl_EdgeMotionInit(void);
+void MotionCtrl_DishomingMotionInit(void);
+void MotionCtrl_HomingMotionInit(void);
 void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act);
 void MotionCtrl_PathFaultProc(u8 StopOnFinish);
 void MotionCtrl_TrapProc(void);
 void MotionCtrl_ChargeStationAvoid(u8 dir, u8 turnCnt, u8 StopOnFinish);
-void MotionCtrl_RoundedSlowly(void);
 void MotionCtrl_MoveDirTune(u8 l, u8 r);
 
 #endif /* __MITION_CTRL_H__ */

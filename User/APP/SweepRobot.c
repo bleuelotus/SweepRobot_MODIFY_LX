@@ -17,7 +17,6 @@
 #include "PWM.h"
 #include "PwrManagement.h"
 #include "MotionCtrl.h"
-#include "IrDA.h"
 #include "Measurement.h"
 #include "CtrlPanel.h"
 #include "RTC.h"
@@ -27,6 +26,7 @@ enum RobotState     gRobotState;
 enum RobotWorkMode  gRobotMode;
 
 #define ROBOT_MAIN_MSG_Q_SIZE               10
+#define STARTUP_DELAY_TIME                  30000                               // 3s
 
 struct RobotHomingState_s {
 
@@ -78,10 +78,10 @@ s8 SweepRobot_Init(void)
         goto SWEEPROBOT_INIT_FAIL;
     /* Robot motion control */
     MotionCtrl_Init();
-    /* IrDA Rx init */
-    IrDA_Init();
     /* CtrlPanel config */
     CtrlPanel_Init();
+    /* IrDA puls len counting timebase share TIM7 with battery monitor process */
+    IrDA_Init();
 
     gRobotState = ROBOT_STATE_IDLE;
 #ifdef DEBUG_LOG
@@ -112,7 +112,7 @@ void SweepRobot_Start(void)
                             SweepRobot_PMMsgProc(MainMsgQ->Msg.Data.PMEvt);
                             break;
                         case MSG_TYPE_BM:
-                            PM_ResetSysIdleState();
+//                            PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
                             printf("BM msg %d.\r\n", MainMsgQ->Msg.Data.BatEvt);
 #endif
@@ -127,7 +127,7 @@ void SweepRobot_Start(void)
                             break;
                         case MSG_TYPE_PWR_STATION:
 #ifdef DEBUG_LOG
-//                            printf("PWR_STATION msg Pos: %d, code: 0x%X.\r\n", MainMsgQ->Msg->Data.PSSigDat.src, MainMsgQ->Msg->Data.PSSigDat.sig);
+//                            printf("PWR_STATION msg Pos: %d, code: 0x%X.\r\n", MainMsgQ->Msg.Data.PSSigDat.src, MainMsgQ->Msg.Data.PSSigDat.sig);
 #endif
                             SweepRobot_PwrStationMsgProc(&MainMsgQ->Msg.Data.PSSigDat);
                             break;
@@ -153,54 +153,176 @@ void SweepRobot_Start(void)
     }
 }
 
+void SweepRobot_StartupInit(void *pDelayedWork)
+{
+    gRobotState = ROBOT_STATE_STARTUP;
+
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FAN_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
+    TIM_SetAutoreload(MOTION_MONITOR_TIM, STARTUP_DELAY_TIME);
+    TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
+    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
+    TIM_Cmd(MOTION_MONITOR_TIM, ENABLE);
+
+    plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, pDelayedWork);
+}
+
+void SweepRobot_StartupComplete(void)
+{
+    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+
+    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
+}
+
+void SweepRobot_StartupAbort(void)
+{
+    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+
+    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
+
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
+
+    gRobotState = ROBOT_STATE_IDLE;
+}
+
+void SweepRobot_Stop()
+{
+    MotionCtrl_Stop();
+
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
+
+    gRobotState = ROBOT_STATE_IDLE;
+}
+
 void SweepRobot_AutoModeProc(void)
 {
     if(gRobotState != ROBOT_STATE_RUNNING){
-        MotionCtrl_AutoMotionInit();
-        gRobotMode = ROBOT_WORK_MODE_AUTO;
+        if(gRobotState == ROBOT_STATE_STARTUP){
+            SweepRobot_StartupAbort();
+        }
+        else if(gRobotState == ROBOT_STATE_HOME){
+            MotionCtrl_DishomingMotionInit();
+        }
+        else{
+            SweepRobot_StartupInit((void*)MotionCtrl_AutoMotionInit);
+        }
     }
     else{
-        MotionCtrl_Stop();
+        if(gRobotMode!=ROBOT_WORK_MODE_DISHOMING){
+            SweepRobot_Stop();
+        }
     }
 }
 
 void SweepRobot_SpotModeProc(void)
 {
-    if(gRobotMode != ROBOT_WORK_MODE_SPOT){
+    if((gRobotState == ROBOT_STATE_HOME) || (gRobotState == ROBOT_STATE_STARTUP)){
+        return;
+    }
+
+    if(gRobotState != ROBOT_STATE_RUNNING){
+        SweepRobot_StartupInit((void*)MotionCtrl_SpotMotionInit);
+    }
+    else{
+        MotionCtrl_Stop();
+
         MotionCtrl_SpotMotionInit();
-        gRobotState = ROBOT_STATE_RUNNING;
+    }
+}
+
+void SweepRobot_EdgeModeProc(void)
+{
+    if((gRobotState == ROBOT_STATE_HOME) || (gRobotState == ROBOT_STATE_STARTUP)){
+        return;
+    }
+
+    if(gRobotState != ROBOT_STATE_RUNNING){
+        SweepRobot_StartupInit((void*)MotionCtrl_EdgeMotionInit);
+    }
+    else{
+        MotionCtrl_Stop();
+
+        MotionCtrl_EdgeMotionInit();
     }
 }
 
 void SweepRobot_ManualModeProc(enum MotionCtrlManualAct act)
 {
-    if(gRobotState == ROBOT_STATE_HOME){
+    if((gRobotState == ROBOT_STATE_HOME) || (gRobotState == ROBOT_STATE_STARTUP)){
         return;
     }
 
+    if(gRobotState != ROBOT_STATE_RUNNING){
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FAN_CHAN_STARTUP_SPEED);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+    }
+    else{
+        MotionCtrl_Stop();
+    }
     MotionCtrl_ManualCtrlProc(act);
-    gRobotMode = ROBOT_WORK_MODE_MANUAL;
 }
 
 void SweepRobot_HomingInit(void)
 {
-    if(gRobotState == ROBOT_STATE_HOME){
-#ifdef DEBUG_LOG
-        printf("Already in charging.\r\n");
-#endif
+    if((gRobotState == ROBOT_STATE_HOME) || (gRobotState == ROBOT_STATE_STARTUP)){
         return;
     }
 
-    MotionCtrl_RoundedSlowly();
-    gRobotMode = ROBOT_WORK_MODE_HOMING;
-    /* Turn around for search power station signal */
+    if(gRobotState != ROBOT_STATE_RUNNING){
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+    }
+    else{
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
+        MotionCtrl_Stop();
+    }
+    MotionCtrl_HomingMotionInit();
+
     gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
     LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 }
 
+void SweepRobot_MotionStateSync(void)
+{
+    gRobotState = ROBOT_STATE_IDLE;
+
+    if(gRobotMode==ROBOT_WORK_MODE_DISHOMING){
+        SweepRobot_AutoModeProc();
+    }
+    else{
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
+    }
+}
+
 void SweepRobot_HomingSuccess(void)
 {
+    gRobotState = ROBOT_STATE_HOME;
+
     MotionCtrl_Stop();
+
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
 
     gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
     LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
@@ -225,7 +347,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
 #endif
             if(gRobotState == ROBOT_STATE_HOME){
                 gRobotState = ROBOT_STATE_IDLE;
-                CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+                CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
             }
             break;
         case BM_EVT_POWER_LINK:
@@ -236,20 +358,20 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
                 SweepRobot_HomingSuccess();
             }
             gRobotState = ROBOT_STATE_HOME;
-            gRobotMode  = ROBOT_WORK_MODE_HOMING;
+            gRobotMode = ROBOT_WORK_MODE_HOMING;
             break;
         case BM_EVT_LOW_LEVEL:
             /* Low battery condition, try to home and get charged */
 #ifdef DEBUG_LOG
             printf("Robot low battery condition.\r\n");
 #endif
-            if(gRobotMode != ROBOT_WORK_MODE_HOMING){
-                CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, 1);
+            if(gRobotState==ROBOT_STATE_RUNNING && gRobotMode != ROBOT_WORK_MODE_HOMING && gRobotMode != ROBOT_WORK_MODE_DISHOMING && gRobotMode != ROBOT_WORK_MODE_MANUAL){
+                CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, CTRL_PANEL_LED_BR_LVL);
                 SweepRobot_HomingInit();
             }
             break;
         case BM_EVT_CHARGE_COMPLETE:
-            CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+            CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
 #ifdef DEBUG_LOG
             printf("Robot finish charging.\r\n");
 #endif
@@ -313,14 +435,20 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
 #ifdef DEBUG_LOG
             printf("Exception state.\r\n");
 #endif
-            MotionCtrl_Stop();
+            Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
+            SweepRobot_Stop();
             break;
         case MOTION_EVT_TRAPPED:
+            Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_LONG);
             MotionCtrl_TrapProc();
+            break;
+        case MOTION_EVT_STATE_SYNC:
+            SweepRobot_MotionStateSync();
             break;
     }
 }
 
+#ifdef PWS_HW_VERSION_1_0
 #define IS_PWR_STATION_BACKOFF_SIG(sig)     ((sig==PWR_STATION_BACKOFF_SIG_L)||(sig==PWR_STATION_BACKOFF_SIG_R))
 #define IS_PWR_STATION_SIG_LONG(sig)        ((sig==PWR_STATION_HOME_SIG_LL)||(sig==PWR_STATION_HOME_SIG_RL))
 #define IS_PWR_STATION_SIG_CENTER(sig)      (sig==PWR_STATION_HOME_SIG_CENTER)
@@ -332,6 +460,14 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
 #define IS_PWR_STATION_SIG_SHORT(sig)       ((sig==PWR_STATION_BACKOFF_SIG_R)||(sig==PWR_STATION_BACKOFF_SIG_L))
 #define IS_PWR_STATION_SIG_LEFT(sig)        ((sig==PWR_STATION_HOME_SIG_LL)||(sig==PWR_STATION_BACKOFF_SIG_L))
 #define IS_PWR_STATION_SIG_RIGHT(sig)       ((sig==PWR_STATION_HOME_SIG_RL)||(sig==PWR_STATION_BACKOFF_SIG_R))
+#endif
+#else /* Power Station HW Revision 1.1 */
+#define IS_PWR_STATION_BACKOFF_SIG(sig)     ((sig==PWR_STATION_BACKOFF_SIG_L)||(sig==PWR_STATION_BACKOFF_SIG_R))
+#define IS_PWR_STATION_SIG_LONG(sig)        ((sig==PWR_STATION_HOME_SIG_LL)||(sig==PWR_STATION_HOME_SIG_RL))
+#define IS_PWR_STATION_SIG_SHORT(sig)       ((sig==PWR_STATION_HOME_SIG_LS)||(sig==PWR_STATION_HOME_SIG_RS))
+#define IS_PWR_STATION_SIG_CENTER(sig)      (sig==PWR_STATION_HOME_SIG_CENTER)
+#define IS_PWR_STATION_SIG_LEFT(sig)        ((sig==PWR_STATION_HOME_SIG_LL)||(sig==PWR_STATION_HOME_SIG_LS))
+#define IS_PWR_STATION_SIG_RIGHT(sig)       ((sig==PWR_STATION_HOME_SIG_RL)||(sig==PWR_STATION_HOME_SIG_RS))
 #endif
 
 void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
@@ -345,12 +481,10 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
     }
 
     if(gRobotMode == ROBOT_WORK_MODE_HOMING){
-#if 0
         /* Ignore backoff signal */
         if(IS_PWR_STATION_BACKOFF_SIG(PwrSig->sig)){
             return;
         }
-#endif
         for(i = 0; i < HomingDataCnt; i++){
             if(RobotHomingData[i].sig == PwrSig->sig && RobotHomingData[i].src == PwrSig->src){
                 break;
@@ -520,7 +654,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
                 }
                 else if(HomingState.Angle == 90){
                     MotionCtrl_MoveDirTune(4, WHEEL_HOMING_SPEED);
-                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_BLUE, 1);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_BLUE, CTRL_PANEL_LED_BR_LVL);
                 }
                 else{
                     MotionCtrl_MoveDirTune(1, WHEEL_HOMING_SPEED);
@@ -535,7 +669,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
                 }
                 else if(HomingState.Angle == -90){
                     MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 4);
-                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_BLUE, 1);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_BLUE, CTRL_PANEL_LED_BR_LVL);
                 }
                 else{
                     MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED, 1);
@@ -553,7 +687,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
                 }
                 else {
                     MotionCtrl_MoveDirTune(WHEEL_CRUISE_SPEED, WHEEL_CRUISE_SPEED);
-                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
                 }
             }
             else{
@@ -565,7 +699,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
                 }
                 else {
                     MotionCtrl_MoveDirTune(WHEEL_CRUISE_SPEED, WHEEL_CRUISE_SPEED);
-                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 1);
+                    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
                 }
             }
         }
@@ -587,13 +721,13 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
             else{
                 gHomingStage = ROBOT_HOMING_STAGE_OK;
                 MotionCtrl_MoveDirTune(WHEEL_HOMING_SPEED-2, WHEEL_HOMING_SPEED-2);
-                CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, 1);
+                CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, CTRL_PANEL_LED_BR_LVL);
             }
         }
         LastHomingStage = gHomingStage;
     }
     else {
-        if( IS_MOTION_PROC_FINISH() && (PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_L || PwrSig->sig == (u8)PWR_STATION_BACKOFF_SIG_R) ){
+        if( IS_MOTION_PROC_FINISH() && IS_PWR_STATION_BACKOFF_SIG(PwrSig->sig) ){
             if( (PwrSig->src==IRDA_RECV_POS_L || PwrSig->src==IRDA_RECV_POS_FL) ){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
                     MotionCtrl_ChargeStationAvoid(1, WHEEL_TURN_30_CNT, 1);

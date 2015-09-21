@@ -150,6 +150,13 @@ void BM_ConditionUpdate(void)
                 break;
             case BAT_STATE_WAIT_FOR_CHARGE:
                 gBM_Cond.state = BAT_STATE_DISCHARGING;
+                /* Power loss event */
+                Msg.expire = 0;
+                Msg.type = MSG_TYPE_BM;
+                Msg.prio = MSG_PRIO_LOW;
+                Msg.MsgCB = BM_ChargeStop;
+                Msg.Data.BatEvt = BM_EVT_POWER_LOSS;
+                SweepRobot_SendMsg(&Msg);
                 break;
             case BAT_STATE_CHARGING:
                 BM_ChargeExit();
@@ -299,23 +306,23 @@ void BM_Init(void)
 
     PWM_ChanInit(PWM_CHAN_CHARGE, 1, 0);
 
-    NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
+    NVIC_InitStructure.NVIC_IRQChannel = BAT_MONITOR_TIM_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = BAT_MONITOR_TIM_IRQ_PP;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = BAT_MONITOR_TIM_IRQ_SP;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7 , ENABLE);
-    TIM_DeInit(TIM7);
+    RCC_APB1PeriphClockCmd(BAT_MONITOR_TIM_PERIPH_ID , ENABLE);
+    TIM_DeInit(BAT_MONITOR_TIM);
     TIM_TimeBaseStructure.TIM_Period = 10000-1;                                 // 100ms
     TIM_TimeBaseStructure.TIM_Prescaler = 720-1;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(TIM7, &TIM_TimeBaseStructure);
-    TIM_ClearFlag(TIM7, TIM_FLAG_Update);
-    TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
+    TIM_TimeBaseInit(BAT_MONITOR_TIM, &TIM_TimeBaseStructure);
+    TIM_ClearFlag(BAT_MONITOR_TIM, TIM_FLAG_Update);
+    TIM_ITConfig(BAT_MONITOR_TIM, TIM_IT_Update, ENABLE);
 
-    plat_int_reg_cb(STM32F10x_INT_TIM7, (void*)BM_ConditionUpdate);
-    TIM_Cmd(TIM7, ENABLE);
+    plat_int_reg_cb(BAT_MONITOR_TIM_INT_IDX, (void*)BM_ConditionUpdate);
+    TIM_Cmd(BAT_MONITOR_TIM, ENABLE);
 }
 

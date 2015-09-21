@@ -13,9 +13,22 @@
 
 #include "stm32f10x_conf.h"
 
+#ifdef REVISION_1_0
 #define BM_CHARGE_SW_STATUS_GPIO_PERIPH_ID      RCC_APB2Periph_GPIOD
 #define BM_CHARGE_SW_STATUS_GPIO                GPIOD
 #define BM_CHARGE_SW_STATUS_PIN                 GPIO_Pin_7
+#elif defined REVISION_1_1
+#define BM_CHARGE_SW_STATUS_GPIO_PERIPH_ID      RCC_APB2Periph_GPIOB
+#define BM_CHARGE_SW_STATUS_GPIO                GPIOB
+#define BM_CHARGE_SW_STATUS_PIN                 GPIO_Pin_5
+#endif
+
+#define BAT_MONITOR_TIM_PERIPH_ID               RCC_APB1Periph_TIM5
+#define BAT_MONITOR_TIM                         TIM5
+#define BAT_MONITOR_TIM_IRQn                    TIM5_IRQn
+#define BAT_MONITOR_TIM_IRQ_PP                  3
+#define BAT_MONITOR_TIM_IRQ_SP                  3
+#define BAT_MONITOR_TIM_INT_IDX                 STM32F10x_INT_TIM5
 
 enum BatteryState {
 

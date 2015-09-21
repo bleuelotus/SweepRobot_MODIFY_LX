@@ -12,6 +12,7 @@
 
 #define BUZZER_ONE_PULS_LEN             300                                     // 750ms
 
+static u16 BuzzerPulsLen = BUZZER_ONE_PULS_LEN;
 static u8 BuzzerPulsCnt = 0;
 static u16 BuzzerInput = 0;
 
@@ -19,7 +20,7 @@ void BuzzerClock(void)
 {
     BuzzerInput++;
     if(!(BuzzerPulsCnt%2)){
-        if(!(BuzzerInput%BUZZER_ONE_PULS_LEN)){
+        if(!(BuzzerInput%BuzzerPulsLen)){
             BuzzerPulsCnt--;
         }
         GPIO_WriteBit(BUZZER_SW_GPIO, BUZZER_SW_PIN, (BitAction)(BuzzerInput%2));
@@ -30,7 +31,7 @@ void BuzzerClock(void)
             BuzzerInput = 0;
         }
         else{
-            if(!(BuzzerInput%BUZZER_ONE_PULS_LEN)){
+            if(!(BuzzerInput%BuzzerPulsLen)){
                 BuzzerPulsCnt--;
             }
         }
@@ -71,7 +72,7 @@ void Buzzer_Init(void)
     plat_int_reg_cb(BUZZER_PWM_SRC_TIM_INT_IDX, (void*)BuzzerClock);
 }
 
-void Buzzer_Play(enum BuzzerSndType snd)
+void Buzzer_Play(enum BuzzerSndType snd, enum BuzzerSndInterval interval)
 {
     Buzzer_Stop();
 
@@ -91,6 +92,8 @@ void Buzzer_Play(enum BuzzerSndType snd)
             break;
         default:return;
     }
+
+    BuzzerPulsLen = interval;
 
     TIM_Cmd(BUZZER_PWM_SRC_TIM, ENABLE);
 }

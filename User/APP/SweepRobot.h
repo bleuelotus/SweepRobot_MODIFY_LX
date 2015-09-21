@@ -18,10 +18,10 @@ extern enum _RobotHomingStage gHomingStage;
 
 enum RobotState {
 
+    ROBOT_STATE_STARTUP,
     ROBOT_STATE_IDLE,
     ROBOT_STATE_RUNNING,
     ROBOT_STATE_HOME,
-    ROBOT_STATE_POWER_SAVE,
 };
 
 enum RobotWorkMode{
@@ -31,6 +31,7 @@ enum RobotWorkMode{
     ROBOT_WORK_MODE_SPOT,
     ROBOT_WORK_MODE_EDGE,
     ROBOT_WORK_MODE_HOMING,
+    ROBOT_WORK_MODE_DISHOMING,
 };
 
 enum _RobotHomingStage {
@@ -44,6 +45,8 @@ enum _RobotHomingStage {
 
 s8 SweepRobot_Init(void);
 void SweepRobot_Start(void);
+void SweepRobot_StartupComplete(void);
+void SweepRobot_Stop(void);
 s8 SweepRobot_SendMsg(Msg_t *Msg);
 
 

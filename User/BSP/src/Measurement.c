@@ -13,7 +13,7 @@
 #define ADC1_DR_Address                 ((u32)0x4001244C)
 
 
-__IO u16 ADCConvertedLSB[MEAS_CHAN_CNT] = {0};
+__IO u16 ADCConvertedLSB[MEAS_CHAN_NUM] = {0};
 
 void Meas_Init(void)
 {
@@ -34,12 +34,17 @@ void Meas_Init(void)
     GPIO_Init(AD_IFRD_SIDE_RX_RIGHT_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_LEFT_PIN;
     GPIO_Init(AD_IFRD_BOTTOM_RX_LEFT_GPIO, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_BL_PIN;
-    GPIO_Init(AD_IFRD_BOTTOM_RX_BL_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_RIGHT_PIN;
     GPIO_Init(AD_IFRD_BOTTOM_RX_RIGHT_GPIO, &GPIO_InitStructure);
+#ifdef REVISION_1_0
+    GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_BL_PIN;
+    GPIO_Init(AD_IFRD_BOTTOM_RX_BL_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_BR_PIN;
     GPIO_Init(AD_IFRD_BOTTOM_RX_BR_GPIO, &GPIO_InitStructure);
+#elif defined REVISION_1_1
+    GPIO_InitStructure.GPIO_Pin = AD_UNIVERSAL_WHEEL_SIG_PIN;
+    GPIO_Init(AD_UNIVERSAL_WHEEL_SIG_GPIO, &GPIO_InitStructure);
+#endif
     GPIO_InitStructure.GPIO_Pin = AD_BRUSH_CUR_LEFT_PIN;
     GPIO_Init(AD_BRUSH_CUR_LEFT_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_BRUSH_CUR_RIGHT_PIN;
@@ -62,7 +67,7 @@ void Meas_Init(void)
     DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_Address;
     DMA_InitStructure.DMA_MemoryBaseAddr = (u32)&ADCConvertedLSB;
     DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-    DMA_InitStructure.DMA_BufferSize = MEAS_CHAN_CNT * MEAS_SAMPLE_CNT;
+    DMA_InitStructure.DMA_BufferSize = MEAS_CHAN_NUM * MEAS_SAMPLE_CNT;
     DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
     DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
     DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
@@ -82,7 +87,7 @@ void Meas_Init(void)
 	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStructure.ADC_NbrOfChannel = MEAS_CHAN_CNT;
+	ADC_InitStructure.ADC_NbrOfChannel = MEAS_CHAN_NUM;
 	ADC_Init(ADC1, &ADC_InitStructure);
 
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_2,   MEAS_CHAN_IFRD_FRONT_RX_L,      ADC_SampleTime_55Cycles5);
@@ -91,12 +96,16 @@ void Meas_Init(void)
     ADC_RegularChannelConfig(ADC1, ADC_Channel_10,  MEAS_CHAN_IFRD_SIDE_RX_R,       ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_3,   MEAS_CHAN_IFRD_BOTTOM_RX_L,     ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_11,  MEAS_CHAN_IFRD_BOTTOM_RX_R,     ADC_SampleTime_55Cycles5);
+#ifdef REVISION_1_0
     ADC_RegularChannelConfig(ADC1, ADC_Channel_15,  MEAS_CHAN_IFRD_BOTTOM_RX_BL,    ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_8,   MEAS_CHAN_IFRD_BOTTOM_RX_BR,    ADC_SampleTime_55Cycles5);
+#elif defined REVISION_1_1
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_15,  MEAS_CHAN_UNIVERSAL_WHEEL_SIG,  ADC_SampleTime_55Cycles5);
+#endif
     ADC_RegularChannelConfig(ADC1, ADC_Channel_5,   MEAS_CHAN_BRUSH_CUR_LEFT,       ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_9,   MEAS_CHAN_BRUSH_CUR_RIGHT,      ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_7,   MEAS_CHAN_BRUSH_CUR_MIDDLE,     ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_6,   MEAS_CHAN_FUN_CUR,              ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_6,   MEAS_CHAN_FAN_CUR,              ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_12,  MEAS_CHAN_BAT_CHARGE_CUR,       ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_13,  MEAS_CHAN_BAT_VOL,              ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_14,  MEAS_CHAN_ASH_TRAY_LVL,         ADC_SampleTime_55Cycles5);
