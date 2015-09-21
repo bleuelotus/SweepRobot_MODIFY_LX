@@ -157,6 +157,13 @@ void SweepRobot_StartupInit(void *pDelayedWork)
 {
     gRobotState = ROBOT_STATE_STARTUP;
 
+    if(WHEEL_FLOAT_SIGN_ALL || ASH_TRAY_INSTALL_SIGN){
+        Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
+        CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, CTRL_PANEL_LED_BR_LVL);
+        gRobotState = ROBOT_STATE_IDLE;
+        return;
+    }
+
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FAN_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);

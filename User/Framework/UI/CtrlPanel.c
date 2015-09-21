@@ -85,7 +85,7 @@ void CtrlPanel_RemoteCB(u8 code)
     SweepRobot_SendMsg(&Msg);
 }
 
-void CtrlPanel_AllInOneBtnProc(void)
+void CtrlPanel_AllInOneBtnUpProc(void)
 {
     Msg_t   Msg;
 
@@ -95,6 +95,15 @@ void CtrlPanel_AllInOneBtnProc(void)
     Msg.MsgCB = NULL;
     Msg.Data.ByteVal = REMOTE_CMD_RUN_STOP;
     SweepRobot_SendMsg(&Msg);
+
+    PM_ResetSysIdleState();
+}
+
+void CtrlPanel_AllInOneBtnDownProc(void)
+{
+    if(gSystemIdleCnt > 3){
+        gSystemIdleCnt = 3;
+    }
 }
 
 void CtrlPanel_Init(void)
@@ -119,8 +128,8 @@ void CtrlPanel_Init(void)
     AllInOnekey.RCCResID = CTRL_BTN_ALL_IN_ONE_GPIO_PERIPH_ID;
     AllInOnekey.GPIOx = CTRL_BTN_ALL_IN_ONE_GPIO;
     AllInOnekey.GPIO_Pin = CTRL_BTN_ALL_IN_ONE_PIN;
-    AllInOnekey.EvtCB.Down = NULL;
-    AllInOnekey.EvtCB.Up = CtrlPanel_AllInOneBtnProc;
+    AllInOnekey.EvtCB.Down = CtrlPanel_AllInOneBtnDownProc;
+    AllInOnekey.EvtCB.Up = CtrlPanel_AllInOneBtnUpProc;
     Key_Register(&AllInOnekey);
 
     Key_StartListen();
