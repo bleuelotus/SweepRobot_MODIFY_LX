@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=1403695504
+Checksum=-124855199
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]
@@ -95,7 +95,8 @@ Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.
 Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.244.5" 0 0 1 "" 0 "" 0
 Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.278.5" 0 0 1 "" 0 "" 0
 Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.295.5" 0 0 1 "" 0 "" 0
-Count=4
+Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\BSP\src\BatteryManage.c}.257.5" 0 0 1 "" 0 "" 0
+Count=5
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

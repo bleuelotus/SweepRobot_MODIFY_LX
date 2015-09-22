@@ -62,6 +62,13 @@ extern u8 gActSeqDepLIndicator;
 extern u8 gActSeqDepRIndicator;
 extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 
+
+#define LBRUSH_CUR_THRESHOLD                    300                             //  0.5A
+#define RBRUSH_CUR_THRESHOLD                    300                             //  0.5A
+#define MBRUSH_CUR_THRESHOLD                    1000                            //  1.6A
+#define FAN_CUR_THRESHOLD                       1000                            //  1.6A
+
+
 #define IS_MOTION_PROC_FINISH()             ((gActSeqDepLIndicator==0)&&(gActSeqDepRIndicator==0))
 #define MOTION_PROC_STATE_SET()             do{gActSeqDepLIndicator++;}while(0);
 

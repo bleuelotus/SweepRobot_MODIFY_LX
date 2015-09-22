@@ -27,11 +27,6 @@
 #define IFRD_CHAN_BOTTOM_BL                     6
 #define IFRD_CHAN_BOTTOM_BR                     7
 
-#define LBRUSH_CUR_THRESHOLD                    300                             //  0.5A
-#define RBRUSH_CUR_THRESHOLD                    300                             //  0.5A
-#define MBRUSH_CUR_THRESHOLD                    1000                            //  1.6A
-#define FAN_CUR_THRESHOLD                       1000                            //  1.6A
-
 
 /* deltaT = deltaRad * Pi * BASE_LEN / 180 / deltaV [ Pre-condition: Vinner != 0 ]; deltaV = Vouter - Vinner */
 #define EDGE_MODE_EXIT_CNT                      10
@@ -156,14 +151,14 @@ u8 ExceptionStateCheck(void)
     u8 ExceptionMask = 0;
 
     /* Update exception sign: left, right, middle brush over loading, wheel floationg and ash tray exist or not */
-    ExceptionMask |= (WHEEL_FLOAT_SIGN_ALL ? 1 : 0) << EXCEPTION_MASK_WHEEL_FLOAT_POS;
-    ExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
+//    ExceptionMask |= (WHEEL_FLOAT_SIGN_ALL ? 1 : 0) << EXCEPTION_MASK_WHEEL_FLOAT_POS;
+//    ExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_FAN_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_LBRUSH_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_RBRUSH_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_MBRUSH_OC_POS;
-    ExceptionMask |= (((20 < MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_LWHEEL)) && ((gRWheelTotalCnt - gLastTotalLWheelCnt) < 4)) ? 1 : 0) << EXCEPTION_MASK_LWHEEL_STUCK_POS;
-    ExceptionMask |= (((20 < MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_RWHEEL)) && ((gRWheelTotalCnt - gLastTotalRWheelCnt) < 4)) ? 1 : 0) << EXCEPTION_MASK_RWHEEL_STUCK_POS;
+    ExceptionMask |= (((30 < MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_LWHEEL)) && ((gRWheelTotalCnt - gLastTotalLWheelCnt) < 4)) ? 1 : 0) << EXCEPTION_MASK_LWHEEL_STUCK_POS;
+    ExceptionMask |= (((30 < MotorCtrl_ChanSpeedLevelGet(MOTOR_CTRL_CHAN_RWHEEL)) && ((gRWheelTotalCnt - gLastTotalRWheelCnt) < 4)) ? 1 : 0) << EXCEPTION_MASK_RWHEEL_STUCK_POS;
     gLastTotalLWheelCnt = gLWheelTotalCnt;
     gLastTotalRWheelCnt = gRWheelTotalCnt;
 
@@ -188,7 +183,7 @@ void MotionStateProc(void)
                 gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
                 SweepRobot_SendMsg(&gMsg);
             }
-//            printf("Exp:%d\r\n", ExceptionMask);
+            printf("Exp:%d\r\n", ExceptionMask);
             gLastExceptionMask = ExceptionMask;
         }
 
@@ -204,7 +199,7 @@ void MotionStateProc(void)
 //        printf(":%d\r\n", gUniversalWheelActiveVal);
 #endif
 
-        if( (gRobotMode == ROBOT_WORK_MODE_AUTO || gRobotMode == ROBOT_WORK_MODE_HOMING) && (LWHEEL_CUR_SPEED==RWHEEL_CUR_SPEED) && IS_MOTION_PROC_FINISH() ){
+        if( (LWHEEL_CUR_SPEED > 1) && (LWHEEL_CUR_SPEED==RWHEEL_CUR_SPEED) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_LWHEEL)==1) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_RWHEEL)==1) ){
             if(abs(gUniversalWheelActiveVal-gUniversalWheelActiveValLast) > UNIVERSAL_WHEEL_ACTIVE_THRESHOLD){
                 FWHEEL_CNT++;
                 gUniversalWheelActiveValLast = gUniversalWheelActiveVal;
