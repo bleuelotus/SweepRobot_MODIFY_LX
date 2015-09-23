@@ -63,10 +63,11 @@ typedef void (*WheelExpFunc_t)(void);
 
 static WheelExpFunc_t  gLWheelExpCB = NULL;
 static WheelExpFunc_t  gRWheelExpCB = NULL;
-
+static WheelExpFunc_t  gWheelProcExitCB = NULL;
 static u16 gLastWheelCnt[WHEEL_NUM] = {0};
 static u16 gDeltaWheelCnt[WHEEL_NUM] = {0};
 static u8 gCurLWheelSpeed = WHEEL_CRUISE_SPEED, gCurRWheelSpeed = WHEEL_CRUISE_SPEED;
+
 static s8 gLastPathFault = 0; /* 0: none, 1: right, -1: left */
 static u8 gConsecutivePathFaultCnt = 0;
 static u8 gPathFaultProcEdgeModeCnt = 0;
@@ -95,6 +96,7 @@ u8 gActSeqDepLIndicator = 0, gActSeqDepRIndicator = 0;
 #define RWHEEL_EXP_CNT_INC(n)                       do{gRWheelExpCnt+=n;}while(0)
 #define LWHEEL_EXP_CB_REG(f)                        do{gLWheelExpCB=f;}while(0)
 #define RWHEEL_EXP_CB_REG(f)                        do{gRWheelExpCB=f;}while(0)
+#define WHEEL_PROC_EXIT_CB_REG(f)                   do{gWheelProcExitCB=f;}while(0)
 #define LWHEEL_EXP_SPEED_SET(s)                     do{gCurLWheelSpeed=s;}while(0)
 #define RWHEEL_EXP_SPEED_SET(s)                     do{gCurRWheelSpeed=s;}while(0)
 #define LWHEEL_EXP_SPEED_INC(s)                     do{gCurLWheelSpeed+=s;}while(0)
@@ -107,7 +109,7 @@ u8 gActSeqDepLIndicator = 0, gActSeqDepRIndicator = 0;
 static u16 gtmpCnt = 0;
 static u16 gIFRDTxOffRxVal[IFRD_TxRx_CHAN_NUM] = {0};
 static u32 gPathCondMap = 0;
-static u8 gLastExceptionMask = 0, ExceptionMask = 0;
+static u8 gLastExceptionMask = 0, gExceptionMask = 0, gIsExceptionHandling = 0;
 static u16 gUniversalWheelActiveVal = 0, gUniversalWheelActiveValLast = 0, gUniveralWheelDetectPeriodCnt = 0;
 static Msg_t gMsg;
 
@@ -151,8 +153,8 @@ u8 ExceptionStateCheck(void)
     u8 ExceptionMask = 0;
 
     /* Update exception sign: left, right, middle brush over loading, wheel floationg and ash tray exist or not */
-//    ExceptionMask |= (WHEEL_FLOAT_SIGN_ALL ? 1 : 0) << EXCEPTION_MASK_WHEEL_FLOAT_POS;
-//    ExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
+//    gExceptionMask |= (WHEEL_FLOAT_SIGN_ALL ? 1 : 0) << EXCEPTION_MASK_WHEEL_FLOAT_POS;
+//    gExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_FAN_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_LBRUSH_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_RBRUSH_OC_POS;
@@ -173,18 +175,20 @@ void MotionStateProc(void)
     if((++gtmpCnt)%2){
 
         if(!(gtmpCnt%EXCEPTION_CHECK_PERIOD)){
-            ExceptionMask = ExceptionStateCheck();
-            if(gLastExceptionMask & ExceptionMask){
+            gExceptionMask = ExceptionStateCheck();
+            if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
                 /* Send exception message */
                 gMsg.expire = 0;
                 gMsg.prio = MSG_PRIO_HIGHEST;
                 gMsg.type = MSG_TYPE_MOTION;
                 gMsg.MsgCB = NULL;
                 gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
-                SweepRobot_SendMsg(&gMsg);
+                if(!SweepRobot_SendMsg(&gMsg)){
+                    gIsExceptionHandling = 1;
+                }
             }
-            printf("Exp:%d\r\n", ExceptionMask);
-            gLastExceptionMask = ExceptionMask;
+            printf("Exp:%d\r\n", gExceptionMask);
+            gLastExceptionMask = gExceptionMask;
         }
 
         /* Save proximity condition in Tx off */
@@ -620,12 +624,18 @@ static inline void MotionCtrl_LWheelProcExitOn(void)
 {
     LWHEEL_EXP_CB_REG(NULL);
     gActSeqDepLIndicator--;
+    if((NULL!=gWheelProcExitCB) && (gActSeqDepRIndicator==0) && (gActSeqDepLIndicator==0)){
+        gWheelProcExitCB();
+    }
 }
 
 static inline void MotionCtrl_RWheelProcExitOn(void)
 {
     RWHEEL_EXP_CB_REG(NULL);
     gActSeqDepRIndicator--;
+    if((NULL!=gWheelProcExitCB) && (gActSeqDepRIndicator==0) && (gActSeqDepLIndicator==0)){
+        gWheelProcExitCB();
+    }
 }
 
 static inline void MotionCtrl_LWheelProcExitOff(void)
@@ -634,14 +644,14 @@ static inline void MotionCtrl_LWheelProcExitOff(void)
 //    LWHEEL_EXP_SPEED_SET(0);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
     gActSeqDepLIndicator--;
-    if(gActSeqDepRIndicator==0 && gActSeqDepLIndicator==0){
+    if((gActSeqDepRIndicator==0) && (gActSeqDepLIndicator==0)){
         MotionCtrl_Stop();
         /* Notify main process make the further stop */
         gMsg.expire = 0;
         gMsg.prio = MSG_PRIO_HIGHEST;
         gMsg.type = MSG_TYPE_MOTION;
         gMsg.MsgCB = NULL;
-        gMsg.Data.MEvt = MOTION_EVT_STATE_SYNC;
+        gMsg.Data.MEvt = MOTION_EVT_IDLE_SYNC;
         SweepRobot_SendMsg(&gMsg);
     }
 }
@@ -652,14 +662,14 @@ static inline void MotionCtrl_RWheelProcExitOff(void)
 //    RWHEEL_EXP_SPEED_SET(0);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
     gActSeqDepRIndicator--;
-    if(gActSeqDepRIndicator==0 && gActSeqDepLIndicator==0){
+    if((gActSeqDepRIndicator==0) && (gActSeqDepLIndicator==0)){
         MotionCtrl_Stop();
         /* Notify main process make the further stop */
         gMsg.expire = 0;
         gMsg.prio = MSG_PRIO_HIGHEST;
         gMsg.type = MSG_TYPE_MOTION;
         gMsg.MsgCB = NULL;
-        gMsg.Data.MEvt = MOTION_EVT_STATE_SYNC;
+        gMsg.Data.MEvt = MOTION_EVT_IDLE_SYNC;
         SweepRobot_SendMsg(&gMsg);
     }
 }
@@ -1090,6 +1100,116 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
     gActSeqDepth++;
     pActSequence++;
     MotionCtrl_Proc();
+}
+
+void ExceptionHandleFinishCB(void)
+{
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+
+    gIsExceptionHandling = 0;
+}
+
+s8 MotionCtrl_ExceptionHandle(void)
+{
+    if( gExceptionMask & ((1<<EXCEPTION_MASK_WHEEL_FLOAT_POS) | (1<<EXCEPTION_MASK_ASHTRAY_INS_POS) | (1<<EXCEPTION_MASK_FAN_OC_POS)) ){
+        return -1;
+    }
+
+    if(gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS)){
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
+    }
+    if(gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS)){
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
+    }
+    if(gExceptionMask & (1<<EXCEPTION_MASK_MBRUSH_OC_POS)){
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
+    }
+    if( gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS)) ){
+
+    }
+
+    MotionCtrl_Start();
+    gActSequence[0].LWheelDefDir = 0;
+    gActSequence[0].RWheelDefDir = 0;
+    gActSequence[0].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[0].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[0].LWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
+    gActSequence[0].RWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
+    gActSequence[0].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[0].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[0].LWheelSync = 0;
+    gActSequence[0].RWheelSync = 0;
+    gActSequence[0].PreAct = NULL;
+    gActSequence[0].PostAct = NULL;
+    gActSequence[1].LWheelDefDir = 0;
+    gActSequence[1].RWheelDefDir = 1;
+    gActSequence[1].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[1].RWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[1].LWheelExpCnt = WHEEL_TURN_45_CNT;
+    gActSequence[1].RWheelExpCnt = WHEEL_TURN_45_CNT;
+    gActSequence[1].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[1].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[1].LWheelSync = 0;
+    gActSequence[1].RWheelSync = 0;
+    gActSequence[1].PreAct = NULL;
+    gActSequence[1].PostAct = NULL;
+    gActSequence[2].LWheelDefDir = 1;
+    gActSequence[2].RWheelDefDir = 0;
+    gActSequence[2].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[2].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[2].LWheelExpCnt = WHEEL_TURN_45_CNT;
+    gActSequence[2].RWheelExpCnt = WHEEL_TURN_45_CNT;
+    gActSequence[2].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[2].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[2].LWheelSync = 0;
+    gActSequence[2].RWheelSync = 0;
+    gActSequence[2].PreAct = NULL;
+    gActSequence[2].PostAct = NULL;
+    gActSequence[3].LWheelDefDir = 0;
+    gActSequence[3].RWheelDefDir = 0;
+    gActSequence[3].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[3].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED*2;
+    gActSequence[3].LWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
+    gActSequence[3].RWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
+    gActSequence[3].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[3].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[3].LWheelSync = 0;
+    gActSequence[3].RWheelSync = 0;
+    gActSequence[3].PreAct = MotionCtrl_PathFaultTryTurnCondTest;
+    gActSequence[3].PostAct = MotionCtrl_PathFaultTurnProcCompleteCondTest;
+    gActSequence[4].LWheelDefDir = 1;
+    gActSequence[4].RWheelDefDir = 0;
+    gActSequence[4].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[4].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[4].LWheelExpCnt = WHEEL_TURN_180_CNT;
+    gActSequence[4].RWheelExpCnt = WHEEL_TURN_180_CNT;
+    gActSequence[4].LWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[4].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[4].LWheelSync = 0;
+    gActSequence[4].RWheelSync = 0;
+    gActSequence[4].PreAct = NULL;
+    gActSequence[4].PostAct = NULL;
+    gActSequence[5].LWheelDefDir = 1;
+    gActSequence[5].RWheelDefDir = 1;
+    gActSequence[5].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[5].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[5].LWheelExpCnt = 0x1;
+    gActSequence[5].RWheelExpCnt = 0x2;
+    gActSequence[5].LWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[5].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[5].LWheelSync = 0;
+    gActSequence[5].RWheelSync = 0;
+    gActSequence[5].PreAct = NULL;
+    gActSequence[5].PostAct = NULL;
+    gActSeqDepth = 6;
+
+    MotionCtrl_Proc();
+
+    WHEEL_PROC_EXIT_CB_REG(ExceptionHandleFinishCB);
+
+    return 0;
 }
 
 void MotionCtrl_TrapProc(void)

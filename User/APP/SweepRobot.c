@@ -366,7 +366,7 @@ void SweepRobot_HomingInit(void)
     LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 }
 
-void SweepRobot_MotionStateSync(void)
+void SweepRobot_IdleStateSync(void)
 {
     gRobotState = ROBOT_STATE_IDLE;
 
@@ -504,14 +504,16 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
             printf("Exception state.\r\n");
 #endif
             Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
-            SweepRobot_Stop();
+            if(MotionCtrl_ExceptionHandle()){
+                SweepRobot_Stop();
+            }
             break;
         case MOTION_EVT_TRAPPED:
             Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_LONG);
             MotionCtrl_TrapProc();
             break;
-        case MOTION_EVT_STATE_SYNC:
-            SweepRobot_MotionStateSync();
+        case MOTION_EVT_IDLE_SYNC:
+            SweepRobot_IdleStateSync();
             break;
     }
 }

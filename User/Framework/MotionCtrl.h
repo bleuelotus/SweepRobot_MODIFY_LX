@@ -22,14 +22,14 @@
 #define IFRD_FRONT_CHAN_NUM                 2
 #define IFRD_SIDE_CHAN_NUM                  2
 #define IFRD_BOTTOM_CHAN_NUM                2
-#define MCTRL_ACT_MAX_DEPTH                 3
+#define MCTRL_ACT_MAX_DEPTH                 10
 
 enum MotionEvt {
 
     MOTION_EVT_PATH_FAULT,
     MOTION_EVT_EXCEPTION,
     MOTION_EVT_TRAPPED,
-    MOTION_EVT_STATE_SYNC,
+    MOTION_EVT_IDLE_SYNC,
 };
 
 enum MotionCtrlManualAct {
@@ -161,6 +161,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_TURN_360_CNT                  1400//1500
 #define WHEEL_FAULT_BACK_CNT                180
 
+#define WHEEL_ESCAPE_SPEED                  20
 #define WHEEL_CRUISE_SPEED                  12
 #define WHEEL_MODE_SPOT_SPEED               10
 #define WHEEL_FAULT_PROC_SPEED              9
@@ -215,6 +216,7 @@ void MotionCtrl_DishomingMotionInit(void);
 void MotionCtrl_HomingMotionInit(void);
 void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act);
 void MotionCtrl_PathFaultProc(u8 StopOnFinish);
+s8 MotionCtrl_ExceptionHandle(void);
 void MotionCtrl_TrapProc(void);
 void MotionCtrl_ChargeStationAvoid(u8 dir, u8 turnCnt, u8 StopOnFinish);
 void MotionCtrl_MoveDirTune(u8 l, u8 r);
