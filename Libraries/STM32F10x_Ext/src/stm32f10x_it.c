@@ -184,7 +184,7 @@ void SysTick_Handler(void)
 void RTC_IRQHandler(void)
 {
     if (RTC_GetITStatus(RTC_IT_ALR) != RESET){
-        RTC_ClearITPendingBit(RTC_IT_ALR|RTC_IT_OW|RTC_IT_SEC);
+        RTC_ClearITPendingBit(RTC_IT_ALR);
         if(stm32f10x_int_cb_tbl[STM32F10x_INT_RTC_ALR]){
             stm32f10x_int_cb_tbl[STM32F10x_INT_RTC_ALR]();
         }

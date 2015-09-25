@@ -86,8 +86,8 @@
 
 #define IRDA_HOMING_CODE_BOUND_UPPER                0x47
 #define IRDA_HOMING_CODE_BOUND_LOWER                0x39
-//#define IS_IRDA_HOMING_CODE(code)                   ((code<IRDA_HOMING_CODE_BOUND_UPPER) && (code>IRDA_HOMING_CODE_BOUND_LOWER))
-#define IS_IRDA_HOMING_CODE(code)                   (code<IRDA_HOMING_CODE_BOUND_UPPER)
+#define IS_IRDA_HOMING_CODE(code)                   ((code<IRDA_HOMING_CODE_BOUND_UPPER) && (code>IRDA_HOMING_CODE_BOUND_LOWER))
+//#define IS_IRDA_HOMING_CODE(code)                   (code<IRDA_HOMING_CODE_BOUND_UPPER)
 
 enum IRAD_Light {
 

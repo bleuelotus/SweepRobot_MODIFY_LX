@@ -24,6 +24,7 @@
 
 enum RobotState     gRobotState;
 enum RobotWorkMode  gRobotMode, gRobotModeLast;
+static s8 RobotPlanFlag = 0;
 
 #define ROBOT_MAIN_MSG_Q_SIZE               10
 #define STARTUP_DELAY_TIME                  30000                               // 3s
@@ -47,6 +48,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt);
 void SweepRobot_CtrlMsgProc(u8 CtrlCode);
 void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig);
 void SweepRobot_MotionMsgProc(enum MotionEvt evt);
+void SweepRobot_AutoModeProc(void);
 
 s8 SweepRobot_Init(void)
 {
@@ -55,7 +57,7 @@ s8 SweepRobot_Init(void)
     /* Power management init */
     PM_Init();
     /* Real time clock init */
-    RTC_Init();
+    RobotPlanFlag = RTC_Init();
     /* Message Queue for processing robot state */
     MainMsgQ = MsgQueue_Create(ROBOT_MAIN_MSG_Q_SIZE);
     if(MainMsgQ == NULL){
@@ -100,6 +102,11 @@ SWEEPROBOT_INIT_FAIL:
 void SweepRobot_Start(void)
 {
     u8  i = 0;
+
+    if(RobotPlanFlag){
+        RobotPlanFlag = 0;
+        SweepRobot_AutoModeProc();
+    }
 
     while(1){
         /* Message loop */
@@ -163,9 +170,9 @@ void SweepRobot_StartupInit(void)
     plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
 
     if(1==gRobotStartupSeqNum){
-        if(WHEEL_FLOAT_SIGN_ALL || ASH_TRAY_INSTALL_SIGN){
-            goto STARTUP_FAIL_ON_WF_AT;
-        }
+//        if(WHEEL_FLOAT_SIGN_ALL || ASH_TRAY_INSTALL_SIGN){
+//            goto STARTUP_FAIL_ON_WF_AT;
+//        }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, MOTOR_FAN_CHAN_STARTUP_SPEED);
     }
     else if(2==gRobotStartupSeqNum){
@@ -483,6 +490,21 @@ void SweepRobot_CtrlMsgProc(u8 CtrlCode)
             break;
         case REMOTE_CMD_CHARGE:
             SweepRobot_HomingInit();
+            break;
+        case REMOTE_CMD_PLAN_STATE:
+            if(RTC_AlarmGet()){
+                Buzzer_Play(BUZZER_ONE_PULS, BUZZER_SND_LONG);
+            }
+            break;
+        case REMOTE_CMD_PLAN_CANCEL:
+            RTC_AlarmSet(0);
+            Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
+            break;
+        default:
+            if(CtrlCode >= REMOTE_CMD_PLAN_23P5H || CtrlCode <= REMOTE_CMD_PLAN_0P5H){
+                RTC_AlarmSet((REMOTE_CMD_PLAN_0P5H-CtrlCode+1)*1800);
+                Buzzer_Play(BUZZER_ONE_PULS, BUZZER_SND_SHORT);
+            }
             break;
     }
 }
