@@ -2108,12 +2108,6 @@
         <file>
           <name>$PROJ_DIR$\..\..\User\Framework\Common\src\PwrManagement.c</name>
         </file>
-        <file>
-          <name>$PROJ_DIR$\..\..\User\Framework\Common\src\Schedule.c</name>
-          <excluded>
-            <configuration>DB-ROBOT-S1</configuration>
-          </excluded>
-        </file>
       </group>
       <group>
         <name>UI</name>

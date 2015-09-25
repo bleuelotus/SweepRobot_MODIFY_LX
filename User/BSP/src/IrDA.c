@@ -111,7 +111,7 @@ static inline void IrDA_ParseNEC(enum IRAD_Light idx)
 }
 #endif
 
-static inline void IrDA_ParseEJE(enum IRAD_Light idx)
+static void IrDA_ParseEJE(enum IRAD_Light idx)
 {
     u8  data = 0;
 

@@ -620,7 +620,7 @@ void MotionCtrl_Init(void)
     IFRD_PathDetectInit();
 }
 
-static inline void MotionCtrl_LWheelProcExitOn(void)
+static void MotionCtrl_LWheelProcExitOn(void)
 {
     LWHEEL_EXP_CB_REG(NULL);
     gActSeqDepLIndicator--;
@@ -630,7 +630,7 @@ static inline void MotionCtrl_LWheelProcExitOn(void)
     }
 }
 
-static inline void MotionCtrl_RWheelProcExitOn(void)
+static void MotionCtrl_RWheelProcExitOn(void)
 {
     RWHEEL_EXP_CB_REG(NULL);
     gActSeqDepRIndicator--;
@@ -640,7 +640,7 @@ static inline void MotionCtrl_RWheelProcExitOn(void)
     }
 }
 
-static inline void MotionCtrl_LWheelProcExitOff(void)
+static void MotionCtrl_LWheelProcExitOff(void)
 {
     LWHEEL_EXP_CB_REG(NULL);
 //    LWHEEL_EXP_SPEED_SET(0);
@@ -658,7 +658,7 @@ static inline void MotionCtrl_LWheelProcExitOff(void)
     }
 }
 
-static inline void MotionCtrl_RWheelProcExitOff(void)
+static void MotionCtrl_RWheelProcExitOff(void)
 {
     RWHEEL_EXP_CB_REG(NULL);
 //    RWHEEL_EXP_SPEED_SET(0);
@@ -676,7 +676,7 @@ static inline void MotionCtrl_RWheelProcExitOff(void)
     }
 }
 
-static inline void MotionCtrl_RWheelSubProc(void)
+static void MotionCtrl_RWheelSubProc(void)
 {
     u8  idx = 0;
 
@@ -731,7 +731,7 @@ static inline void MotionCtrl_RWheelSubProc(void)
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, gActSequence[idx].RWheelInitSpeed);
 }
 
-static inline void MotionCtrl_LWheelSubProc(void)
+static void MotionCtrl_LWheelSubProc(void)
 {
     u8  idx = 0;
 

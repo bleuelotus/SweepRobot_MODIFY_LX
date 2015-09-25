@@ -332,9 +332,6 @@
         <file>
           <name>$PROJ_DIR$\..\..\User\Framework\Common\src\PwrManagement.c</name>
         </file>
-        <file>
-          <name>$PROJ_DIR$\..\..\User\Framework\Common\src\Schedule.c</name>
-        </file>
       </group>
       <group>
         <name>UI</name>

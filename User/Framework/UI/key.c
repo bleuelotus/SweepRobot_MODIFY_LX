@@ -79,6 +79,7 @@ s8 Key_Register(Key_t *key)
 {
     KeyList_t           *pKeyList = KeyListHead;
     GPIO_InitTypeDef    GPIO_InitStructure;
+	KeyList_t   		*KeyNode = NULL;
 
     if( NULL==key )
         return -1;
@@ -89,7 +90,7 @@ s8 Key_Register(Key_t *key)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(key->GPIOx, &GPIO_InitStructure);
 
-    KeyList_t   *KeyNode = malloc(sizeof(KeyList_t));
+    KeyNode = malloc(sizeof(KeyList_t));
     if( NULL==KeyNode )
         return -1;
     memset(KeyNode, 0, sizeof(KeyList_t));
@@ -175,6 +176,6 @@ void Key_EvtProccess(void)
     IrDA_ProcessEJE(CtrlPanel_RemoteCB);
 #endif
     return;
-}
+} 
 
 /***************************** end key file************************************/

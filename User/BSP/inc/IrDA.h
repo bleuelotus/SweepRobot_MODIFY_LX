@@ -134,3 +134,4 @@ void PwrStationHomingSigProc(u8 idx, u8 code);
 #define IRDA_ID             0
 
 #endif /* __IRDA_H__ */
+

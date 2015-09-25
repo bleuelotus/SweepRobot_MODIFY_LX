@@ -2,7 +2,7 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>2687869084</fileChecksum>
+  <fileChecksum>990848540</fileChecksum>
   <configuration>
     <name>DB-ROBOT-S1</name>
     <outputs>
@@ -1417,6 +1417,10 @@
       </inputs>
     </file>
     <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+    <forcedrebuild>
       <name>$PROJ_DIR$\..\..\User\BSP\src\ET6204.c</name>
       <tool>ICCARM</tool>
     </forcedrebuild>
@@ -1676,7 +1680,7 @@
       <inputs>
         <tool>
           <name>ILINK</name>
-          <file> 139 56 46 25 42 31 34 32 52 50 69 11 73 87 7 28 54 15 72 68 81 83 76 13 21 9 19 26 5 29 84 36 75 51 4 88 16 44 22 41 66 79 59 10 90 80 200 115 102</file>
+          <file> 139 56 46 25 42 31 34 32 52 50 69 11 73 87 7 28 54 72 68 81 83 76 13 21 9 19 26 5 29 84 36 75 51 4 88 16 44 22 41 66 79 59 10 90 80 200 115 102</file>
         </tool>
       </inputs>
     </file>
@@ -1707,19 +1711,11 @@
       <name>$PROJ_DIR$\..\..\User\Framework\Common\src\Schedule.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 15</file>
-        </tool>
-        <tool>
           <name>BICOMP</name>
           <file> 35</file>
         </tool>
       </outputs>
       <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 121 210 201 208 91 113 119 110 126 130 96 93 114 106 105 132 108 128 118 97 100 211 205 107 135 129 101 127 109 146 206 116 123 99 142 138 111 125 136 148 98 215 202 199 122 131</file>
-        </tool>
         <tool>
           <name>BICOMP</name>
           <file> 121 210 201 208 91 113 119 110 126 130 96 93 114 106 105 132 108 128 118 97 100 211 205 107 135 129 101 127 109 146 206 116 123 99 142 138 111 125 136 148 98 215 202 199 122 131</file>
