@@ -9,7 +9,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=122385213
+Checksum=-2068690587
 [CodeCoverage]
 Enabled=_ 0
 [Exceptions]
@@ -63,9 +63,6 @@ Fmt3=u8[2]	3	0
 Fmt4=u8[3]	3	0
 Fmt5=u8[5]	4	0
 Fmt6=u8[6]	4	0
-[Trace2]
-Enabled=0
-ShowSource=0
 [SWOTraceWindow]
 PcSampling=0
 InterruptLogs=0
@@ -88,6 +85,21 @@ GraphEnabled=0
 ShowTimeLog=1
 ShowTimeSum=1
 SumSortOrder=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=3
+Graph=0
+Symbiont=0
+Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
@@ -97,21 +109,6 @@ Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.
 Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.295.5" 0 0 1 "" 0 "" 0
 Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\BSP\src\BatteryManage.c}.257.5" 0 0 1 "" 0 "" 0
 Count=5
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
 Count=0
 SuppressDialog=0
-[CallStackLog]
-Enabled=0
-[DriverProfiling]
-Enabled=0
-Mode=3
-Graph=0
-Symbiont=0
-Exclusions=

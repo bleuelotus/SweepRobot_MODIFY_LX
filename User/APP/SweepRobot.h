@@ -13,7 +13,7 @@
 #include "MsgQueue.h"
 
 extern enum RobotState     gRobotState;
-extern enum RobotWorkMode  gRobotMode;
+extern enum RobotWorkMode  gRobotMode, gRobotModeLast;
 extern enum _RobotHomingStage gHomingStage;
 
 enum RobotState {

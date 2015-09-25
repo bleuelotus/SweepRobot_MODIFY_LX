@@ -289,7 +289,7 @@ void MotionStateProc(void)
                         if((gEdgeModeAngleCnt++) > EDGE_MODE_ANGLE_360){
                             LWHEEL_EXP_SPEED_SET(WHEEL_CRUISE_SPEED);
                             RWHEEL_EXP_SPEED_SET(WHEEL_CRUISE_SPEED);
-                            gRobotMode = ROBOT_WORK_MODE_AUTO;
+                            gRobotMode = gRobotModeLast;
                             gEdgeModeAngleCnt = 0;
                         }
                     }
@@ -297,7 +297,7 @@ void MotionStateProc(void)
             }
             else if( (gRobotMode == ROBOT_WORK_MODE_SPOT) && (gPathFaultProcMode == PATH_FAULT_PROC_MODE_SPOT_L) ){
                 if((gSpotModeAngleCnt++) >= gSpotModeCircleCnt){
-                    if(LWHEEL_CUR_SPEED < WHEEL_CRUISE_SPEED){
+                    if(LWHEEL_CUR_SPEED < (WHEEL_CRUISE_SPEED/2)){
                         gSpotModeAngleCnt = 0;
                         gSpotModeCircleCnt += SPOT_MODE_CIRCLE_INC_STEP;
                         LWHEEL_EXP_SPEED_INC(1);
@@ -380,7 +380,7 @@ void MotionStateProc(void)
                         if((gEdgeModeAngleCnt++) > EDGE_MODE_ANGLE_360){
                             LWHEEL_EXP_SPEED_SET(WHEEL_CRUISE_SPEED);
                             RWHEEL_EXP_SPEED_SET(WHEEL_CRUISE_SPEED);
-                            gRobotMode = ROBOT_WORK_MODE_AUTO;
+                            gRobotMode = gRobotModeLast;
                             gEdgeModeAngleCnt = 0;
                         }
                     }
@@ -626,6 +626,7 @@ static inline void MotionCtrl_LWheelProcExitOn(void)
     gActSeqDepLIndicator--;
     if((NULL!=gWheelProcExitCB) && (gActSeqDepRIndicator==0) && (gActSeqDepLIndicator==0)){
         gWheelProcExitCB();
+        WHEEL_PROC_EXIT_CB_REG(NULL);
     }
 }
 
@@ -635,6 +636,7 @@ static inline void MotionCtrl_RWheelProcExitOn(void)
     gActSeqDepRIndicator--;
     if((NULL!=gWheelProcExitCB) && (gActSeqDepRIndicator==0) && (gActSeqDepLIndicator==0)){
         gWheelProcExitCB();
+        WHEEL_PROC_EXIT_CB_REG(NULL);
     }
 }
 
@@ -945,31 +947,34 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
                 gConsecutivePathFaultCnt += 2;
             }
             else{
+                gRobotModeLast = gRobotMode;
                 gRobotMode = ROBOT_WORK_MODE_EDGE;
                 gPathFaultProcEdgeModeCnt = EDGE_MODE_EXIT_CNT;
                 if(gPathCondMap & PATH_FAULT_LEFT_MASK){
                     gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE_L;
-#ifdef DEBUG_LOG
-                    printf("Edge mode L ON\r\n");
-#endif
                 }
                 else if(gPathCondMap & PATH_FAULT_RIGHT_MASK){
                     gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE_R;
-#ifdef DEBUG_LOG
-                    printf("Edge mode R ON\r\n");
-#endif
                 }
             }
         }
         else {
-            if( !gPathFaultProcEdgeModeCnt ){
-                gRobotMode = ROBOT_WORK_MODE_AUTO;
-#ifdef DEBUG_LOG
-                printf("Edge mode off\r\n");
-#endif
+            if(gPathFaultProcMode == PATH_FAULT_PROC_MODE_EDGE){
+                gRobotModeLast = gRobotMode;
+                if(gPathCondMap & PATH_FAULT_LEFT_MASK){
+                    gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE_L;
+                }
+                else if(gPathCondMap & PATH_FAULT_RIGHT_MASK){
+                    gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE_R;
+                }
             }
             else{
-                gPathFaultProcEdgeModeCnt--;
+                if( !gPathFaultProcEdgeModeCnt ){
+                    gRobotMode = gRobotModeLast;
+                }
+                else{
+                    gPathFaultProcEdgeModeCnt--;
+                }
             }
         }
     }
@@ -991,6 +996,7 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
             pActSequence->LWheelDefDir = 1;
             pActSequence->RWheelDefDir = 0;
         }
+        /* Edge mode R */
         else{
             pActSequence->LWheelDefDir = 0;
             pActSequence->RWheelDefDir = 1;
@@ -1025,15 +1031,13 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
             pActSequence->PreAct = MotionCtrl_PathFaultTryTurnCondTest;
             pActSequence->PostAct = MotionCtrl_PathFaultTurnProcCompleteCondTest;
         }
-
-        /* turn direction judge */
         if( (gPathCondMap & PATH_FAULT_LEFT_MASK) && (gPathCondMap & PATH_FAULT_RIGHT_MASK) ){
             turnCntL = WHEEL_TURN_90_CNT;
             turnCntR = WHEEL_TURN_90_CNT;
         }
 
+        /* turn direction judge */
         if(gPathCondMap & PATH_FAULT_LEFT_MASK){
-
             pActSequence->LWheelDefDir = 1;
             pActSequence->RWheelDefDir = 0;
             if(0==gLastPathFault){
@@ -1041,12 +1045,6 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
             }
         }
         else{
-            if(gPathFaultProcMode==PATH_FAULT_PROC_MODE_EDGE){
-                gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE_R;
-#ifdef DEBUG_LOG
-                printf("Edge mode R\r\n");
-#endif
-            }
             pActSequence->LWheelDefDir = 0;
             pActSequence->RWheelDefDir = 1;
             if(0==gLastPathFault){
@@ -1477,7 +1475,7 @@ void MotionCtrl_EdgeMotionInit(void)
     /* Don't forget this */
     SweepRobot_StartupComplete();
 
-    gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE_L;
+    gPathFaultProcMode = PATH_FAULT_PROC_MODE_EDGE;
     MotionCtrl_Start();
 
     gActSequence[0].LWheelDefDir = 1;

@@ -23,7 +23,7 @@
 #include "Buzzer.h"
 
 enum RobotState     gRobotState;
-enum RobotWorkMode  gRobotMode;
+enum RobotWorkMode  gRobotMode, gRobotModeLast;
 
 #define ROBOT_MAIN_MSG_Q_SIZE               10
 #define STARTUP_DELAY_TIME                  30000                               // 3s
@@ -458,6 +458,7 @@ void SweepRobot_CtrlMsgProc(u8 CtrlCode)
             break;
         case REMOTE_CMD_MODE_1:
             /* work mode switch */
+            SweepRobot_EdgeModeProc();
             break;
         case REMOTE_CMD_MODE_2:
             /* work mode switch */
