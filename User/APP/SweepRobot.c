@@ -109,7 +109,7 @@ void SweepRobot_Start(void)
     }
 
     while(1){
-        /* Message loop */
+		/* Message loop */
         for(i = 0; i < ROBOT_MAIN_MSG_Q_SIZE; i++){
             if(!MainMsgQ->Msg.expire){
                 if(MainMsgQ->Msg.prio == MSG_PRIO_HIGHEST){
@@ -405,11 +405,23 @@ void SweepRobot_HomingSuccess(void)
 
 void SweepRobot_PMMsgProc(enum PM_Mode mode)
 {
-    if(gRobotState==ROBOT_STATE_IDLE){
-        PM_EnterPwrMode(mode);
-    }
-    else{
-        PM_ResetSysIdleState();
+    switch(mode){
+
+        case PM_MODE_RESUME:
+            if(gRobotState==ROBOT_STATE_IDLE || gRobotState==ROBOT_STATE_HOME){
+                PM_EnterPwrMode(mode);
+            }
+            break;
+        case PM_MODE_STANDBY:
+            if(gRobotState==ROBOT_STATE_IDLE){
+                PM_EnterPwrMode(mode);
+            }
+            else{
+                PM_ResetSysIdleState();
+            }
+            break;
+        default:
+            break;
     }
 }
 

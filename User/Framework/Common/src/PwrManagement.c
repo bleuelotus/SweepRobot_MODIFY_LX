@@ -30,6 +30,18 @@ void PM_SysTryToStandby(void)
     }
 }
 
+void PM_SysTryToResume(void)
+{
+    Msg_t   Msg;
+
+    Msg.expire = 0;
+    Msg.prio = MSG_PRIO_HIGHEST;
+    Msg.type = MSG_TYPE_PM;
+    Msg.MsgCB = NULL;
+    Msg.Data.PMEvt = PM_MODE_RESUME;
+    SweepRobot_SendMsg(&Msg);
+}
+
 void PM_Init(void)
 {
     GPIO_InitTypeDef    GPIO_InitStructure;
@@ -60,7 +72,7 @@ s8 PM_EnterPwrMode(enum PM_Mode mode)
 {
     switch(mode)
     {
-        case PM_MODE_RUN:
+        case PM_MODE_RESUME:
             break;
         case PM_MODE_SLEEP:
         case PM_MODE_STOP:

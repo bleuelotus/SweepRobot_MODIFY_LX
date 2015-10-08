@@ -14,7 +14,7 @@
 enum PM_Mode {
 
     PM_MODE_NONE,
-    PM_MODE_RUN,
+    PM_MODE_RESUME,
     PM_MODE_SLEEP,
     PM_MODE_STOP,
     PM_MODE_STANDBY
@@ -49,6 +49,7 @@ extern u8 gSystemIdleCnt;
 void PM_Init(void);
 void PM_DeInit(void);
 void PM_SysTryToStandby(void);
+void PM_SysTryToResume(void);
 s8 PM_EnterPwrMode(enum PM_Mode mode);
 
 #endif /* !__PWRMANAGEMENT_H__ */

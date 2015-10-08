@@ -55,6 +55,7 @@ enum _PathFaultProcMode {
 
 /* Infrared based proximity detection sensitivity */
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 150, 150 };
+const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 2500, 2500, 2500, 2500, 3600, 3600 };
 static u32 gLWheelTotalCnt = 4, gRWheelTotalCnt = 4, gLastTotalLWheelCnt = 0, gLastTotalRWheelCnt = 0;
 static u16 gWheelCnt[WHEEL_NUM] = {0};
 static u16 gLWheelExpCnt = 0xFFFF, gRWheelExpCnt = 0xFFFF;
@@ -187,13 +188,16 @@ void MotionStateProc(void)
                     gIsExceptionHandling = 1;
                 }
             }
-            printf("Exp:%d\r\n", gExceptionMask);
+			if(gExceptionMask){
+				printf("Exp:%d\r\n", gExceptionMask);
+			}
             gLastExceptionMask = gExceptionMask;
         }
 
         /* Save proximity condition in Tx off */
         for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
+//			printf("%d\r\n",gIFRDTxOffRxVal[i]);
         }
         IFRD_TX_ENABLE();
 
@@ -220,12 +224,14 @@ void MotionStateProc(void)
 #ifdef DEBUG_LOG
                     printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
 #endif
+					/*
                     gMsg.expire = 0;
                     gMsg.prio = MSG_PRIO_NORMAL;
                     gMsg.type = MSG_TYPE_MOTION;
                     gMsg.MsgCB = NULL;
                     gMsg.Data.MEvt = MOTION_EVT_TRAPPED;
                     SweepRobot_SendMsg(&gMsg);
+					*/
                 }
                 FWHEEL_CNT_CLR();
                 gLastWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT;
@@ -247,12 +253,33 @@ void MotionStateProc(void)
         else {
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
         }
-        if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
-            gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-        }
-        else {
-            gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-        }
+
+		/* FIXME: add bottom high light detect function */
+//		printf("loff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
+//		printf("lon=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
+
+		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
+			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
+//			printf("l_1\r\n");
+		}else {
+			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
+				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
+//				printf("loff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
+//				printf("lon=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
+//				printf("l_2\r\n");
+			}
+			else {
+				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
+//				printf("l_ok\r\n");
+			}
+		}
+
+//		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
+//				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
+//		}
+//		else {
+//			gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
+//		}
 
         gCurPathCondSLDiff = gIFRDTxOffRxVal[IFRD_CHAN_SIDE_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_SIDE_RX_L-1];
         if( gCurPathCondSLDiff > gProximityDetectionThreshold[IFRD_CHAN_SIDE_L] ){
@@ -263,7 +290,7 @@ void MotionStateProc(void)
         }
         /* Path adjust for edge mode */
         if( IS_MOTION_PROC_FINISH() ){
-            if( (gRobotMode == ROBOT_WORK_MODE_EDGE) && (gPathFaultProcMode == PATH_FAULT_PROC_MODE_EDGE_L) ){
+			if( (gRobotMode == ROBOT_WORK_MODE_EDGE) && (gPathFaultProcMode == PATH_FAULT_PROC_MODE_EDGE_L) ){
                 if( (gLastPathCondSLDiff - gCurPathCondSLDiff) >= 50 ){
                     /* faraway */
                     LWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-3);
@@ -338,12 +365,33 @@ void MotionStateProc(void)
         else {
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FR_POS);
         }
-        if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R]) ){
-            gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-        }
-        else {
-            gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-        }
+
+		/* FIXME: add bottom high light detect function */		
+//		printf("roff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
+//		printf("ron=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
+
+		if( gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_R] ){
+			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
+//			printf("r_1\r\n");
+		}else {
+			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R]) ){
+				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
+//				printf("roff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
+//				printf("ron=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
+//				printf("r_2\r\n");
+			}
+			else {
+				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
+//				printf("r_ok\r\n");
+			}
+		}
+
+//		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R]) ){
+//				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
+//		}
+//		else {
+//			gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
+//		}
 
         gCurPathCondSRDiff = gIFRDTxOffRxVal[IFRD_CHAN_SIDE_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_SIDE_RX_R-1];
         if( gCurPathCondSRDiff > gProximityDetectionThreshold[IFRD_CHAN_SIDE_R] ){
@@ -958,7 +1006,7 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
                 }
             }
         }
-        else {
+        else{
             if(gPathFaultProcMode == PATH_FAULT_PROC_MODE_EDGE){
                 gRobotModeLast = gRobotMode;
                 if(gPathCondMap & PATH_FAULT_LEFT_MASK){

@@ -109,6 +109,8 @@ void RTC_AlarmWork(void)
     /* save the current cnt */
     BKP_WriteBackupRegister(RTC_ALR_LSB_BKP_REG, (RTCAlarmCnt&0xFFFF));
     BKP_WriteBackupRegister(RTC_ALR_MSB_BKP_REG, ((RTCAlarmCnt>>16)&0xFFFF));
+
+    PM_SysTryToResume();
 }
 
 void RTC_AlarmSet(u32 val)

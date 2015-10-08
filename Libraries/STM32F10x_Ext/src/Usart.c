@@ -16,10 +16,10 @@
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #define GETCHAR_PROTOTYPE int __io_getchar()
 #else
-//#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-//#define GETCHAR_PROTOTYPE int fgetc(FILE *f)
-#define PUTCHAR_PROTOTYPE int putchar(int ch)
-#define GETCHAR_PROTOTYPE int getchar(void)
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#define GETCHAR_PROTOTYPE int fgetc(FILE *f)
+//#define PUTCHAR_PROTOTYPE int putchar(int ch)
+//#define GETCHAR_PROTOTYPE int getchar(void)
 #endif
 
 void USART1_Config(void)

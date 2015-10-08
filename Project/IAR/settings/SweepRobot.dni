@@ -63,9 +63,6 @@ Fmt3=u8[2]	3	0
 Fmt4=u8[3]	3	0
 Fmt5=u8[5]	4	0
 Fmt6=u8[6]	4	0
-[Trace2]
-Enabled=0
-ShowSource=0
 [SWOTraceWindow]
 PcSampling=0
 InterruptLogs=0
@@ -88,30 +85,9 @@ GraphEnabled=0
 ShowTimeLog=1
 ShowTimeSum=1
 SumSortOrder=0
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.227.5" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.244.5" 0 0 1 "" 0 "" 0
-Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.278.5" 0 0 1 "" 0 "" 0
-Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.295.5" 0 0 1 "" 0 "" 0
-Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\BSP\src\BatteryManage.c}.257.5" 0 0 1 "" 0 "" 0
-Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.211.5" 0 0 1 "" 0 "" 0
-Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.211.5" 0 0 1 "" 0 "" 0
-Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\APP\SweepRobot.c}.495.16" 0 0 1 "" 0 "" 0
-Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\APP\SweepRobot.c}.500.13" 0 0 1 "" 0 "" 0
-Bp9=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\APP\SweepRobot.c}.504.13" 0 0 1 "" 0 "" 0
-Count=10
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
-[Aliases]
-Count=0
-SuppressDialog=0
 [CallStackLog]
 Enabled=0
 [DriverProfiling]
@@ -120,3 +96,24 @@ Mode=3
 Graph=0
 Symbiont=0
 Exclusions=
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.227.5" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.244.5" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.278.5" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.295.5" 0 0 1 "" 0 "" 0
+Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\BSP\src\BatteryManage.c}.257.5" 0 0 1 "" 0 "" 0
+Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.211.1" 0 0 1 "" 0 "" 0
+Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\Libraries\STM32F10x_Ext\src\stm32f10x_it.c}.211.5" 0 0 1 "" 0 "" 0
+Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\APP\SweepRobot.c}.507.16" 0 0 1 "" 0 "" 0
+Bp8=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\APP\SweepRobot.c}.512.13" 0 0 1 "" 0 "" 0
+Bp9=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\User\APP\SweepRobot.c}.516.13" 0 0 1 "" 0 "" 0
+Count=10
+[Aliases]
+Count=0
+SuppressDialog=0
