@@ -16,7 +16,8 @@
 #include "SweepRobot.h"
 #include "CtrlPanel.h"
 
-#define MOTION_MONITOR_TIM_PERIOD               200                             // 20ms
+#define MOTION_MONITOR_TIM_PERIOD               20                             	// 2ms
+#define MOTION_WHEEL_SPEED_ADJUST_PERIOD		200								// 20ms
 
 #define IFRD_CHAN_FRONT_L                       0
 #define IFRD_CHAN_FRONT_R                       1
@@ -55,7 +56,7 @@ enum _PathFaultProcMode {
 
 /* Infrared based proximity detection sensitivity */
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 150, 150 };
-const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 2500, 2500, 2500, 2500, 3600, 3600 };
+const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 2500, 2500, 2500, 2500, 3500, 3500 };
 static u32 gLWheelTotalCnt = 4, gRWheelTotalCnt = 4, gLastTotalLWheelCnt = 0, gLastTotalRWheelCnt = 0;
 static u16 gWheelCnt[WHEEL_NUM] = {0};
 static u16 gLWheelExpCnt = 0xFFFF, gRWheelExpCnt = 0xFFFF;
@@ -260,17 +261,12 @@ void MotionStateProc(void)
 
 		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-//			printf("l_1\r\n");
 		}else {
 			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-//				printf("loff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
-//				printf("lon=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
-//				printf("l_2\r\n");
 			}
 			else {
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-//				printf("l_ok\r\n");
 			}
 		}
 
@@ -372,17 +368,12 @@ void MotionStateProc(void)
 
 		if( gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_R] ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-//			printf("r_1\r\n");
 		}else {
 			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R]) ){
 				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-//				printf("roff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
-//				printf("ron=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
-//				printf("r_2\r\n");
 			}
 			else {
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-//				printf("r_ok\r\n");
 			}
 		}
 
@@ -486,25 +477,33 @@ void MotionStateProc(void)
                     MOTION_PROC_STATE_SET();
                 }
             }
-        }
-
-        /* Wheel speed adjust */
-        gDeltaWheelCnt[WHEEL_IDX_L] = LWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_L];
-        gDeltaWheelCnt[WHEEL_IDX_R] = RWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_R];
-
-        if( (gDeltaWheelCnt[WHEEL_IDX_L] - gCurLWheelSpeed) > 0 ){
-            MotorCtrl_ChanSpeedDec(MOTOR_CTRL_CHAN_LWHEEL);
-        }
-        else if( (gCurLWheelSpeed - gDeltaWheelCnt[WHEEL_IDX_L]) > 0 ){
-            MotorCtrl_ChanSpeedInc(MOTOR_CTRL_CHAN_LWHEEL);
-        }
-        if( (gDeltaWheelCnt[WHEEL_IDX_R] - gCurRWheelSpeed) > 0 ){
-            MotorCtrl_ChanSpeedDec(MOTOR_CTRL_CHAN_RWHEEL);
-        }
-        else if( (gCurRWheelSpeed - gDeltaWheelCnt[WHEEL_IDX_R]) > 0 ){
-            MotorCtrl_ChanSpeedInc(MOTOR_CTRL_CHAN_RWHEEL);
-        }
+        }        
     }
+}
+
+void Wheel_SpeedAdjustProc(void)
+{
+	if((gtmpCnt)%2){
+		
+	}
+	else{
+		/* Wheel speed adjust */
+		gDeltaWheelCnt[WHEEL_IDX_L] = LWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_L];
+		gDeltaWheelCnt[WHEEL_IDX_R] = RWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_R];
+
+		if( (gDeltaWheelCnt[WHEEL_IDX_L] - gCurLWheelSpeed) > 0 ){
+			MotorCtrl_ChanSpeedDec(MOTOR_CTRL_CHAN_LWHEEL);
+		}
+		else if( (gCurLWheelSpeed - gDeltaWheelCnt[WHEEL_IDX_L]) > 0 ){
+			MotorCtrl_ChanSpeedInc(MOTOR_CTRL_CHAN_LWHEEL);
+		}
+		if( (gDeltaWheelCnt[WHEEL_IDX_R] - gCurRWheelSpeed) > 0 ){
+			MotorCtrl_ChanSpeedDec(MOTOR_CTRL_CHAN_RWHEEL);
+		}
+		else if( (gCurRWheelSpeed - gDeltaWheelCnt[WHEEL_IDX_R]) > 0 ){
+			MotorCtrl_ChanSpeedInc(MOTOR_CTRL_CHAN_RWHEEL);
+		}
+	}
 }
 
 void IFRD_PathDetectInit(void)
@@ -540,26 +539,52 @@ void IFRD_PathDetectInit(void)
     TIM_TimeBaseInit(MOTION_MONITOR_TIM, &TIM_TimeBaseStructure);
     TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
     TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
+	
+	/* Wheel speed adjust timer init */
+	NVIC_InitStructure.NVIC_IRQChannel = MOTION_WHEEL_SPEED_ADJUST_TIM_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = MOTION_WHEEL_SPEED_ADJUST_TIM_IRQ_PP;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = MOTION_WHEEL_SPEED_ADJUST_IRQ_SP;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+	
+	RCC_APB1PeriphClockCmd(MOTION_WHEEL_SPEED_ADJUST_TIM_PERIPH_ID, ENABLE);
+	TIM_DeInit(MOTION_WHEEL_SPEED_ADJUST_TIM);
+	TIM_TimeBaseStructure.TIM_Period = MOTION_WHEEL_SPEED_ADJUST_PERIOD - 1;	//20ms
+	TIM_TimeBaseStructure.TIM_Prescaler = 7200 - 1;
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseInit(MOTION_WHEEL_SPEED_ADJUST_TIM, &TIM_TimeBaseStructure);
+	TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
+	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
 }
 
 static void IFRD_PathDetectStart(void)
 {
     gtmpCnt = 0;
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
     TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
+	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
     TIM_SetAutoreload(MOTION_MONITOR_TIM, MOTION_MONITOR_TIM_PERIOD);
+	TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, MOTION_WHEEL_SPEED_ADJUST_PERIOD);
     TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
+	TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
     TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
+	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
 
     plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionStateProc);
+	plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)Wheel_SpeedAdjustProc);
 
     TIM_Cmd(MOTION_MONITOR_TIM, ENABLE);
+	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
 }
 
 static void IFRD_PathDetectStop(void)
 {
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
+	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
     IFRD_TX_DISABLE();
 }
 
