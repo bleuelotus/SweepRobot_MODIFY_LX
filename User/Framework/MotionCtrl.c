@@ -31,12 +31,12 @@
 
 /* deltaT = deltaRad * Pi * BASE_LEN / 180 / deltaV [ Pre-condition: Vinner != 0 ]; deltaV = Vouter - Vinner */
 #define EDGE_MODE_EXIT_CNT                      10
-#define SPOT_MODE_INIT_CIRCLE_CNT               30                              // 30 * 20ms
+#define SPOT_MODE_INIT_CIRCLE_CNT               120                             // 120 * 5ms  // 30 * 20ms
 #define SPOT_MODE_CIRCLE_INC_STEP               55                              // for every 2 units of speed inc
 
-#define UNIVERSAL_WHEEL_DETECT_PERIOD           75                              // 3000ms
-#define EDGE_MODE_ANGLE_360                     300                             // 300 * 20ms
-#define EXCEPTION_CHECK_PERIOD                  25                              // 25 * 20ms
+#define UNIVERSAL_WHEEL_DETECT_PERIOD           75                              // 75 * 20 * 2 = 3000ms
+#define EDGE_MODE_ANGLE_360                     1200                            // 1200 * 5ms // 300 * 20ms
+#define EXCEPTION_CHECK_PERIOD                  25                              // 25 * 5ms  //25 * 20ms
 
 enum _PathFaultProcMode {
 
@@ -109,6 +109,7 @@ u8 gActSeqDepLIndicator = 0, gActSeqDepRIndicator = 0;
 #define RWHEEL_CUR_SPEED                            (gCurRWheelSpeed)
 
 static u16 gtmpCnt = 0;
+static u16 gtmpCnt2 = 0;
 static u16 gIFRDTxOffRxVal[IFRD_TxRx_CHAN_NUM] = {0};
 static u32 gPathCondMap = 0;
 static u8 gLastExceptionMask = 0, gExceptionMask = 0, gIsExceptionHandling = 0;
@@ -175,75 +176,11 @@ void MotionStateProc(void)
 
     /* Phase 1 */
     if((++gtmpCnt)%2){
-
-        if(!(gtmpCnt%EXCEPTION_CHECK_PERIOD)){
-            gExceptionMask = ExceptionStateCheck();
-            if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
-                /* Send exception message */
-                gMsg.expire = 0;
-                gMsg.prio = MSG_PRIO_HIGHEST;
-                gMsg.type = MSG_TYPE_MOTION;
-                gMsg.MsgCB = NULL;
-                gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
-                if(!SweepRobot_SendMsg(&gMsg)){
-                    gIsExceptionHandling = 1;
-                }
-            }
-			if(gExceptionMask){
-				printf("Exp:%d\r\n", gExceptionMask);
-			}
-            gLastExceptionMask = gExceptionMask;
-        }
-
         /* Save proximity condition in Tx off */
         for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
-//			printf("%d\r\n",gIFRDTxOffRxVal[i]);
         }
         IFRD_TX_ENABLE();
-
-        /* Universal wheel signal check */
-        gUniversalWheelActiveVal = FWHEEL_ACTIVE_VAL;
-#ifdef DEBUG_LOG
-//        printf(":%d\r\n", gUniversalWheelActiveVal);
-#endif
-
-        if( (LWHEEL_CUR_SPEED > 1) && (LWHEEL_CUR_SPEED==RWHEEL_CUR_SPEED) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_LWHEEL)==1) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_RWHEEL)==1) ){
-            if(abs(gUniversalWheelActiveVal-gUniversalWheelActiveValLast) > UNIVERSAL_WHEEL_ACTIVE_THRESHOLD){
-                FWHEEL_CNT++;
-                gUniversalWheelActiveValLast = gUniversalWheelActiveVal;
-            }
-            gUniveralWheelDetectPeriodCnt++;
-            if(gUniveralWheelDetectPeriodCnt > UNIVERSAL_WHEEL_DETECT_PERIOD){
-                gUniveralWheelDetectPeriodCnt = 0;
-#ifdef DEBUG_LOG
-                printf("%d\r\n", FWHEEL_CNT);
-#endif
-                gDeltaWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_F];
-                if( (gDeltaWheelCnt[WHEEL_IDX_F] < 5) || (gDeltaWheelCnt[WHEEL_IDX_F] > 150) ){
-                    /* Send block message */
-#ifdef DEBUG_LOG
-                    printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
-#endif
-					/*
-                    gMsg.expire = 0;
-                    gMsg.prio = MSG_PRIO_NORMAL;
-                    gMsg.type = MSG_TYPE_MOTION;
-                    gMsg.MsgCB = NULL;
-                    gMsg.Data.MEvt = MOTION_EVT_TRAPPED;
-                    SweepRobot_SendMsg(&gMsg);
-					*/
-                }
-                FWHEEL_CNT_CLR();
-                gLastWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT;
-            }
-        }
-        else{
-            FWHEEL_CNT_CLR();
-            gUniveralWheelDetectPeriodCnt = 0;
-        }
-        gLastWheelCnt[WHEEL_IDX_L] = LWHEEL_CNT;
-        gLastWheelCnt[WHEEL_IDX_R] = RWHEEL_CNT;
     }
     /* Phase 2 */
     else{
@@ -255,10 +192,7 @@ void MotionStateProc(void)
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
         }
 
-		/* FIXME: add bottom high light detect function */
-//		printf("loff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
-//		printf("lon=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
-
+		/* XXX: add bottom high light detection function */
 		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
 		}else {
@@ -269,13 +203,6 @@ void MotionStateProc(void)
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
 			}
 		}
-
-//		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
-//				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-//		}
-//		else {
-//			gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-//		}
 
         gCurPathCondSLDiff = gIFRDTxOffRxVal[IFRD_CHAN_SIDE_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_SIDE_RX_L-1];
         if( gCurPathCondSLDiff > gProximityDetectionThreshold[IFRD_CHAN_SIDE_L] ){
@@ -362,10 +289,7 @@ void MotionStateProc(void)
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FR_POS);
         }
 
-		/* FIXME: add bottom high light detect function */		
-//		printf("roff=%d\r\n",gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L]);
-//		printf("ron=%d\r\n",ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1]);
-
+		/* XXX: add bottom high light detection function */
 		if( gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_R] ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
 		}else {
@@ -376,13 +300,6 @@ void MotionStateProc(void)
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
 			}
 		}
-
-//		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R]) ){
-//				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-//		}
-//		else {
-//			gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-//		}
 
         gCurPathCondSRDiff = gIFRDTxOffRxVal[IFRD_CHAN_SIDE_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_SIDE_RX_R-1];
         if( gCurPathCondSRDiff > gProximityDetectionThreshold[IFRD_CHAN_SIDE_R] ){
@@ -477,14 +394,73 @@ void MotionStateProc(void)
                     MOTION_PROC_STATE_SET();
                 }
             }
-        }        
+        }
     }
 }
 
-void Wheel_SpeedAdjustProc(void)
+void WheelSpeedAdjustProc(void)
 {
-	if((gtmpCnt)%2){
+	if((++gtmpCnt2)%2){
 		
+		if(!(gtmpCnt%EXCEPTION_CHECK_PERIOD)){
+            gExceptionMask = ExceptionStateCheck();
+            if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
+                /* Send exception message */
+                gMsg.expire = 0;
+                gMsg.prio = MSG_PRIO_HIGHEST;
+                gMsg.type = MSG_TYPE_MOTION;
+                gMsg.MsgCB = NULL;
+                gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
+                if(!SweepRobot_SendMsg(&gMsg)){
+                    gIsExceptionHandling = 1;
+                }
+            }
+			if(gExceptionMask){
+				printf("Exp:%d\r\n", gExceptionMask);
+			}
+            gLastExceptionMask = gExceptionMask;
+        }
+		
+		/* Universal wheel signal check */
+        gUniversalWheelActiveVal = FWHEEL_ACTIVE_VAL;
+#ifdef DEBUG_LOG
+//        printf(":%d\r\n", gUniversalWheelActiveVal);
+#endif
+
+        if( (LWHEEL_CUR_SPEED > 1) && (LWHEEL_CUR_SPEED==RWHEEL_CUR_SPEED) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_LWHEEL)==1) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_RWHEEL)==1) ){
+            if(abs(gUniversalWheelActiveVal-gUniversalWheelActiveValLast) > UNIVERSAL_WHEEL_ACTIVE_THRESHOLD){
+                FWHEEL_CNT++;
+                gUniversalWheelActiveValLast = gUniversalWheelActiveVal;
+            }
+            gUniveralWheelDetectPeriodCnt++;
+            if(gUniveralWheelDetectPeriodCnt > UNIVERSAL_WHEEL_DETECT_PERIOD){
+                gUniveralWheelDetectPeriodCnt = 0;
+#ifdef DEBUG_LOG
+                printf("%d\r\n", FWHEEL_CNT);
+#endif
+                gDeltaWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_F];
+                if( (gDeltaWheelCnt[WHEEL_IDX_F] < 5) || (gDeltaWheelCnt[WHEEL_IDX_F] > 150) ){
+                    /* Send block message */
+#ifdef DEBUG_LOG
+                    printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
+#endif
+//                    gMsg.expire = 0;
+//                    gMsg.prio = MSG_PRIO_NORMAL;
+//                    gMsg.type = MSG_TYPE_MOTION;
+//                    gMsg.MsgCB = NULL;
+//                    gMsg.Data.MEvt = MOTION_EVT_TRAPPED;
+//                    SweepRobot_SendMsg(&gMsg);
+                }
+                FWHEEL_CNT_CLR();
+                gLastWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT;
+            }
+        }
+        else{
+            FWHEEL_CNT_CLR();
+            gUniveralWheelDetectPeriodCnt = 0;
+        }
+        gLastWheelCnt[WHEEL_IDX_L] = LWHEEL_CNT;
+        gLastWheelCnt[WHEEL_IDX_R] = RWHEEL_CNT;
 	}
 	else{
 		/* Wheel speed adjust */
@@ -532,21 +508,21 @@ void IFRD_PathDetectInit(void)
 
     RCC_APB1PeriphClockCmd(MOTION_MONITOR_TIM_PERIPH_ID , ENABLE);
     TIM_DeInit(MOTION_MONITOR_TIM);
-    TIM_TimeBaseStructure.TIM_Period = MOTION_MONITOR_TIM_PERIOD-1;             //20ms
+    TIM_TimeBaseStructure.TIM_Period = MOTION_MONITOR_TIM_PERIOD-1;             //2ms
     TIM_TimeBaseStructure.TIM_Prescaler = 7200-1;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInit(MOTION_MONITOR_TIM, &TIM_TimeBaseStructure);
     TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
     TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
-	
-	/* Wheel speed adjust timer init */
+
+	/* Exception detection, Universal wheel detection and Wheel speed adjust timer init */
 	NVIC_InitStructure.NVIC_IRQChannel = MOTION_WHEEL_SPEED_ADJUST_TIM_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = MOTION_WHEEL_SPEED_ADJUST_TIM_IRQ_PP;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = MOTION_WHEEL_SPEED_ADJUST_IRQ_SP;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-	
+
 	RCC_APB1PeriphClockCmd(MOTION_WHEEL_SPEED_ADJUST_TIM_PERIPH_ID, ENABLE);
 	TIM_DeInit(MOTION_WHEEL_SPEED_ADJUST_TIM);
 	TIM_TimeBaseStructure.TIM_Period = MOTION_WHEEL_SPEED_ADJUST_PERIOD - 1;	//20ms
@@ -561,19 +537,21 @@ void IFRD_PathDetectInit(void)
 static void IFRD_PathDetectStart(void)
 {
     gtmpCnt = 0;
-    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
-	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
-    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
-	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
-    TIM_SetAutoreload(MOTION_MONITOR_TIM, MOTION_MONITOR_TIM_PERIOD);
-	TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, MOTION_WHEEL_SPEED_ADJUST_PERIOD);
-    TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
-	TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
-    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
-	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
+	gtmpCnt2 = 0;
 
-    plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionStateProc);
-	plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)Wheel_SpeedAdjustProc);
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
+	TIM_SetAutoreload(MOTION_MONITOR_TIM, MOTION_MONITOR_TIM_PERIOD);
+	TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
+	TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
+	plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionStateProc);
+
+	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
+	TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, MOTION_WHEEL_SPEED_ADJUST_PERIOD);
+	TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
+	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
+	plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)WheelSpeedAdjustProc);
 
     TIM_Cmd(MOTION_MONITOR_TIM, ENABLE);
 	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
@@ -582,8 +560,8 @@ static void IFRD_PathDetectStart(void)
 static void IFRD_PathDetectStop(void)
 {
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+	TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
 	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
-    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
 	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
     IFRD_TX_DISABLE();
 }
@@ -869,6 +847,7 @@ void MotionCtrl_Proc(void)
     if(gActSequence[0].LWheelDefDir!=MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_LWHEEL)
      ||gActSequence[0].RWheelDefDir!=MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_RWHEEL)
         ){
+		/* TODO: could change from stoping motor directly to decelerating motor speed to 0 */
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
 
@@ -1198,7 +1177,7 @@ s8 MotionCtrl_ExceptionHandle(void)
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
     }
     if( gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS)) ){
-
+		/* TODO: add wheel stuck process here */
     }
 
     MotionCtrl_Start();

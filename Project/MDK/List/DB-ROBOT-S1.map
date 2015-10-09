@@ -28,26 +28,6 @@ Section Cross References
     main.o(.text) refers to misc.o(.text) for SysTick_CLKSourceConfig
     main.o(.text) refers to usart.o(.text) for UART4_Config
     main.o(.text) refers to sweeprobot.o(.text) for SweepRobot_Init
-    sweeprobot.o(.text) refers to pwrmanagement.o(.text) for PM_Init
-    sweeprobot.o(.text) refers to rtc.o(.text) for RTC_Init
-    sweeprobot.o(.text) refers to msgqueue.o(.text) for MsgQueue_Create
-    sweeprobot.o(.text) refers to measurement.o(.text) for Meas_Init
-    sweeprobot.o(.text) refers to pwm.o(.text) for PWM_ControllerInit
-    sweeprobot.o(.text) refers to batterymanage.o(.text) for BM_Init
-    sweeprobot.o(.text) refers to buzzer.o(.text) for Buzzer_Init
-    sweeprobot.o(.text) refers to motorctrl.o(.text) for MotorCtrl_Init
-    sweeprobot.o(.text) refers to motionctrl.o(.text) for MotionCtrl_Init
-    sweeprobot.o(.text) refers to ctrlpanel.o(.text) for CtrlPanel_Init
-    sweeprobot.o(.text) refers to irda.o(.text) for IrDA_Init
-    sweeprobot.o(.text) refers to printf5.o(i.__0printf$5) for __2printf
-    sweeprobot.o(.text) refers to stm32f10x_it.o(.text) for plat_int_reg_cb
-    sweeprobot.o(.text) refers to stm32f10x_tim.o(.text) for TIM_SetCounter
-    sweeprobot.o(.text) refers to sweeprobot.o(.data) for RobotPlanFlag
-    sweeprobot.o(.text) refers to measurement.o(.bss) for ADCConvertedLSB
-    sweeprobot.o(.text) refers to sweeprobot.o(.constdata) for STARTUP_SEQ_DELAY_TIME
-    sweeprobot.o(.text) refers to sweeprobot.o(.bss) for RobotHomingData
-    sweeprobot.o(.text) refers to motionctrl.o(.data) for gActSeqDepLIndicator
-    sweeprobot.o(.text) refers to pwrmanagement.o(.data) for gSystemIdleCnt
     batterymanage.o(.text) refers to printf5.o(i.__0printf$5) for __2printf
     batterymanage.o(.text) refers to pwm.o(.text) for PWM_DutyCycleSet
     batterymanage.o(.text) refers to ctrlpanel.o(.text) for CtrlPanel_LEDCtrl
@@ -128,14 +108,14 @@ Section Cross References
     key.o(.text) refers to malloc.o(i.free) for free
     key.o(.text) refers to key.o(.data) for KeyListHead
     motionctrl.o(.text) refers to motorctrl.o(.text) for MotorCtrl_ChanSpeedLevelGet
-    motionctrl.o(.text) refers to sweeprobot.o(.text) for SweepRobot_SendMsg
-    motionctrl.o(.text) refers to printf5.o(i.__0printf$5) for __2printf
     motionctrl.o(.text) refers to stm32f10x_gpio.o(.text) for GPIO_SetBits
+    motionctrl.o(.text) refers to sweeprobot.o(.text) for SweepRobot_SendMsg
     motionctrl.o(.text) refers to motionctrl.o(.data) for gWheelCnt
     motionctrl.o(.text) refers to measurement.o(.bss) for ADCConvertedLSB
-    motionctrl.o(.text) refers to motionctrl.o(.bss) for gMsg
+    motionctrl.o(.text) refers to motionctrl.o(.bss) for gIFRDTxOffRxVal
     motionctrl.o(.text) refers to motionctrl.o(.constdata) for gProximityDetectionThreshold
     motionctrl.o(.text) refers to sweeprobot.o(.data) for gHomingStage
+    motionctrl.o(.text) refers to printf5.o(i.__0printf$5) for __2printf
     motionctrl.o(.text) refers to stm32f10x_rcc.o(.text) for RCC_APB2PeriphClockCmd
     motionctrl.o(.text) refers to misc.o(.text) for NVIC_Init
     motionctrl.o(.text) refers to stm32f10x_tim.o(.text) for TIM_DeInit
@@ -144,6 +124,26 @@ Section Cross References
     motionctrl.o(.text) refers to ctrlpanel.o(.text) for CtrlPanel_LEDCtrl
     msgqueue.o(.text) refers to malloc.o(i.malloc) for malloc
     msgqueue.o(.text) refers to memseta.o(.text) for __aeabi_memclr4
+    sweeprobot.o(.text) refers to pwrmanagement.o(.text) for PM_Init
+    sweeprobot.o(.text) refers to rtc.o(.text) for RTC_Init
+    sweeprobot.o(.text) refers to msgqueue.o(.text) for MsgQueue_Create
+    sweeprobot.o(.text) refers to measurement.o(.text) for Meas_Init
+    sweeprobot.o(.text) refers to pwm.o(.text) for PWM_ControllerInit
+    sweeprobot.o(.text) refers to batterymanage.o(.text) for BM_Init
+    sweeprobot.o(.text) refers to buzzer.o(.text) for Buzzer_Init
+    sweeprobot.o(.text) refers to motorctrl.o(.text) for MotorCtrl_Init
+    sweeprobot.o(.text) refers to motionctrl.o(.text) for MotionCtrl_Init
+    sweeprobot.o(.text) refers to ctrlpanel.o(.text) for CtrlPanel_Init
+    sweeprobot.o(.text) refers to irda.o(.text) for IrDA_Init
+    sweeprobot.o(.text) refers to printf5.o(i.__0printf$5) for __2printf
+    sweeprobot.o(.text) refers to stm32f10x_it.o(.text) for plat_int_reg_cb
+    sweeprobot.o(.text) refers to stm32f10x_tim.o(.text) for TIM_SetCounter
+    sweeprobot.o(.text) refers to sweeprobot.o(.data) for RobotPlanFlag
+    sweeprobot.o(.text) refers to measurement.o(.bss) for ADCConvertedLSB
+    sweeprobot.o(.text) refers to sweeprobot.o(.constdata) for STARTUP_SEQ_DELAY_TIME
+    sweeprobot.o(.text) refers to sweeprobot.o(.bss) for RobotHomingData
+    sweeprobot.o(.text) refers to motionctrl.o(.data) for gActSeqDepLIndicator
+    sweeprobot.o(.text) refers to pwrmanagement.o(.data) for gSystemIdleCnt
     stm32f10x_it.o(.text) refers to stm32f10x_rtc.o(.text) for RTC_GetITStatus
     stm32f10x_it.o(.text) refers to stm32f10x_tim.o(.text) for TIM_GetITStatus
     stm32f10x_it.o(.text) refers to stm32f10x_exti.o(.text) for EXTI_GetITStatus
@@ -487,49 +487,49 @@ Image Symbol Table
 
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
-    ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
     ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
+    ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
-    ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
+    ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
+    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  mallocra.o ABSOLUTE
     ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  malloca.o ABSOLUTE
     ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  mallocr.o ABSOLUTE
     ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  malloc.o ABSOLUTE
-    ../clib/microlib/malloc/malloc.c         0x00000000   Number         0  mallocra.o ABSOLUTE
     ../clib/microlib/malloc/mvars.c          0x00000000   Number         0  mvars.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf0.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf2.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfb.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf5.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf6.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfa.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf3.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf6.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfb.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf0.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf1.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf3.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf5.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf8.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf2.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
     ../clib/microlib/printf/stubs.s          0x00000000   Number         0  stubs.o ABSOLUTE
     ../clib/microlib/stdio/streams.c         0x00000000   Number         0  stdout.o ABSOLUTE
-    ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpya.o ABSOLUTE
     ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpyb.o ABSOLUTE
+    ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpya.o ABSOLUTE
     ../clib/microlib/string/memset.c         0x00000000   Number         0  memseta.o ABSOLUTE
     ../clib/microlib/stubs.s                 0x00000000   Number         0  iusefp.o ABSOLUTE
     ../fplib/microlib/fpadd.c                0x00000000   Number         0  dadd.o ABSOLUTE
-    ../fplib/microlib/fpdiv.c                0x00000000   Number         0  fdiv.o ABSOLUTE
     ../fplib/microlib/fpdiv.c                0x00000000   Number         0  ddiv.o ABSOLUTE
+    ../fplib/microlib/fpdiv.c                0x00000000   Number         0  fdiv.o ABSOLUTE
     ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  fepilogue.o ABSOLUTE
     ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  depilogue.o ABSOLUTE
     ../fplib/microlib/fpfix.c                0x00000000   Number         0  dfixul.o ABSOLUTE
@@ -616,158 +616,159 @@ Image Symbol Table
     TI1_Config                               0x08001c37   Thumb Code   108  stm32f10x_tim.o(.text)
     .text                                    0x080023f0   Section        0  stm32f10x_usart.o(.text)
     .text                                    0x080027f8   Section        0  main.o(.text)
-    .text                                    0x08002820   Section        0  sweeprobot.o(.text)
-    .text                                    0x0800399c   Section        0  batterymanage.o(.text)
-    .text                                    0x08003ed0   Section        0  buzzer.o(.text)
-    .text                                    0x08004070   Section        0  irda.o(.text)
-    IrDA_ParseEJE                            0x0800409d   Thumb Code   312  irda.o(.text)
-    .text                                    0x0800437c   Section        0  measurement.o(.text)
-    .text                                    0x0800462c   Section        0  motorctrl.o(.text)
-    .text                                    0x0800482c   Section        0  pwm.o(.text)
-    .text                                    0x08004bbc   Section        0  rtc.o(.text)
-    .text                                    0x08004e50   Section        0  delay.o(.text)
-    .text                                    0x08004ee4   Section        0  pwrmanagement.o(.text)
-    .text                                    0x08004fc0   Section        0  ctrlpanel.o(.text)
-    .text                                    0x080051cc   Section        0  key.o(.text)
-    .text                                    0x08005394   Section        0  motionctrl.o(.text)
-    IFRD_PathDetectStart                     0x08005e49   Thumb Code   136  motionctrl.o(.text)
-    IFRD_PathDetectStop                      0x08005ed1   Thumb Code    60  motionctrl.o(.text)
-    WheelCntMach_Start                       0x08005f0d   Thumb Code    86  motionctrl.o(.text)
-    WheelCntMach_Stop                        0x08005f63   Thumb Code    56  motionctrl.o(.text)
-    MotionCtrl_LWheelProcExitOn              0x080060ff   Thumb Code    58  motionctrl.o(.text)
-    MotionCtrl_RWheelProcExitOn              0x08006139   Thumb Code    58  motionctrl.o(.text)
-    MotionCtrl_LWheelProcExitOff             0x080061ad   Thumb Code    74  motionctrl.o(.text)
-    MotionCtrl_RWheelProcExitOff             0x080061f7   Thumb Code    74  motionctrl.o(.text)
-    MotionCtrl_RWheelSubProc                 0x08006241   Thumb Code   352  motionctrl.o(.text)
-    MotionCtrl_LWheelSubProc                 0x080063a1   Thumb Code   438  motionctrl.o(.text)
-    .text                                    0x080070b0   Section        0  msgqueue.o(.text)
-    .text                                    0x08007160   Section        0  stm32f10x_it.o(.text)
-    .text                                    0x08007560   Section        0  usart.o(.text)
-    .text                                    0x0800770c   Section        0  memcpya.o(.text)
-    .text                                    0x08007730   Section        0  memseta.o(.text)
-    .text                                    0x08007754   Section        0  fmul.o(.text)
-    .text                                    0x080077b8   Section        0  fdiv.o(.text)
-    .text                                    0x08007834   Section        0  ffltui.o(.text)
-    .text                                    0x0800783e   Section        0  ffixui.o(.text)
-    .text                                    0x08007866   Section        0  uldiv.o(.text)
-    .text                                    0x080078c8   Section        0  iusefp.o(.text)
-    .text                                    0x080078c8   Section        0  fepilogue.o(.text)
-    .text                                    0x08007938   Section       36  init.o(.text)
-    .text                                    0x0800795c   Section        0  llshl.o(.text)
-    .text                                    0x0800797a   Section        0  llushr.o(.text)
-    i.__0printf$5                            0x0800799c   Section        0  printf5.o(i.__0printf$5)
-    i.__scatterload_copy                     0x080079bc   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x080079ca   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x080079cc   Section       14  handlers.o(i.__scatterload_zeroinit)
-    i._printf_core                           0x080079dc   Section        0  printf5.o(i._printf_core)
-    _printf_core                             0x080079dd   Thumb Code   654  printf5.o(i._printf_core)
-    i.free                                   0x08007c98   Section        0  malloc.o(i.free)
-    i.malloc                                 0x08007ce8   Section        0  malloc.o(i.malloc)
-    .constdata                               0x08007d54   Section       32  sweeprobot.o(.constdata)
-    HomingSigSrc2AngleMap                    0x08007d54   Data          10  sweeprobot.o(.constdata)
-    STARTUP_SEQ_DELAY_TIME                   0x08007d60   Data          20  sweeprobot.o(.constdata)
-    .constdata                               0x08007d74   Section       72  motorctrl.o(.constdata)
-    MotorCtrlChan                            0x08007d74   Data          72  motorctrl.o(.constdata)
-    .constdata                               0x08007dbc   Section      160  pwm.o(.constdata)
-    PWMChanRes                               0x08007dbc   Data         112  pwm.o(.constdata)
-    PWMController                            0x08007e2c   Data          48  pwm.o(.constdata)
-    .constdata                               0x08007e5c   Section       36  ctrlpanel.o(.constdata)
-    .constdata                               0x08007e80   Section       24  motionctrl.o(.constdata)
+    .text                                    0x08002820   Section        0  batterymanage.o(.text)
+    .text                                    0x08002d54   Section        0  buzzer.o(.text)
+    .text                                    0x08002ef4   Section        0  irda.o(.text)
+    IrDA_ParseEJE                            0x08002f21   Thumb Code   312  irda.o(.text)
+    .text                                    0x08003200   Section        0  measurement.o(.text)
+    .text                                    0x080034b0   Section        0  motorctrl.o(.text)
+    .text                                    0x080036b0   Section        0  pwm.o(.text)
+    .text                                    0x08003a40   Section        0  rtc.o(.text)
+    .text                                    0x08003cd4   Section        0  pwrmanagement.o(.text)
+    .text                                    0x08003db4   Section        0  ctrlpanel.o(.text)
+    .text                                    0x08003fc0   Section        0  key.o(.text)
+    .text                                    0x08004188   Section        0  motionctrl.o(.text)
+    IFRD_PathDetectStart                     0x08004c39   Thumb Code   140  motionctrl.o(.text)
+    IFRD_PathDetectStop                      0x08004cc5   Thumb Code    60  motionctrl.o(.text)
+    WheelCntMach_Start                       0x08004d01   Thumb Code    86  motionctrl.o(.text)
+    WheelCntMach_Stop                        0x08004d57   Thumb Code    56  motionctrl.o(.text)
+    MotionCtrl_LWheelProcExitOn              0x08004f0f   Thumb Code    58  motionctrl.o(.text)
+    MotionCtrl_RWheelProcExitOn              0x08004f49   Thumb Code    58  motionctrl.o(.text)
+    MotionCtrl_LWheelProcExitOff             0x08004fbd   Thumb Code    74  motionctrl.o(.text)
+    MotionCtrl_RWheelProcExitOff             0x08005007   Thumb Code    74  motionctrl.o(.text)
+    MotionCtrl_RWheelSubProc                 0x08005051   Thumb Code   352  motionctrl.o(.text)
+    MotionCtrl_LWheelSubProc                 0x080051b1   Thumb Code   428  motionctrl.o(.text)
+    .text                                    0x08005ec8   Section        0  msgqueue.o(.text)
+    .text                                    0x08005f78   Section        0  sweeprobot.o(.text)
+    .text                                    0x080070fc   Section        0  delay.o(.text)
+    .text                                    0x08007190   Section        0  stm32f10x_it.o(.text)
+    .text                                    0x08007590   Section        0  usart.o(.text)
+    .text                                    0x0800773c   Section        0  memcpya.o(.text)
+    .text                                    0x08007760   Section        0  memseta.o(.text)
+    .text                                    0x08007784   Section        0  fmul.o(.text)
+    .text                                    0x080077e8   Section        0  fdiv.o(.text)
+    .text                                    0x08007864   Section        0  ffltui.o(.text)
+    .text                                    0x0800786e   Section        0  ffixui.o(.text)
+    .text                                    0x08007896   Section        0  uldiv.o(.text)
+    .text                                    0x080078f8   Section        0  fepilogue.o(.text)
+    .text                                    0x080078f8   Section        0  iusefp.o(.text)
+    .text                                    0x08007968   Section       36  init.o(.text)
+    .text                                    0x0800798c   Section        0  llshl.o(.text)
+    .text                                    0x080079aa   Section        0  llushr.o(.text)
+    i.__0printf$5                            0x080079cc   Section        0  printf5.o(i.__0printf$5)
+    i.__scatterload_copy                     0x080079ec   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x080079fa   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x080079fc   Section       14  handlers.o(i.__scatterload_zeroinit)
+    i._printf_core                           0x08007a0c   Section        0  printf5.o(i._printf_core)
+    _printf_core                             0x08007a0d   Thumb Code   654  printf5.o(i._printf_core)
+    i.free                                   0x08007cc8   Section        0  malloc.o(i.free)
+    i.malloc                                 0x08007d18   Section        0  malloc.o(i.malloc)
+    .constdata                               0x08007d84   Section       72  motorctrl.o(.constdata)
+    MotorCtrlChan                            0x08007d84   Data          72  motorctrl.o(.constdata)
+    .constdata                               0x08007dcc   Section      160  pwm.o(.constdata)
+    PWMChanRes                               0x08007dcc   Data         112  pwm.o(.constdata)
+    PWMController                            0x08007e3c   Data          48  pwm.o(.constdata)
+    .constdata                               0x08007e6c   Section       36  ctrlpanel.o(.constdata)
+    .constdata                               0x08007e90   Section       24  motionctrl.o(.constdata)
+    .constdata                               0x08007ea8   Section       32  sweeprobot.o(.constdata)
+    HomingSigSrc2AngleMap                    0x08007ea8   Data          10  sweeprobot.o(.constdata)
+    STARTUP_SEQ_DELAY_TIME                   0x08007eb4   Data          20  sweeprobot.o(.constdata)
     .data                                    0x20000000   Section       20  system_stm32f10x.o(.data)
     .data                                    0x20000014   Section       20  stm32f10x_rcc.o(.data)
     APBAHBPrescTable                         0x20000014   Data          16  stm32f10x_rcc.o(.data)
     ADCPrescTable                            0x20000024   Data           4  stm32f10x_rcc.o(.data)
-    .data                                    0x20000028   Section       18  sweeprobot.o(.data)
-    RobotPlanFlag                            0x2000002b   Data           1  sweeprobot.o(.data)
-    MainMsgQ                                 0x2000002c   Data           4  sweeprobot.o(.data)
-    LastHomingStage                          0x20000031   Data           1  sweeprobot.o(.data)
-    gRobotStartupSeqNum                      0x20000032   Data           1  sweeprobot.o(.data)
-    i                                        0x20000033   Data           1  sweeprobot.o(.data)
-    j                                        0x20000034   Data           1  sweeprobot.o(.data)
-    k                                        0x20000035   Data           1  sweeprobot.o(.data)
-    l                                        0x20000036   Data           1  sweeprobot.o(.data)
-    HomingDataCnt                            0x20000037   Data           1  sweeprobot.o(.data)
-    RepeatCodeFound                          0x20000038   Data           1  sweeprobot.o(.data)
-    HomingStateConfirmCnt                    0x20000039   Data           1  sweeprobot.o(.data)
-    .data                                    0x2000003c   Section       18  batterymanage.o(.data)
-    ADC_BatLSB                               0x20000040   Data           8  batterymanage.o(.data)
-    BM_StateInited                           0x20000048   Data           1  batterymanage.o(.data)
-    BM_ChargeFlag                            0x20000049   Data           1  batterymanage.o(.data)
-    Counter                                  0x2000004a   Data           2  batterymanage.o(.data)
-    LedBrightnessSch                         0x2000004c   Data           1  batterymanage.o(.data)
-    LedBrightnessDir                         0x2000004d   Data           1  batterymanage.o(.data)
-    .data                                    0x2000004e   Section        6  buzzer.o(.data)
-    BuzzerPulsLen                            0x2000004e   Data           2  buzzer.o(.data)
-    BuzzerPulsCnt                            0x20000050   Data           1  buzzer.o(.data)
-    BuzzerInput                              0x20000052   Data           2  buzzer.o(.data)
-    .data                                    0x20000054   Section       22  irda.o(.data)
-    IrDA_FrameData                           0x20000054   Data           5  irda.o(.data)
-    IrDA_FrameBuf                            0x20000059   Data           1  irda.o(.data)
-    IrDA_FrameBufFlag                        0x2000005a   Data           1  irda.o(.data)
-    PulsCnt                                  0x2000005b   Data           5  irda.o(.data)
-    PulsStart                                0x20000060   Data           5  irda.o(.data)
-    HeadPuls                                 0x20000065   Data           5  irda.o(.data)
-    .data                                    0x2000006a   Section        1  pwrmanagement.o(.data)
-    .data                                    0x2000006b   Section        9  ctrlpanel.o(.data)
-    gLED                                     0x2000006b   Data           1  ctrlpanel.o(.data)
-    gBrightness                              0x2000006c   Data           1  ctrlpanel.o(.data)
-    gBrightnessCnt                           0x2000006d   Data           1  ctrlpanel.o(.data)
-    gHighCnt                                 0x2000006e   Data           3  ctrlpanel.o(.data)
-    gLowCnt                                  0x20000071   Data           3  ctrlpanel.o(.data)
-    .data                                    0x20000074   Section        8  key.o(.data)
-    KeyScanCnt                               0x20000074   Data           2  key.o(.data)
-    .data                                    0x2000007c   Section       94  motionctrl.o(.data)
-    gLWheelTotalCnt                          0x2000007c   Data           4  motionctrl.o(.data)
-    gRWheelTotalCnt                          0x20000080   Data           4  motionctrl.o(.data)
-    gLastTotalLWheelCnt                      0x20000084   Data           4  motionctrl.o(.data)
-    gLastTotalRWheelCnt                      0x20000088   Data           4  motionctrl.o(.data)
-    gWheelCnt                                0x2000008c   Data           6  motionctrl.o(.data)
-    gLWheelExpCnt                            0x20000092   Data           2  motionctrl.o(.data)
-    gRWheelExpCnt                            0x20000094   Data           2  motionctrl.o(.data)
-    gLWheelExpCB                             0x20000098   Data           4  motionctrl.o(.data)
-    gRWheelExpCB                             0x2000009c   Data           4  motionctrl.o(.data)
-    gWheelProcExitCB                         0x200000a0   Data           4  motionctrl.o(.data)
-    gLastWheelCnt                            0x200000a4   Data           6  motionctrl.o(.data)
-    gDeltaWheelCnt                           0x200000aa   Data           6  motionctrl.o(.data)
-    gCurLWheelSpeed                          0x200000b0   Data           1  motionctrl.o(.data)
-    gCurRWheelSpeed                          0x200000b1   Data           1  motionctrl.o(.data)
-    gLastPathFault                           0x200000b2   Data           1  motionctrl.o(.data)
-    gConsecutivePathFaultCnt                 0x200000b3   Data           1  motionctrl.o(.data)
-    gPathFaultProcEdgeModeCnt                0x200000b4   Data           1  motionctrl.o(.data)
-    gSpotModeAngleCnt                        0x200000b6   Data           2  motionctrl.o(.data)
-    gSpotModeCircleCnt                       0x200000b8   Data           2  motionctrl.o(.data)
-    gPathFaultProcMode                       0x200000ba   Data           1  motionctrl.o(.data)
-    gLastPathCondSLDiff                      0x200000bc   Data           2  motionctrl.o(.data)
-    gLastPathCondSRDiff                      0x200000be   Data           2  motionctrl.o(.data)
-    gCurPathCondSLDiff                       0x200000c0   Data           2  motionctrl.o(.data)
-    gCurPathCondSRDiff                       0x200000c2   Data           2  motionctrl.o(.data)
-    gEdgeModeAngleCnt                        0x200000c4   Data           2  motionctrl.o(.data)
-    gtmpCnt                                  0x200000ca   Data           2  motionctrl.o(.data)
-    gPathCondMap                             0x200000cc   Data           4  motionctrl.o(.data)
-    gLastExceptionMask                       0x200000d0   Data           1  motionctrl.o(.data)
-    gExceptionMask                           0x200000d1   Data           1  motionctrl.o(.data)
-    gIsExceptionHandling                     0x200000d2   Data           1  motionctrl.o(.data)
-    gUniversalWheelActiveVal                 0x200000d4   Data           2  motionctrl.o(.data)
-    gUniversalWheelActiveValLast             0x200000d6   Data           2  motionctrl.o(.data)
-    gUniveralWheelDetectPeriodCnt            0x200000d8   Data           2  motionctrl.o(.data)
-    .data                                    0x200000dc   Section        4  stdout.o(.data)
-    .data                                    0x200000e0   Section        4  mvars.o(.data)
+    .data                                    0x20000028   Section       18  batterymanage.o(.data)
+    ADC_BatLSB                               0x2000002c   Data           8  batterymanage.o(.data)
+    BM_StateInited                           0x20000034   Data           1  batterymanage.o(.data)
+    BM_ChargeFlag                            0x20000035   Data           1  batterymanage.o(.data)
+    Counter                                  0x20000036   Data           2  batterymanage.o(.data)
+    LedBrightnessSch                         0x20000038   Data           1  batterymanage.o(.data)
+    LedBrightnessDir                         0x20000039   Data           1  batterymanage.o(.data)
+    .data                                    0x2000003a   Section        6  buzzer.o(.data)
+    BuzzerPulsLen                            0x2000003a   Data           2  buzzer.o(.data)
+    BuzzerPulsCnt                            0x2000003c   Data           1  buzzer.o(.data)
+    BuzzerInput                              0x2000003e   Data           2  buzzer.o(.data)
+    .data                                    0x20000040   Section       22  irda.o(.data)
+    IrDA_FrameData                           0x20000040   Data           5  irda.o(.data)
+    IrDA_FrameBuf                            0x20000045   Data           1  irda.o(.data)
+    IrDA_FrameBufFlag                        0x20000046   Data           1  irda.o(.data)
+    PulsCnt                                  0x20000047   Data           5  irda.o(.data)
+    PulsStart                                0x2000004c   Data           5  irda.o(.data)
+    HeadPuls                                 0x20000051   Data           5  irda.o(.data)
+    .data                                    0x20000056   Section        1  pwrmanagement.o(.data)
+    .data                                    0x20000057   Section        9  ctrlpanel.o(.data)
+    gLED                                     0x20000057   Data           1  ctrlpanel.o(.data)
+    gBrightness                              0x20000058   Data           1  ctrlpanel.o(.data)
+    gBrightnessCnt                           0x20000059   Data           1  ctrlpanel.o(.data)
+    gHighCnt                                 0x2000005a   Data           3  ctrlpanel.o(.data)
+    gLowCnt                                  0x2000005d   Data           3  ctrlpanel.o(.data)
+    .data                                    0x20000060   Section        8  key.o(.data)
+    KeyScanCnt                               0x20000060   Data           2  key.o(.data)
+    .data                                    0x20000068   Section       98  motionctrl.o(.data)
+    gLWheelTotalCnt                          0x20000068   Data           4  motionctrl.o(.data)
+    gRWheelTotalCnt                          0x2000006c   Data           4  motionctrl.o(.data)
+    gLastTotalLWheelCnt                      0x20000070   Data           4  motionctrl.o(.data)
+    gLastTotalRWheelCnt                      0x20000074   Data           4  motionctrl.o(.data)
+    gWheelCnt                                0x20000078   Data           6  motionctrl.o(.data)
+    gLWheelExpCnt                            0x2000007e   Data           2  motionctrl.o(.data)
+    gRWheelExpCnt                            0x20000080   Data           2  motionctrl.o(.data)
+    gLWheelExpCB                             0x20000084   Data           4  motionctrl.o(.data)
+    gRWheelExpCB                             0x20000088   Data           4  motionctrl.o(.data)
+    gWheelProcExitCB                         0x2000008c   Data           4  motionctrl.o(.data)
+    gLastWheelCnt                            0x20000090   Data           6  motionctrl.o(.data)
+    gDeltaWheelCnt                           0x20000096   Data           6  motionctrl.o(.data)
+    gCurLWheelSpeed                          0x2000009c   Data           1  motionctrl.o(.data)
+    gCurRWheelSpeed                          0x2000009d   Data           1  motionctrl.o(.data)
+    gLastPathFault                           0x2000009e   Data           1  motionctrl.o(.data)
+    gConsecutivePathFaultCnt                 0x2000009f   Data           1  motionctrl.o(.data)
+    gPathFaultProcEdgeModeCnt                0x200000a0   Data           1  motionctrl.o(.data)
+    gSpotModeAngleCnt                        0x200000a2   Data           2  motionctrl.o(.data)
+    gSpotModeCircleCnt                       0x200000a4   Data           2  motionctrl.o(.data)
+    gPathFaultProcMode                       0x200000a6   Data           1  motionctrl.o(.data)
+    gLastPathCondSLDiff                      0x200000a8   Data           2  motionctrl.o(.data)
+    gLastPathCondSRDiff                      0x200000aa   Data           2  motionctrl.o(.data)
+    gCurPathCondSLDiff                       0x200000ac   Data           2  motionctrl.o(.data)
+    gCurPathCondSRDiff                       0x200000ae   Data           2  motionctrl.o(.data)
+    gEdgeModeAngleCnt                        0x200000b0   Data           2  motionctrl.o(.data)
+    gtmpCnt                                  0x200000b6   Data           2  motionctrl.o(.data)
+    gtmpCnt2                                 0x200000b8   Data           2  motionctrl.o(.data)
+    gPathCondMap                             0x200000bc   Data           4  motionctrl.o(.data)
+    gLastExceptionMask                       0x200000c0   Data           1  motionctrl.o(.data)
+    gExceptionMask                           0x200000c1   Data           1  motionctrl.o(.data)
+    gIsExceptionHandling                     0x200000c2   Data           1  motionctrl.o(.data)
+    gUniversalWheelActiveVal                 0x200000c4   Data           2  motionctrl.o(.data)
+    gUniversalWheelActiveValLast             0x200000c6   Data           2  motionctrl.o(.data)
+    gUniveralWheelDetectPeriodCnt            0x200000c8   Data           2  motionctrl.o(.data)
+    .data                                    0x200000cc   Section       18  sweeprobot.o(.data)
+    RobotPlanFlag                            0x200000cf   Data           1  sweeprobot.o(.data)
+    MainMsgQ                                 0x200000d0   Data           4  sweeprobot.o(.data)
+    LastHomingStage                          0x200000d5   Data           1  sweeprobot.o(.data)
+    gRobotStartupSeqNum                      0x200000d6   Data           1  sweeprobot.o(.data)
+    i                                        0x200000d7   Data           1  sweeprobot.o(.data)
+    j                                        0x200000d8   Data           1  sweeprobot.o(.data)
+    k                                        0x200000d9   Data           1  sweeprobot.o(.data)
+    l                                        0x200000da   Data           1  sweeprobot.o(.data)
+    HomingDataCnt                            0x200000db   Data           1  sweeprobot.o(.data)
+    RepeatCodeFound                          0x200000dc   Data           1  sweeprobot.o(.data)
+    HomingStateConfirmCnt                    0x200000dd   Data           1  sweeprobot.o(.data)
+    .data                                    0x200000e0   Section        4  stdout.o(.data)
     .data                                    0x200000e4   Section        4  mvars.o(.data)
-    .bss                                     0x200000e8   Section       20  sweeprobot.o(.bss)
-    RobotHomingData                          0x200000e8   Data          20  sweeprobot.o(.bss)
-    .bss                                     0x200000fc   Section       32  batterymanage.o(.bss)
-    TempADC                                  0x200000fc   Data          20  batterymanage.o(.bss)
-    Msg                                      0x20000110   Data          12  batterymanage.o(.bss)
-    .bss                                     0x2000011c   Section       30  irda.o(.bss)
-    PulsTimeS                                0x2000011c   Data          10  irda.o(.bss)
-    PulsTimeE                                0x20000126   Data          10  irda.o(.bss)
-    PulsLen                                  0x20000130   Data          10  irda.o(.bss)
-    .bss                                     0x2000013a   Section       28  measurement.o(.bss)
-    .bss                                     0x20000158   Section      264  motionctrl.o(.bss)
-    gIFRDTxOffRxVal                          0x20000248   Data          12  motionctrl.o(.bss)
-    gMsg                                     0x20000254   Data          12  motionctrl.o(.bss)
-    .bss                                     0x20000260   Section      316  stm32f10x_it.o(.bss)
-    stm32f10x_int_cb_tbl                     0x20000260   Data         316  stm32f10x_it.o(.bss)
+    .data                                    0x200000e8   Section        4  mvars.o(.data)
+    .bss                                     0x200000ec   Section       32  batterymanage.o(.bss)
+    TempADC                                  0x200000ec   Data          20  batterymanage.o(.bss)
+    Msg                                      0x20000100   Data          12  batterymanage.o(.bss)
+    .bss                                     0x2000010c   Section       30  irda.o(.bss)
+    PulsTimeS                                0x2000010c   Data          10  irda.o(.bss)
+    PulsTimeE                                0x20000116   Data          10  irda.o(.bss)
+    PulsLen                                  0x20000120   Data          10  irda.o(.bss)
+    .bss                                     0x2000012a   Section       28  measurement.o(.bss)
+    .bss                                     0x20000148   Section      264  motionctrl.o(.bss)
+    gIFRDTxOffRxVal                          0x20000238   Data          12  motionctrl.o(.bss)
+    gMsg                                     0x20000244   Data          12  motionctrl.o(.bss)
+    .bss                                     0x20000250   Section       20  sweeprobot.o(.bss)
+    RobotHomingData                          0x20000250   Data          20  sweeprobot.o(.bss)
+    .bss                                     0x20000264   Section      316  stm32f10x_it.o(.bss)
+    stm32f10x_int_cb_tbl                     0x20000264   Data         316  stm32f10x_it.o(.bss)
     HEAP                                     0x200003a0   Section      512  startup_stm32f10x_hd.o(HEAP)
     STACK                                    0x200005a0   Section     1024  startup_stm32f10x_hd.o(STACK)
 
@@ -1142,210 +1143,210 @@ Image Symbol Table
     USART_GetITStatus                        0x08002771   Thumb Code    84  stm32f10x_usart.o(.text)
     USART_ClearITPendingBit                  0x080027c5   Thumb Code    52  stm32f10x_usart.o(.text)
     main                                     0x080027f9   Thumb Code    38  main.o(.text)
-    SweepRobot_Init                          0x08002821   Thumb Code   108  sweeprobot.o(.text)
-    SweepRobot_Stop                          0x0800288d   Thumb Code    46  sweeprobot.o(.text)
-    SweepRobot_StartupInit                   0x080028bb   Thumb Code   452  sweeprobot.o(.text)
-    SweepRobot_StartupAbort                  0x08002a7f   Thumb Code    96  sweeprobot.o(.text)
-    SweepRobot_AutoModeProc                  0x08002adf   Thumb Code    62  sweeprobot.o(.text)
-    SweepRobot_IdleStateSync                 0x08002b1d   Thumb Code    56  sweeprobot.o(.text)
-    SweepRobot_MotionMsgProc                 0x08002b55   Thumb Code   104  sweeprobot.o(.text)
-    SweepRobot_PwrStationMsgProc             0x08002bbd   Thumb Code  2124  sweeprobot.o(.text)
-    SweepRobot_HomingInit                    0x08003409   Thumb Code    82  sweeprobot.o(.text)
-    SweepRobot_ManualModeProc                0x0800345b   Thumb Code   148  sweeprobot.o(.text)
-    SweepRobot_EdgeModeProc                  0x080034ef   Thumb Code    50  sweeprobot.o(.text)
-    SweepRobot_SpotModeProc                  0x08003521   Thumb Code    50  sweeprobot.o(.text)
-    SweepRobot_CtrlMsgProc                   0x08003553   Thumb Code   196  sweeprobot.o(.text)
-    SweepRobot_HomingSuccess                 0x08003617   Thumb Code    56  sweeprobot.o(.text)
-    SweepRobot_BMMsgProc                     0x0800364f   Thumb Code   162  sweeprobot.o(.text)
-    SweepRobot_PMMsgProc                     0x080036f1   Thumb Code    72  sweeprobot.o(.text)
-    SweepRobot_Start                         0x08003739   Thumb Code   256  sweeprobot.o(.text)
-    SweepRobot_StartupComplete               0x08003839   Thumb Code    52  sweeprobot.o(.text)
-    SweepRobot_SendMsg                       0x0800386d   Thumb Code    34  sweeprobot.o(.text)
-    BM_ChargeStop                            0x0800399d   Thumb Code    20  batterymanage.o(.text)
-    BM_ChargeExit                            0x080039b1   Thumb Code    20  batterymanage.o(.text)
-    BM_ChargeStart                           0x080039c5   Thumb Code    16  batterymanage.o(.text)
-    BM_ChargePowerDec                        0x080039d5   Thumb Code    44  batterymanage.o(.text)
-    BM_ChargePowerInc                        0x08003a01   Thumb Code    46  batterymanage.o(.text)
-    BM_ChargeProc                            0x08003a2f   Thumb Code   196  batterymanage.o(.text)
-    BM_ConditionUpdate                       0x08003af3   Thumb Code   810  batterymanage.o(.text)
-    BM_Init                                  0x08003e1d   Thumb Code   164  batterymanage.o(.text)
-    BuzzerClock                              0x08003ed1   Thumb Code   138  buzzer.o(.text)
-    Buzzer_Init                              0x08003f5b   Thumb Code   156  buzzer.o(.text)
-    Buzzer_Stop                              0x08003ff7   Thumb Code    22  buzzer.o(.text)
-    Buzzer_Play                              0x0800400d   Thumb Code    80  buzzer.o(.text)
-    PwrStationHomingSigProc                  0x08004071   Thumb Code    44  irda.o(.text)
-    IrDA_BackLightIsr                        0x080041d5   Thumb Code    10  irda.o(.text)
-    IrDA_LeftLightIsr                        0x080041df   Thumb Code    10  irda.o(.text)
-    IrDA_FrontLLightIsr                      0x080041e9   Thumb Code    10  irda.o(.text)
-    IrDA_FrontRLightIsr                      0x080041f3   Thumb Code    10  irda.o(.text)
-    IrDA_RightLightIsr                       0x080041fd   Thumb Code    10  irda.o(.text)
-    IrDA_Init                                0x08004207   Thumb Code   294  irda.o(.text)
-    IrDA_DeInit                              0x0800432d   Thumb Code     8  irda.o(.text)
-    IrDA_ProcessEJE                          0x08004335   Thumb Code    24  irda.o(.text)
-    Meas_Init                                0x0800437d   Thumb Code   536  measurement.o(.text)
-    Meas_Start                               0x08004595   Thumb Code    86  measurement.o(.text)
-    Meas_Stop                                0x080045eb   Thumb Code    42  measurement.o(.text)
-    MotorCtrl_Init                           0x0800462d   Thumb Code   180  motorctrl.o(.text)
-    MotorCtrl_ChanSpeedLevelSet              0x080046e1   Thumb Code    50  motorctrl.o(.text)
-    MotorCtrl_ChanSpeedLevelGet              0x08004713   Thumb Code    30  motorctrl.o(.text)
-    MotorCtrl_ChanSpeedDec                   0x08004731   Thumb Code    32  motorctrl.o(.text)
-    MotorCtrl_ChanSpeedInc                   0x08004751   Thumb Code    46  motorctrl.o(.text)
-    MotorCtrl_ChanDirSet                     0x0800477f   Thumb Code    64  motorctrl.o(.text)
-    MotorCtrl_ChanDirGet                     0x080047bf   Thumb Code    32  motorctrl.o(.text)
-    MotorCtrl_ChanStateGet                   0x080047df   Thumb Code    70  motorctrl.o(.text)
-    PWM_ControllerInit                       0x0800482d   Thumb Code   240  pwm.o(.text)
-    PWM_ChanInit                             0x0800491d   Thumb Code   216  pwm.o(.text)
-    PWM_DutyCycleSet                         0x080049f5   Thumb Code   140  pwm.o(.text)
-    PWM_DutyCycleGet                         0x08004a81   Thumb Code   146  pwm.o(.text)
-    PWM_ControllerStart                      0x08004b13   Thumb Code    74  pwm.o(.text)
-    PWM_ControllerStop                       0x08004b5d   Thumb Code    74  pwm.o(.text)
-    RTC_Configuration                        0x08004bbd   Thumb Code    76  rtc.o(.text)
-    Time_Adjust                              0x08004c09   Thumb Code    38  rtc.o(.text)
-    Time_Display                             0x08004c2f   Thumb Code    92  rtc.o(.text)
-    RTC_AlarmWork                            0x08004c8b   Thumb Code    66  rtc.o(.text)
-    RTC_AlarmSet                             0x08004ccd   Thumb Code    84  rtc.o(.text)
-    RTC_AlarmGet                             0x08004d21   Thumb Code    18  rtc.o(.text)
-    RTC_LoadAlarmCfg                         0x08004d33   Thumb Code   106  rtc.o(.text)
-    RTC_Init                                 0x08004d9d   Thumb Code   142  rtc.o(.text)
-    uDelay                                   0x08004e51   Thumb Code    60  delay.o(.text)
-    mDelay                                   0x08004e8d   Thumb Code    62  delay.o(.text)
-    sDelay                                   0x08004ecb   Thumb Code    26  delay.o(.text)
-    PM_SysTryToStandby                       0x08004ee5   Thumb Code    48  pwrmanagement.o(.text)
-    PM_SysTryToResume                        0x08004f15   Thumb Code    32  pwrmanagement.o(.text)
-    PM_Init                                  0x08004f35   Thumb Code    72  pwrmanagement.o(.text)
-    PM_DeInit                                0x08004f7d   Thumb Code     2  pwrmanagement.o(.text)
-    PM_EnterPwrMode                          0x08004f7f   Thumb Code    56  pwrmanagement.o(.text)
-    CtrlPanel_LEDCtrl                        0x08004fc1   Thumb Code    18  ctrlpanel.o(.text)
-    CtrlPanel_LEDCtrlProc                    0x08004fd3   Thumb Code   258  ctrlpanel.o(.text)
-    CtrlPanel_RemoteCB                       0x080050d5   Thumb Code    36  ctrlpanel.o(.text)
-    CtrlPanel_AllInOneBtnUpProc              0x080050f9   Thumb Code    46  ctrlpanel.o(.text)
-    CtrlPanel_AllInOneBtnDownProc            0x08005127   Thumb Code    16  ctrlpanel.o(.text)
-    CtrlPanel_Init                           0x08005137   Thumb Code   118  ctrlpanel.o(.text)
-    Key_EvtProccess                          0x080051cd   Thumb Code   116  key.o(.text)
-    Key_CoreInit                             0x08005241   Thumb Code   106  key.o(.text)
-    Key_StartListen                          0x080052ab   Thumb Code    12  key.o(.text)
-    Key_StopListen                           0x080052b7   Thumb Code    12  key.o(.text)
-    Key_Register                             0x080052c3   Thumb Code   116  key.o(.text)
-    Key_Deregister                           0x08005337   Thumb Code    76  key.o(.text)
-    FWheelCounterISR                         0x08005395   Thumb Code    12  motionctrl.o(.text)
-    LWheelCounterISR                         0x080053a1   Thumb Code    68  motionctrl.o(.text)
-    RWheelCounterISR                         0x080053e5   Thumb Code    68  motionctrl.o(.text)
-    ExceptionStateCheck                      0x08005429   Thumb Code   172  motionctrl.o(.text)
-    MotionStateProc                          0x080054d5   Thumb Code  2022  motionctrl.o(.text)
-    Wheel_SpeedAdjustProc                    0x08005cbb   Thumb Code   134  motionctrl.o(.text)
-    IFRD_PathDetectInit                      0x08005d41   Thumb Code   264  motionctrl.o(.text)
-    MotionCtrl_Init                          0x08005f9b   Thumb Code   356  motionctrl.o(.text)
-    MotionCtrl_Stop                          0x08006173   Thumb Code    58  motionctrl.o(.text)
-    MotionCtrl_Proc                          0x08006557   Thumb Code   232  motionctrl.o(.text)
-    MotionCtrl_Start                         0x0800663f   Thumb Code    38  motionctrl.o(.text)
-    MotionCtrl_PathFaultBackProcCompleteCondTest 0x08006665   Thumb Code    28  motionctrl.o(.text)
-    MotionCtrl_PathFaultTryTurnCondTest      0x08006681   Thumb Code    90  motionctrl.o(.text)
-    MotionCtrl_PathFaultEdgeModeProcAct      0x080066db   Thumb Code    12  motionctrl.o(.text)
-    MotionCtrl_PathFaultTurnProcCompleteCondTest 0x080066e7   Thumb Code    20  motionctrl.o(.text)
-    MotionCtrl_PathFaultProc                 0x080066fb   Thumb Code   816  motionctrl.o(.text)
-    ExceptionHandleFinishCB                  0x08006a2b   Thumb Code    34  motionctrl.o(.text)
-    MotionCtrl_ExceptionHandle               0x08006a4d   Thumb Code   434  motionctrl.o(.text)
-    MotionCtrl_TrapProc                      0x08006bff   Thumb Code   192  motionctrl.o(.text)
-    MotionCtrl_ChargeStationAvoid            0x08006cbf   Thumb Code   134  motionctrl.o(.text)
-    MotionCtrl_MoveDirTune                   0x08006d45   Thumb Code    34  motionctrl.o(.text)
-    MotionCtrl_MoveDirectly                  0x08006d67   Thumb Code   126  motionctrl.o(.text)
-    MotionCtrl_HomingMotionInit              0x08006de5   Thumb Code    68  motionctrl.o(.text)
-    MotionCtrl_DishomingMotionInit           0x08006e29   Thumb Code   168  motionctrl.o(.text)
-    MotionCtrl_AutoMotionInit                0x08006ed1   Thumb Code    72  motionctrl.o(.text)
-    MotionCtrl_SpotMotionInit                0x08006f19   Thumb Code    90  motionctrl.o(.text)
-    MotionCtrl_EdgeMotionInit                0x08006f73   Thumb Code    78  motionctrl.o(.text)
-    MotionCtrl_ManualCtrlProc                0x08006fc1   Thumb Code   212  motionctrl.o(.text)
-    MsgQueue_Create                          0x080070b1   Thumb Code    90  msgqueue.o(.text)
-    MsgQueue_InQueue                         0x0800710b   Thumb Code    68  msgqueue.o(.text)
-    MsgQueue_DeQueue                         0x0800714f   Thumb Code    18  msgqueue.o(.text)
-    plat_int_reg_cb                          0x08007161   Thumb Code    24  stm32f10x_it.o(.text)
-    plat_int_dereg_cb                        0x08007179   Thumb Code    24  stm32f10x_it.o(.text)
-    NMI_Handler                              0x08007191   Thumb Code     2  stm32f10x_it.o(.text)
-    HardFault_Handler                        0x08007193   Thumb Code     4  stm32f10x_it.o(.text)
-    MemManage_Handler                        0x08007197   Thumb Code     4  stm32f10x_it.o(.text)
-    BusFault_Handler                         0x0800719b   Thumb Code     4  stm32f10x_it.o(.text)
-    UsageFault_Handler                       0x0800719f   Thumb Code     4  stm32f10x_it.o(.text)
-    SVC_Handler                              0x080071a3   Thumb Code     2  stm32f10x_it.o(.text)
-    DebugMon_Handler                         0x080071a5   Thumb Code     2  stm32f10x_it.o(.text)
-    PendSV_Handler                           0x080071a7   Thumb Code     2  stm32f10x_it.o(.text)
-    SysTick_Handler                          0x080071a9   Thumb Code    16  stm32f10x_it.o(.text)
-    RTC_IRQHandler                           0x080071b9   Thumb Code    64  stm32f10x_it.o(.text)
-    TIM1_UP_IRQHandler                       0x080071f9   Thumb Code    40  stm32f10x_it.o(.text)
-    TIM2_IRQHandler                          0x08007221   Thumb Code    38  stm32f10x_it.o(.text)
-    TIM3_IRQHandler                          0x08007247   Thumb Code    38  stm32f10x_it.o(.text)
-    TIM4_IRQHandler                          0x0800726d   Thumb Code    38  stm32f10x_it.o(.text)
-    TIM5_IRQHandler                          0x08007293   Thumb Code    38  stm32f10x_it.o(.text)
-    TIM6_IRQHandler                          0x080072b9   Thumb Code    38  stm32f10x_it.o(.text)
-    TIM7_IRQHandler                          0x080072df   Thumb Code    38  stm32f10x_it.o(.text)
-    USART1_IRQHandler                        0x08007305   Thumb Code    20  stm32f10x_it.o(.text)
-    USART2_IRQHandler                        0x08007319   Thumb Code    20  stm32f10x_it.o(.text)
-    EXTI0_IRQHandler                         0x0800732d   Thumb Code    30  stm32f10x_it.o(.text)
-    EXTI1_IRQHandler                         0x0800734b   Thumb Code    30  stm32f10x_it.o(.text)
-    EXTI2_IRQHandler                         0x08007369   Thumb Code    30  stm32f10x_it.o(.text)
-    EXTI3_IRQHandler                         0x08007387   Thumb Code    30  stm32f10x_it.o(.text)
-    EXTI4_IRQHandler                         0x080073a5   Thumb Code    30  stm32f10x_it.o(.text)
-    EXTI9_5_IRQHandler                       0x080073c3   Thumb Code   162  stm32f10x_it.o(.text)
-    EXTI15_10_IRQHandler                     0x08007465   Thumb Code   208  stm32f10x_it.o(.text)
-    USB_LP_CAN1_RX0_IRQHandler               0x08007535   Thumb Code    16  stm32f10x_it.o(.text)
-    USART1_Config                            0x08007561   Thumb Code   114  usart.o(.text)
-    USART2_Config                            0x080075d3   Thumb Code   116  usart.o(.text)
-    UART4_Config                             0x08007647   Thumb Code   120  usart.o(.text)
-    fputc                                    0x080076bf   Thumb Code    32  usart.o(.text)
-    fgetc                                    0x080076df   Thumb Code    26  usart.o(.text)
-    __aeabi_memcpy                           0x0800770d   Thumb Code    36  memcpya.o(.text)
-    __aeabi_memcpy4                          0x0800770d   Thumb Code     0  memcpya.o(.text)
-    __aeabi_memcpy8                          0x0800770d   Thumb Code     0  memcpya.o(.text)
-    __aeabi_memset                           0x08007731   Thumb Code    14  memseta.o(.text)
-    __aeabi_memset4                          0x08007731   Thumb Code     0  memseta.o(.text)
-    __aeabi_memset8                          0x08007731   Thumb Code     0  memseta.o(.text)
-    __aeabi_memclr                           0x0800773f   Thumb Code     4  memseta.o(.text)
-    __aeabi_memclr4                          0x0800773f   Thumb Code     0  memseta.o(.text)
-    __aeabi_memclr8                          0x0800773f   Thumb Code     0  memseta.o(.text)
-    _memset$wrapper                          0x08007743   Thumb Code    18  memseta.o(.text)
-    __aeabi_fmul                             0x08007755   Thumb Code   100  fmul.o(.text)
-    __aeabi_fdiv                             0x080077b9   Thumb Code   124  fdiv.o(.text)
-    __aeabi_ui2f                             0x08007835   Thumb Code    10  ffltui.o(.text)
-    __aeabi_f2uiz                            0x0800783f   Thumb Code    40  ffixui.o(.text)
-    __aeabi_uldivmod                         0x08007867   Thumb Code    98  uldiv.o(.text)
-    __I$use$fp                               0x080078c9   Thumb Code     0  iusefp.o(.text)
-    _float_round                             0x080078c9   Thumb Code    18  fepilogue.o(.text)
-    _float_epilogue                          0x080078db   Thumb Code    92  fepilogue.o(.text)
-    __scatterload                            0x08007939   Thumb Code    28  init.o(.text)
-    __scatterload_rt2                        0x08007939   Thumb Code     0  init.o(.text)
-    __aeabi_llsl                             0x0800795d   Thumb Code    30  llshl.o(.text)
-    _ll_shift_l                              0x0800795d   Thumb Code     0  llshl.o(.text)
-    __aeabi_llsr                             0x0800797b   Thumb Code    32  llushr.o(.text)
-    _ll_ushift_r                             0x0800797b   Thumb Code     0  llushr.o(.text)
-    __0printf$5                              0x0800799d   Thumb Code    22  printf5.o(i.__0printf$5)
-    __1printf$5                              0x0800799d   Thumb Code     0  printf5.o(i.__0printf$5)
-    __2printf                                0x0800799d   Thumb Code     0  printf5.o(i.__0printf$5)
-    __scatterload_copy                       0x080079bd   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x080079cb   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x080079cd   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    free                                     0x08007c99   Thumb Code    76  malloc.o(i.free)
-    malloc                                   0x08007ce9   Thumb Code    92  malloc.o(i.malloc)
-    LEDS                                     0x08007e5c   Data          36  ctrlpanel.o(.constdata)
-    gProximityDetectionThreshold             0x08007e80   Data          12  motionctrl.o(.constdata)
-    gHighLightDetectionThreshold             0x08007e8c   Data          12  motionctrl.o(.constdata)
-    Region$$Table$$Base                      0x08007e98   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08007eb8   Number         0  anon$$obj.o(Region$$Table)
+    BM_ChargeStop                            0x08002821   Thumb Code    20  batterymanage.o(.text)
+    BM_ChargeExit                            0x08002835   Thumb Code    20  batterymanage.o(.text)
+    BM_ChargeStart                           0x08002849   Thumb Code    16  batterymanage.o(.text)
+    BM_ChargePowerDec                        0x08002859   Thumb Code    44  batterymanage.o(.text)
+    BM_ChargePowerInc                        0x08002885   Thumb Code    46  batterymanage.o(.text)
+    BM_ChargeProc                            0x080028b3   Thumb Code   196  batterymanage.o(.text)
+    BM_ConditionUpdate                       0x08002977   Thumb Code   810  batterymanage.o(.text)
+    BM_Init                                  0x08002ca1   Thumb Code   164  batterymanage.o(.text)
+    BuzzerClock                              0x08002d55   Thumb Code   138  buzzer.o(.text)
+    Buzzer_Init                              0x08002ddf   Thumb Code   156  buzzer.o(.text)
+    Buzzer_Stop                              0x08002e7b   Thumb Code    22  buzzer.o(.text)
+    Buzzer_Play                              0x08002e91   Thumb Code    80  buzzer.o(.text)
+    PwrStationHomingSigProc                  0x08002ef5   Thumb Code    44  irda.o(.text)
+    IrDA_BackLightIsr                        0x08003059   Thumb Code    10  irda.o(.text)
+    IrDA_LeftLightIsr                        0x08003063   Thumb Code    10  irda.o(.text)
+    IrDA_FrontLLightIsr                      0x0800306d   Thumb Code    10  irda.o(.text)
+    IrDA_FrontRLightIsr                      0x08003077   Thumb Code    10  irda.o(.text)
+    IrDA_RightLightIsr                       0x08003081   Thumb Code    10  irda.o(.text)
+    IrDA_Init                                0x0800308b   Thumb Code   294  irda.o(.text)
+    IrDA_DeInit                              0x080031b1   Thumb Code     8  irda.o(.text)
+    IrDA_ProcessEJE                          0x080031b9   Thumb Code    24  irda.o(.text)
+    Meas_Init                                0x08003201   Thumb Code   536  measurement.o(.text)
+    Meas_Start                               0x08003419   Thumb Code    86  measurement.o(.text)
+    Meas_Stop                                0x0800346f   Thumb Code    42  measurement.o(.text)
+    MotorCtrl_Init                           0x080034b1   Thumb Code   180  motorctrl.o(.text)
+    MotorCtrl_ChanSpeedLevelSet              0x08003565   Thumb Code    50  motorctrl.o(.text)
+    MotorCtrl_ChanSpeedLevelGet              0x08003597   Thumb Code    30  motorctrl.o(.text)
+    MotorCtrl_ChanSpeedDec                   0x080035b5   Thumb Code    32  motorctrl.o(.text)
+    MotorCtrl_ChanSpeedInc                   0x080035d5   Thumb Code    46  motorctrl.o(.text)
+    MotorCtrl_ChanDirSet                     0x08003603   Thumb Code    64  motorctrl.o(.text)
+    MotorCtrl_ChanDirGet                     0x08003643   Thumb Code    32  motorctrl.o(.text)
+    MotorCtrl_ChanStateGet                   0x08003663   Thumb Code    70  motorctrl.o(.text)
+    PWM_ControllerInit                       0x080036b1   Thumb Code   240  pwm.o(.text)
+    PWM_ChanInit                             0x080037a1   Thumb Code   216  pwm.o(.text)
+    PWM_DutyCycleSet                         0x08003879   Thumb Code   140  pwm.o(.text)
+    PWM_DutyCycleGet                         0x08003905   Thumb Code   146  pwm.o(.text)
+    PWM_ControllerStart                      0x08003997   Thumb Code    74  pwm.o(.text)
+    PWM_ControllerStop                       0x080039e1   Thumb Code    74  pwm.o(.text)
+    RTC_Configuration                        0x08003a41   Thumb Code    76  rtc.o(.text)
+    Time_Adjust                              0x08003a8d   Thumb Code    38  rtc.o(.text)
+    Time_Display                             0x08003ab3   Thumb Code    92  rtc.o(.text)
+    RTC_AlarmWork                            0x08003b0f   Thumb Code    66  rtc.o(.text)
+    RTC_AlarmSet                             0x08003b51   Thumb Code    84  rtc.o(.text)
+    RTC_AlarmGet                             0x08003ba5   Thumb Code    18  rtc.o(.text)
+    RTC_LoadAlarmCfg                         0x08003bb7   Thumb Code   106  rtc.o(.text)
+    RTC_Init                                 0x08003c21   Thumb Code   142  rtc.o(.text)
+    PM_SysTryToStandby                       0x08003cd5   Thumb Code    48  pwrmanagement.o(.text)
+    PM_SysTryToResume                        0x08003d05   Thumb Code    32  pwrmanagement.o(.text)
+    PM_Init                                  0x08003d25   Thumb Code    72  pwrmanagement.o(.text)
+    PM_DeInit                                0x08003d6d   Thumb Code     2  pwrmanagement.o(.text)
+    PM_EnterPwrMode                          0x08003d6f   Thumb Code    62  pwrmanagement.o(.text)
+    CtrlPanel_LEDCtrl                        0x08003db5   Thumb Code    18  ctrlpanel.o(.text)
+    CtrlPanel_LEDCtrlProc                    0x08003dc7   Thumb Code   258  ctrlpanel.o(.text)
+    CtrlPanel_RemoteCB                       0x08003ec9   Thumb Code    36  ctrlpanel.o(.text)
+    CtrlPanel_AllInOneBtnUpProc              0x08003eed   Thumb Code    46  ctrlpanel.o(.text)
+    CtrlPanel_AllInOneBtnDownProc            0x08003f1b   Thumb Code    16  ctrlpanel.o(.text)
+    CtrlPanel_Init                           0x08003f2b   Thumb Code   118  ctrlpanel.o(.text)
+    Key_EvtProccess                          0x08003fc1   Thumb Code   116  key.o(.text)
+    Key_CoreInit                             0x08004035   Thumb Code   106  key.o(.text)
+    Key_StartListen                          0x0800409f   Thumb Code    12  key.o(.text)
+    Key_StopListen                           0x080040ab   Thumb Code    12  key.o(.text)
+    Key_Register                             0x080040b7   Thumb Code   116  key.o(.text)
+    Key_Deregister                           0x0800412b   Thumb Code    76  key.o(.text)
+    FWheelCounterISR                         0x08004189   Thumb Code    12  motionctrl.o(.text)
+    LWheelCounterISR                         0x08004195   Thumb Code    68  motionctrl.o(.text)
+    RWheelCounterISR                         0x080041d9   Thumb Code    68  motionctrl.o(.text)
+    ExceptionStateCheck                      0x0800421d   Thumb Code   172  motionctrl.o(.text)
+    MotionStateProc                          0x080042c9   Thumb Code  1548  motionctrl.o(.text)
+    WheelSpeedAdjustProc                     0x080048d5   Thumb Code   602  motionctrl.o(.text)
+    IFRD_PathDetectInit                      0x08004b2f   Thumb Code   266  motionctrl.o(.text)
+    MotionCtrl_Init                          0x08004d8f   Thumb Code   384  motionctrl.o(.text)
+    MotionCtrl_Stop                          0x08004f83   Thumb Code    58  motionctrl.o(.text)
+    MotionCtrl_Proc                          0x0800535d   Thumb Code   232  motionctrl.o(.text)
+    MotionCtrl_Start                         0x08005445   Thumb Code    38  motionctrl.o(.text)
+    MotionCtrl_PathFaultBackProcCompleteCondTest 0x0800546b   Thumb Code    28  motionctrl.o(.text)
+    MotionCtrl_PathFaultTryTurnCondTest      0x08005487   Thumb Code    90  motionctrl.o(.text)
+    MotionCtrl_PathFaultEdgeModeProcAct      0x080054e1   Thumb Code    12  motionctrl.o(.text)
+    MotionCtrl_PathFaultTurnProcCompleteCondTest 0x080054ed   Thumb Code    20  motionctrl.o(.text)
+    MotionCtrl_PathFaultProc                 0x08005501   Thumb Code   822  motionctrl.o(.text)
+    ExceptionHandleFinishCB                  0x08005837   Thumb Code    34  motionctrl.o(.text)
+    MotionCtrl_ExceptionHandle               0x08005859   Thumb Code   434  motionctrl.o(.text)
+    MotionCtrl_TrapProc                      0x08005a0b   Thumb Code   192  motionctrl.o(.text)
+    MotionCtrl_ChargeStationAvoid            0x08005acb   Thumb Code   174  motionctrl.o(.text)
+    MotionCtrl_MoveDirTune                   0x08005b79   Thumb Code    34  motionctrl.o(.text)
+    MotionCtrl_MoveDirectly                  0x08005b9b   Thumb Code    80  motionctrl.o(.text)
+    MotionCtrl_HomingMotionInit              0x08005beb   Thumb Code    68  motionctrl.o(.text)
+    MotionCtrl_DishomingMotionInit           0x08005c2f   Thumb Code   168  motionctrl.o(.text)
+    MotionCtrl_AutoMotionInit                0x08005cd7   Thumb Code    72  motionctrl.o(.text)
+    MotionCtrl_SpotMotionInit                0x08005d1f   Thumb Code    90  motionctrl.o(.text)
+    MotionCtrl_EdgeMotionInit                0x08005d79   Thumb Code    78  motionctrl.o(.text)
+    MotionCtrl_ManualCtrlProc                0x08005dc7   Thumb Code   212  motionctrl.o(.text)
+    MsgQueue_Create                          0x08005ec9   Thumb Code    90  msgqueue.o(.text)
+    MsgQueue_InQueue                         0x08005f23   Thumb Code    68  msgqueue.o(.text)
+    MsgQueue_DeQueue                         0x08005f67   Thumb Code    18  msgqueue.o(.text)
+    SweepRobot_Init                          0x08005f79   Thumb Code   108  sweeprobot.o(.text)
+    SweepRobot_Stop                          0x08005fe5   Thumb Code    46  sweeprobot.o(.text)
+    SweepRobot_StartupInit                   0x08006013   Thumb Code   452  sweeprobot.o(.text)
+    SweepRobot_StartupAbort                  0x080061d7   Thumb Code    96  sweeprobot.o(.text)
+    SweepRobot_AutoModeProc                  0x08006237   Thumb Code    62  sweeprobot.o(.text)
+    SweepRobot_IdleStateSync                 0x08006275   Thumb Code    56  sweeprobot.o(.text)
+    SweepRobot_MotionMsgProc                 0x080062ad   Thumb Code   104  sweeprobot.o(.text)
+    SweepRobot_PwrStationMsgProc             0x08006315   Thumb Code  2124  sweeprobot.o(.text)
+    SweepRobot_HomingInit                    0x08006b61   Thumb Code    82  sweeprobot.o(.text)
+    SweepRobot_ManualModeProc                0x08006bb3   Thumb Code   148  sweeprobot.o(.text)
+    SweepRobot_EdgeModeProc                  0x08006c47   Thumb Code    50  sweeprobot.o(.text)
+    SweepRobot_SpotModeProc                  0x08006c79   Thumb Code    50  sweeprobot.o(.text)
+    SweepRobot_CtrlMsgProc                   0x08006cab   Thumb Code   196  sweeprobot.o(.text)
+    SweepRobot_HomingSuccess                 0x08006d6f   Thumb Code    56  sweeprobot.o(.text)
+    SweepRobot_BMMsgProc                     0x08006da7   Thumb Code   170  sweeprobot.o(.text)
+    SweepRobot_PMMsgProc                     0x08006e51   Thumb Code    72  sweeprobot.o(.text)
+    SweepRobot_Start                         0x08006e99   Thumb Code   256  sweeprobot.o(.text)
+    SweepRobot_StartupComplete               0x08006f99   Thumb Code    52  sweeprobot.o(.text)
+    SweepRobot_SendMsg                       0x08006fcd   Thumb Code    34  sweeprobot.o(.text)
+    uDelay                                   0x080070fd   Thumb Code    60  delay.o(.text)
+    mDelay                                   0x08007139   Thumb Code    62  delay.o(.text)
+    sDelay                                   0x08007177   Thumb Code    26  delay.o(.text)
+    plat_int_reg_cb                          0x08007191   Thumb Code    24  stm32f10x_it.o(.text)
+    plat_int_dereg_cb                        0x080071a9   Thumb Code    24  stm32f10x_it.o(.text)
+    NMI_Handler                              0x080071c1   Thumb Code     2  stm32f10x_it.o(.text)
+    HardFault_Handler                        0x080071c3   Thumb Code     4  stm32f10x_it.o(.text)
+    MemManage_Handler                        0x080071c7   Thumb Code     4  stm32f10x_it.o(.text)
+    BusFault_Handler                         0x080071cb   Thumb Code     4  stm32f10x_it.o(.text)
+    UsageFault_Handler                       0x080071cf   Thumb Code     4  stm32f10x_it.o(.text)
+    SVC_Handler                              0x080071d3   Thumb Code     2  stm32f10x_it.o(.text)
+    DebugMon_Handler                         0x080071d5   Thumb Code     2  stm32f10x_it.o(.text)
+    PendSV_Handler                           0x080071d7   Thumb Code     2  stm32f10x_it.o(.text)
+    SysTick_Handler                          0x080071d9   Thumb Code    16  stm32f10x_it.o(.text)
+    RTC_IRQHandler                           0x080071e9   Thumb Code    64  stm32f10x_it.o(.text)
+    TIM1_UP_IRQHandler                       0x08007229   Thumb Code    40  stm32f10x_it.o(.text)
+    TIM2_IRQHandler                          0x08007251   Thumb Code    38  stm32f10x_it.o(.text)
+    TIM3_IRQHandler                          0x08007277   Thumb Code    38  stm32f10x_it.o(.text)
+    TIM4_IRQHandler                          0x0800729d   Thumb Code    38  stm32f10x_it.o(.text)
+    TIM5_IRQHandler                          0x080072c3   Thumb Code    38  stm32f10x_it.o(.text)
+    TIM6_IRQHandler                          0x080072e9   Thumb Code    38  stm32f10x_it.o(.text)
+    TIM7_IRQHandler                          0x0800730f   Thumb Code    38  stm32f10x_it.o(.text)
+    USART1_IRQHandler                        0x08007335   Thumb Code    20  stm32f10x_it.o(.text)
+    USART2_IRQHandler                        0x08007349   Thumb Code    20  stm32f10x_it.o(.text)
+    EXTI0_IRQHandler                         0x0800735d   Thumb Code    30  stm32f10x_it.o(.text)
+    EXTI1_IRQHandler                         0x0800737b   Thumb Code    30  stm32f10x_it.o(.text)
+    EXTI2_IRQHandler                         0x08007399   Thumb Code    30  stm32f10x_it.o(.text)
+    EXTI3_IRQHandler                         0x080073b7   Thumb Code    30  stm32f10x_it.o(.text)
+    EXTI4_IRQHandler                         0x080073d5   Thumb Code    30  stm32f10x_it.o(.text)
+    EXTI9_5_IRQHandler                       0x080073f3   Thumb Code   162  stm32f10x_it.o(.text)
+    EXTI15_10_IRQHandler                     0x08007495   Thumb Code   208  stm32f10x_it.o(.text)
+    USB_LP_CAN1_RX0_IRQHandler               0x08007565   Thumb Code    16  stm32f10x_it.o(.text)
+    USART1_Config                            0x08007591   Thumb Code   114  usart.o(.text)
+    USART2_Config                            0x08007603   Thumb Code   116  usart.o(.text)
+    UART4_Config                             0x08007677   Thumb Code   120  usart.o(.text)
+    fputc                                    0x080076ef   Thumb Code    32  usart.o(.text)
+    fgetc                                    0x0800770f   Thumb Code    26  usart.o(.text)
+    __aeabi_memcpy                           0x0800773d   Thumb Code    36  memcpya.o(.text)
+    __aeabi_memcpy4                          0x0800773d   Thumb Code     0  memcpya.o(.text)
+    __aeabi_memcpy8                          0x0800773d   Thumb Code     0  memcpya.o(.text)
+    __aeabi_memset                           0x08007761   Thumb Code    14  memseta.o(.text)
+    __aeabi_memset4                          0x08007761   Thumb Code     0  memseta.o(.text)
+    __aeabi_memset8                          0x08007761   Thumb Code     0  memseta.o(.text)
+    __aeabi_memclr                           0x0800776f   Thumb Code     4  memseta.o(.text)
+    __aeabi_memclr4                          0x0800776f   Thumb Code     0  memseta.o(.text)
+    __aeabi_memclr8                          0x0800776f   Thumb Code     0  memseta.o(.text)
+    _memset$wrapper                          0x08007773   Thumb Code    18  memseta.o(.text)
+    __aeabi_fmul                             0x08007785   Thumb Code   100  fmul.o(.text)
+    __aeabi_fdiv                             0x080077e9   Thumb Code   124  fdiv.o(.text)
+    __aeabi_ui2f                             0x08007865   Thumb Code    10  ffltui.o(.text)
+    __aeabi_f2uiz                            0x0800786f   Thumb Code    40  ffixui.o(.text)
+    __aeabi_uldivmod                         0x08007897   Thumb Code    98  uldiv.o(.text)
+    __I$use$fp                               0x080078f9   Thumb Code     0  iusefp.o(.text)
+    _float_round                             0x080078f9   Thumb Code    18  fepilogue.o(.text)
+    _float_epilogue                          0x0800790b   Thumb Code    92  fepilogue.o(.text)
+    __scatterload                            0x08007969   Thumb Code    28  init.o(.text)
+    __scatterload_rt2                        0x08007969   Thumb Code     0  init.o(.text)
+    __aeabi_llsl                             0x0800798d   Thumb Code    30  llshl.o(.text)
+    _ll_shift_l                              0x0800798d   Thumb Code     0  llshl.o(.text)
+    __aeabi_llsr                             0x080079ab   Thumb Code    32  llushr.o(.text)
+    _ll_ushift_r                             0x080079ab   Thumb Code     0  llushr.o(.text)
+    __0printf$5                              0x080079cd   Thumb Code    22  printf5.o(i.__0printf$5)
+    __1printf$5                              0x080079cd   Thumb Code     0  printf5.o(i.__0printf$5)
+    __2printf                                0x080079cd   Thumb Code     0  printf5.o(i.__0printf$5)
+    __scatterload_copy                       0x080079ed   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x080079fb   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x080079fd   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    free                                     0x08007cc9   Thumb Code    76  malloc.o(i.free)
+    malloc                                   0x08007d19   Thumb Code    92  malloc.o(i.malloc)
+    LEDS                                     0x08007e6c   Data          36  ctrlpanel.o(.constdata)
+    gProximityDetectionThreshold             0x08007e90   Data          12  motionctrl.o(.constdata)
+    gHighLightDetectionThreshold             0x08007e9c   Data          12  motionctrl.o(.constdata)
+    Region$$Table$$Base                      0x08007ec8   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08007ee8   Number         0  anon$$obj.o(Region$$Table)
     SystemCoreClock                          0x20000000   Data           4  system_stm32f10x.o(.data)
     AHBPrescTable                            0x20000004   Data          16  system_stm32f10x.o(.data)
-    gRobotState                              0x20000028   Data           1  sweeprobot.o(.data)
-    gRobotMode                               0x20000029   Data           1  sweeprobot.o(.data)
-    gRobotModeLast                           0x2000002a   Data           1  sweeprobot.o(.data)
-    gHomingStage                             0x20000030   Data           1  sweeprobot.o(.data)
-    gBM_Cond                                 0x2000003c   Data           3  batterymanage.o(.data)
-    gSystemIdleCnt                           0x2000006a   Data           1  pwrmanagement.o(.data)
-    KeyListHead                              0x20000078   Data           4  key.o(.data)
-    gActSeqDepth                             0x200000c6   Data           1  motionctrl.o(.data)
-    gActSeqDepLIndicator                     0x200000c7   Data           1  motionctrl.o(.data)
-    gActSeqDepRIndicator                     0x200000c8   Data           1  motionctrl.o(.data)
-    __stdout                                 0x200000dc   Data           4  stdout.o(.data)
-    __microlib_freelist                      0x200000e0   Data           4  mvars.o(.data)
-    __microlib_freelist_initialised          0x200000e4   Data           4  mvars.o(.data)
-    ADCConvertedLSB                          0x2000013a   Data          28  measurement.o(.bss)
-    gActSequence                             0x20000158   Data         240  motionctrl.o(.bss)
+    gBM_Cond                                 0x20000028   Data           3  batterymanage.o(.data)
+    gSystemIdleCnt                           0x20000056   Data           1  pwrmanagement.o(.data)
+    KeyListHead                              0x20000064   Data           4  key.o(.data)
+    gActSeqDepth                             0x200000b2   Data           1  motionctrl.o(.data)
+    gActSeqDepLIndicator                     0x200000b3   Data           1  motionctrl.o(.data)
+    gActSeqDepRIndicator                     0x200000b4   Data           1  motionctrl.o(.data)
+    gRobotState                              0x200000cc   Data           1  sweeprobot.o(.data)
+    gRobotMode                               0x200000cd   Data           1  sweeprobot.o(.data)
+    gRobotModeLast                           0x200000ce   Data           1  sweeprobot.o(.data)
+    gHomingStage                             0x200000d4   Data           1  sweeprobot.o(.data)
+    __stdout                                 0x200000e0   Data           4  stdout.o(.data)
+    __microlib_freelist                      0x200000e4   Data           4  mvars.o(.data)
+    __microlib_freelist_initialised          0x200000e8   Data           4  mvars.o(.data)
+    ADCConvertedLSB                          0x2000012a   Data          28  measurement.o(.bss)
+    gActSequence                             0x20000148   Data         240  motionctrl.o(.bss)
     __heap_base                              0x200003a0   Data           0  startup_stm32f10x_hd.o(HEAP)
     __heap_limit                             0x200005a0   Data           0  startup_stm32f10x_hd.o(HEAP)
     __initial_sp                             0x200009a0   Data           0  startup_stm32f10x_hd.o(STACK)
@@ -1358,9 +1359,9 @@ Memory Map of the image
 
   Image Entry point : 0x08000131
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00007fa0, Max: 0x00040000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00007fd4, Max: 0x00040000, ABSOLUTE)
 
-    Execution Region ER_IROM1 (Base: 0x08000000, Size: 0x00007eb8, Max: 0x00040000, ABSOLUTE)
+    Execution Region ER_IROM1 (Base: 0x08000000, Size: 0x00007ee8, Max: 0x00040000, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -1391,50 +1392,50 @@ Memory Map of the image
     0x080023f0   0x00000408   Code   RO          392    .text               stm32f10x_usart.o
     0x080027f8   0x00000026   Code   RO          416    .text               main.o
     0x0800281e   0x00000002   PAD
-    0x08002820   0x0000117c   Code   RO          466    .text               sweeprobot.o
-    0x0800399c   0x00000534   Code   RO          516    .text               batterymanage.o
-    0x08003ed0   0x000001a0   Code   RO          538    .text               buzzer.o
-    0x08004070   0x0000030c   Code   RO          552    .text               irda.o
-    0x0800437c   0x000002b0   Code   RO          580    .text               measurement.o
-    0x0800462c   0x00000200   Code   RO          598    .text               motorctrl.o
-    0x0800482c   0x00000390   Code   RO          615    .text               pwm.o
-    0x08004bbc   0x00000294   Code   RO          629    .text               rtc.o
-    0x08004e50   0x00000094   Code   RO          641    .text               delay.o
-    0x08004ee4   0x000000dc   Code   RO          656    .text               pwrmanagement.o
-    0x08004fc0   0x0000020c   Code   RO          677    .text               ctrlpanel.o
-    0x080051cc   0x000001c8   Code   RO          696    .text               key.o
-    0x08005394   0x00001d1c   Code   RO          723    .text               motionctrl.o
-    0x080070b0   0x000000b0   Code   RO          747    .text               msgqueue.o
-    0x08007160   0x00000400   Code   RO          766    .text               stm32f10x_it.o
-    0x08007560   0x000001ac   Code   RO          780    .text               usart.o
-    0x0800770c   0x00000024   Code   RO          798    .text               mc_w.l(memcpya.o)
-    0x08007730   0x00000024   Code   RO          800    .text               mc_w.l(memseta.o)
-    0x08007754   0x00000064   Code   RO         1093    .text               mf_w.l(fmul.o)
-    0x080077b8   0x0000007c   Code   RO         1095    .text               mf_w.l(fdiv.o)
-    0x08007834   0x0000000a   Code   RO         1097    .text               mf_w.l(ffltui.o)
-    0x0800783e   0x00000028   Code   RO         1099    .text               mf_w.l(ffixui.o)
-    0x08007866   0x00000062   Code   RO         1118    .text               mc_w.l(uldiv.o)
-    0x080078c8   0x00000000   Code   RO         1122    .text               mc_w.l(iusefp.o)
-    0x080078c8   0x0000006e   Code   RO         1123    .text               mf_w.l(fepilogue.o)
-    0x08007936   0x00000002   PAD
-    0x08007938   0x00000024   Code   RO         1135    .text               mc_w.l(init.o)
-    0x0800795c   0x0000001e   Code   RO         1137    .text               mc_w.l(llshl.o)
-    0x0800797a   0x00000020   Code   RO         1139    .text               mc_w.l(llushr.o)
-    0x0800799a   0x00000002   PAD
-    0x0800799c   0x00000020   Code   RO          937    i.__0printf$5       mc_w.l(printf5.o)
-    0x080079bc   0x0000000e   Code   RO         1147    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x080079ca   0x00000002   Code   RO         1148    i.__scatterload_null  mc_w.l(handlers.o)
-    0x080079cc   0x0000000e   Code   RO         1149    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x080079da   0x00000002   PAD
-    0x080079dc   0x000002bc   Code   RO          944    i._printf_core      mc_w.l(printf5.o)
-    0x08007c98   0x00000050   Code   RO         1065    i.free              mc_w.l(malloc.o)
-    0x08007ce8   0x0000006c   Code   RO         1066    i.malloc            mc_w.l(malloc.o)
-    0x08007d54   0x00000020   Data   RO          468    .constdata          sweeprobot.o
-    0x08007d74   0x00000048   Data   RO          599    .constdata          motorctrl.o
-    0x08007dbc   0x000000a0   Data   RO          616    .constdata          pwm.o
-    0x08007e5c   0x00000024   Data   RO          678    .constdata          ctrlpanel.o
-    0x08007e80   0x00000018   Data   RO          725    .constdata          motionctrl.o
-    0x08007e98   0x00000020   Data   RO         1145    Region$$Table       anon$$obj.o
+    0x08002820   0x00000534   Code   RO          466    .text               batterymanage.o
+    0x08002d54   0x000001a0   Code   RO          498    .text               buzzer.o
+    0x08002ef4   0x0000030c   Code   RO          515    .text               irda.o
+    0x08003200   0x000002b0   Code   RO          543    .text               measurement.o
+    0x080034b0   0x00000200   Code   RO          561    .text               motorctrl.o
+    0x080036b0   0x00000390   Code   RO          578    .text               pwm.o
+    0x08003a40   0x00000294   Code   RO          592    .text               rtc.o
+    0x08003cd4   0x000000e0   Code   RO          611    .text               pwrmanagement.o
+    0x08003db4   0x0000020c   Code   RO          635    .text               ctrlpanel.o
+    0x08003fc0   0x000001c8   Code   RO          654    .text               key.o
+    0x08004188   0x00001d40   Code   RO          684    .text               motionctrl.o
+    0x08005ec8   0x000000b0   Code   RO          708    .text               msgqueue.o
+    0x08005f78   0x00001184   Code   RO          727    .text               sweeprobot.o
+    0x080070fc   0x00000094   Code   RO          751    .text               delay.o
+    0x08007190   0x00000400   Code   RO          766    .text               stm32f10x_it.o
+    0x08007590   0x000001ac   Code   RO          780    .text               usart.o
+    0x0800773c   0x00000024   Code   RO          798    .text               mc_w.l(memcpya.o)
+    0x08007760   0x00000024   Code   RO          800    .text               mc_w.l(memseta.o)
+    0x08007784   0x00000064   Code   RO         1093    .text               mf_w.l(fmul.o)
+    0x080077e8   0x0000007c   Code   RO         1095    .text               mf_w.l(fdiv.o)
+    0x08007864   0x0000000a   Code   RO         1097    .text               mf_w.l(ffltui.o)
+    0x0800786e   0x00000028   Code   RO         1099    .text               mf_w.l(ffixui.o)
+    0x08007896   0x00000062   Code   RO         1118    .text               mc_w.l(uldiv.o)
+    0x080078f8   0x00000000   Code   RO         1122    .text               mc_w.l(iusefp.o)
+    0x080078f8   0x0000006e   Code   RO         1123    .text               mf_w.l(fepilogue.o)
+    0x08007966   0x00000002   PAD
+    0x08007968   0x00000024   Code   RO         1135    .text               mc_w.l(init.o)
+    0x0800798c   0x0000001e   Code   RO         1137    .text               mc_w.l(llshl.o)
+    0x080079aa   0x00000020   Code   RO         1139    .text               mc_w.l(llushr.o)
+    0x080079ca   0x00000002   PAD
+    0x080079cc   0x00000020   Code   RO          937    i.__0printf$5       mc_w.l(printf5.o)
+    0x080079ec   0x0000000e   Code   RO         1147    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x080079fa   0x00000002   Code   RO         1148    i.__scatterload_null  mc_w.l(handlers.o)
+    0x080079fc   0x0000000e   Code   RO         1149    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x08007a0a   0x00000002   PAD
+    0x08007a0c   0x000002bc   Code   RO          944    i._printf_core      mc_w.l(printf5.o)
+    0x08007cc8   0x00000050   Code   RO         1065    i.free              mc_w.l(malloc.o)
+    0x08007d18   0x0000006c   Code   RO         1066    i.malloc            mc_w.l(malloc.o)
+    0x08007d84   0x00000048   Data   RO          562    .constdata          motorctrl.o
+    0x08007dcc   0x000000a0   Data   RO          579    .constdata          pwm.o
+    0x08007e6c   0x00000024   Data   RO          636    .constdata          ctrlpanel.o
+    0x08007e90   0x00000018   Data   RO          686    .constdata          motionctrl.o
+    0x08007ea8   0x00000020   Data   RO          729    .constdata          sweeprobot.o
+    0x08007ec8   0x00000020   Data   RO         1145    Region$$Table       anon$$obj.o
 
 
     Execution Region RW_IRAM1 (Base: 0x20000000, Size: 0x000009a0, Max: 0x0000c000, ABSOLUTE)
@@ -1443,27 +1444,26 @@ Memory Map of the image
 
     0x20000000   0x00000014   Data   RW           25    .data               system_stm32f10x.o
     0x20000014   0x00000014   Data   RW          331    .data               stm32f10x_rcc.o
-    0x20000028   0x00000012   Data   RW          469    .data               sweeprobot.o
-    0x2000003a   0x00000002   PAD
-    0x2000003c   0x00000012   Data   RW          518    .data               batterymanage.o
-    0x2000004e   0x00000006   Data   RW          539    .data               buzzer.o
-    0x20000054   0x00000016   Data   RW          554    .data               irda.o
-    0x2000006a   0x00000001   Data   RW          657    .data               pwrmanagement.o
-    0x2000006b   0x00000009   Data   RW          679    .data               ctrlpanel.o
-    0x20000074   0x00000008   Data   RW          697    .data               key.o
-    0x2000007c   0x0000005e   Data   RW          726    .data               motionctrl.o
-    0x200000da   0x00000002   PAD
-    0x200000dc   0x00000004   Data   RW         1115    .data               mc_w.l(stdout.o)
-    0x200000e0   0x00000004   Data   RW         1120    .data               mc_w.l(mvars.o)
-    0x200000e4   0x00000004   Data   RW         1121    .data               mc_w.l(mvars.o)
-    0x200000e8   0x00000014   Zero   RW          467    .bss                sweeprobot.o
-    0x200000fc   0x00000020   Zero   RW          517    .bss                batterymanage.o
-    0x2000011c   0x0000001e   Zero   RW          553    .bss                irda.o
-    0x2000013a   0x0000001c   Zero   RW          581    .bss                measurement.o
-    0x20000156   0x00000002   PAD
-    0x20000158   0x00000108   Zero   RW          724    .bss                motionctrl.o
-    0x20000260   0x0000013c   Zero   RW          767    .bss                stm32f10x_it.o
-    0x2000039c   0x00000004   PAD
+    0x20000028   0x00000012   Data   RW          468    .data               batterymanage.o
+    0x2000003a   0x00000006   Data   RW          499    .data               buzzer.o
+    0x20000040   0x00000016   Data   RW          517    .data               irda.o
+    0x20000056   0x00000001   Data   RW          612    .data               pwrmanagement.o
+    0x20000057   0x00000009   Data   RW          637    .data               ctrlpanel.o
+    0x20000060   0x00000008   Data   RW          655    .data               key.o
+    0x20000068   0x00000062   Data   RW          687    .data               motionctrl.o
+    0x200000ca   0x00000002   PAD
+    0x200000cc   0x00000012   Data   RW          730    .data               sweeprobot.o
+    0x200000de   0x00000002   PAD
+    0x200000e0   0x00000004   Data   RW         1115    .data               mc_w.l(stdout.o)
+    0x200000e4   0x00000004   Data   RW         1120    .data               mc_w.l(mvars.o)
+    0x200000e8   0x00000004   Data   RW         1121    .data               mc_w.l(mvars.o)
+    0x200000ec   0x00000020   Zero   RW          467    .bss                batterymanage.o
+    0x2000010c   0x0000001e   Zero   RW          516    .bss                irda.o
+    0x2000012a   0x0000001c   Zero   RW          544    .bss                measurement.o
+    0x20000146   0x00000002   PAD
+    0x20000148   0x00000108   Zero   RW          685    .bss                motionctrl.o
+    0x20000250   0x00000014   Zero   RW          728    .bss                sweeprobot.o
+    0x20000264   0x0000013c   Zero   RW          767    .bss                stm32f10x_it.o
     0x200003a0   0x00000200   Zero   RW            2    HEAP                startup_stm32f10x_hd.o
     0x200005a0   0x00000400   Zero   RW            1    STACK               startup_stm32f10x_hd.o
 
@@ -1475,22 +1475,22 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-      1332        148          0         18         32       5809   batterymanage.o
-       416         20          0          6          0       1430   buzzer.o
+      1332        148          0         18         32       8369   batterymanage.o
+       416         20          0          6          0       2230   buzzer.o
          0          0          0          0          0       4272   core_cm3.o
        524         32         36          9          0       3353   ctrlpanel.o
        148          0          0          0          0       1259   delay.o
        780         48          0         22         30       8438   irda.o
-       456         18          0          8          0       3520   key.o
+       456         18          0          8          0       4452   key.o
         38          0          0          0          0      14088   main.o
        688         24          0          0         28       1739   measurement.o
        220         22          0          0          0       1913   misc.o
-      7452        590         24         94        264      21755   motionctrl.o
+      7488        614         24         98        264      21754   motionctrl.o
        512          8         72          0          0       3632   motorctrl.o
        176          0          0          0          0       9121   msgqueue.o
        912         22        160          0          0       2951   pwm.o
-       220         10          0          1          0       3418   pwrmanagement.o
-       660         38          0          0          0       2103   rtc.o
+       224          8          0          1          0       3426   pwrmanagement.o
+       660         38          0          0          0       3124   rtc.o
         36          8        304          0       1536        928   startup_stm32f10x_hd.o
       1102         26          0          0          0      10953   stm32f10x_adc.o
        196          8          0          0          0       3576   stm32f10x_bkp.o
@@ -1503,14 +1503,14 @@ Image component sizes
        352          6          0          0          0       2858   stm32f10x_rtc.o
       3610         88          0          0          0      22244   stm32f10x_tim.o
       1032         22          0          0          0       8484   stm32f10x_usart.o
-      4476        510         32         18         20      14047   sweeprobot.o
+      4484        510         32         18         20       8738   sweeprobot.o
        480         38          0         20          0     277543   system_stm32f10x.o
        428         20          0          0          0       1543   usart.o
 
     ----------------------------------------------------------------------
-     30152       1840        660        220       2232     459740   Object Totals
+     30200       1862        660        224       2228     459751   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-         6          0          0          4          6          0   (incl. Padding)
+         6          0          0          4          2          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -1563,15 +1563,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     31780       1932        660        232       2232     457484   Grand Totals
-     31780       1932        660        232       2232     457484   ELF Image Totals
-     31780       1932        660        232          0          0   ROM Totals
+     31828       1954        660        236       2228     457495   Grand Totals
+     31828       1954        660        236       2228     457495   ELF Image Totals
+     31828       1954        660        236          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                32440 (  31.68kB)
+    Total RO  Size (Code + RO Data)                32488 (  31.73kB)
     Total RW  Size (RW Data + ZI Data)              2464 (   2.41kB)
-    Total ROM Size (Code + RO Data + RW Data)      32672 (  31.91kB)
+    Total ROM Size (Code + RO Data + RW Data)      32724 (  31.96kB)
 
 ==============================================================================
 

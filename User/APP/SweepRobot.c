@@ -254,8 +254,9 @@ STARTUP_FAIL_ON_WF_AT:
 void SweepRobot_StartupComplete(void)
 {
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
-	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+	
+	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
 	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
 
     plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
@@ -474,6 +475,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
             break;
         case BM_EVT_CHARGE_COMPLETE:
             CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
+			Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
 #ifdef DEBUG_LOG
             printf("Robot finish charging.\r\n");
 #endif

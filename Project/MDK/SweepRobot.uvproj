@@ -852,21 +852,6 @@
               <FilePath>..\..\User\main.c</FilePath>
             </File>
             <File>
-              <FileName>boardcfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\boardcfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\stm32f10x_conf.h</FilePath>
-            </File>
-            <File>
-              <FileName>SweepRobot.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\APP\SweepRobot.c</FilePath>
-            </File>
-            <File>
               <FileName>BatteryManage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\BSP\src\BatteryManage.c</FilePath>
@@ -900,6 +885,56 @@
               <FileName>RTC.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\BSP\src\RTC.c</FilePath>
+            </File>
+            <File>
+              <FileName>PwrManagement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Framework\Common\src\PwrManagement.c</FilePath>
+            </File>
+            <File>
+              <FileName>CtrlPanel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Framework\UI\CtrlPanel.c</FilePath>
+            </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Framework\UI\key.c</FilePath>
+            </File>
+            <File>
+              <FileName>MotionCtrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Framework\MotionCtrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>MsgQueue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Framework\MsgQueue.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>User_APP</GroupName>
+          <Files>
+            <File>
+              <FileName>SweepRobot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\APP\SweepRobot.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>User_SYS</GroupName>
+          <Files>
+            <File>
+              <FileName>boardcfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\boardcfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\stm32f10x_conf.h</FilePath>
             </File>
             <File>
               <FileName>delay.c</FileName>
@@ -953,31 +988,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>PwrManagement.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\Framework\Common\src\PwrManagement.c</FilePath>
-            </File>
-            <File>
-              <FileName>CtrlPanel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\Framework\UI\CtrlPanel.c</FilePath>
-            </File>
-            <File>
-              <FileName>key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\Framework\UI\key.c</FilePath>
-            </File>
-            <File>
-              <FileName>MotionCtrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\Framework\MotionCtrl.c</FilePath>
-            </File>
-            <File>
-              <FileName>MsgQueue.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\Framework\MsgQueue.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_it.c</FileName>

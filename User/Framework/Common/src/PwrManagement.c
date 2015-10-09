@@ -80,6 +80,7 @@ s8 PM_EnterPwrMode(enum PM_Mode mode)
             /* Prepare for enterring to low power state */
             IrDA_DeInit();
             PM_POWER_SUPPLY_CTRL(PM_OFF);
+			sDelay(1);
             /* Enter to low power state */
             PWR_EnterSTANDBYMode();
             break;

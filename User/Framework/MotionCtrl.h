@@ -161,9 +161,17 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_TURN_360_CNT                  1400//1500
 #define WHEEL_FAULT_BACK_CNT                180
 
+/* origin definition of robot speed */
+/*
 #define WHEEL_ESCAPE_SPEED                  20
-//#define WHEEL_CRUISE_SPEED                  12
-#define WHEEL_CRUISE_SPEED					10
+#define WHEEL_CRUISE_SPEED					12
+#define WHEEL_MODE_SPOT_SPEED               10
+#define WHEEL_FAULT_PROC_SPEED              9
+#define WHEEL_HOMING_SPEED                  5
+*/
+
+#define WHEEL_ESCAPE_SPEED                  20
+#define WHEEL_CRUISE_SPEED					15
 #define WHEEL_MODE_SPOT_SPEED               10
 #define WHEEL_FAULT_PROC_SPEED              9
 #define WHEEL_HOMING_SPEED                  5
@@ -206,12 +214,11 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define MOTION_MONITOR_TIM_IRQ_SP           1
 #define MOTION_MONITOR_TIM_INT_IDX          STM32F10x_INT_TIM2
 
-/* FIXME: change Wheel speed adjust from TIM2 to TIM7 */
 #define MOTION_WHEEL_SPEED_ADJUST_TIM_PERIPH_ID			RCC_APB1Periph_TIM7
 #define MOTION_WHEEL_SPEED_ADJUST_TIM                  	TIM7
 #define MOTION_WHEEL_SPEED_ADJUST_TIM_IRQn             	TIM7_IRQn
 #define MOTION_WHEEL_SPEED_ADJUST_TIM_IRQ_PP           	2
-#define MOTION_WHEEL_SPEED_ADJUST_IRQ_SP          		1
+#define MOTION_WHEEL_SPEED_ADJUST_IRQ_SP          		0
 #define MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX         	STM32F10x_INT_TIM7
 
 void MotionCtrl_Init(void);
