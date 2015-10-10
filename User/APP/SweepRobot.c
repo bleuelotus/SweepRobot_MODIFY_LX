@@ -176,28 +176,28 @@ void SweepRobot_StartupInit(void)
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, MOTOR_FAN_CHAN_STARTUP_SPEED);
     }
     else if(2==gRobotStartupSeqNum){
-        /* chcek FAN current */
+        /* check FAN current */
         if(ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD){
             goto STARTUP_FAIL_ON_FAN_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
     }
     else if(3==gRobotStartupSeqNum){
-        /* chcek Lbrush current */
+        /* check Lbrush current */
         if(ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD){
             goto STARTUP_FAIL_ON_LB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
     }
     else if(4==gRobotStartupSeqNum){
-        /* chcek Rbrush current */
+        /* check Rbrush current */
         if(ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD){
             goto STARTUP_FAIL_ON_RB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
     }
     else{
-        /* chcek Mbrush current */
+        /* check Mbrush current */
         if(ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD){
             goto STARTUP_FAIL_ON_MB_OC;
         }

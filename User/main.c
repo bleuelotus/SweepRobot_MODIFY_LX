@@ -32,7 +32,7 @@ int main(void)
 #endif
 
     if(SweepRobot_Init())
-        goto HALT; 
+        goto HALT;
 
     SweepRobot_Start();
 

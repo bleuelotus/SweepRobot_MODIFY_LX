@@ -31,15 +31,14 @@
 
 /* deltaT = deltaRad * Pi * BASE_LEN / 180 / deltaV [ Pre-condition: Vinner != 0 ]; deltaV = Vouter - Vinner */
 #define EDGE_MODE_EXIT_CNT                      10
-#define SPOT_MODE_INIT_CIRCLE_CNT               150                             // 150 * 2ms  // 30 * 20ms
+#define SPOT_MODE_INIT_CIRCLE_CNT               300                             // 300 * 2 * 2ms  // 30 * 20 *2ms
 #define SPOT_MODE_CIRCLE_INC_STEP               55                              // for every 2 units of speed inc
 
 /* original universal_wheel_detect_period */
 //#define UNIVERSAL_WHEEL_DETECT_PERIOD           75                              // 75 * 20 * 2 = 3000ms
 #define UNIVERSAL_WHEEL_DETECT_PERIOD           55                              // 55 * 20 * 2 = 2200ms
 #define EDGE_MODE_ANGLE_360                     3000                            // 3000 * 2 ms // 300 * 20ms
-#define EXCEPTION_CHECK_PERIOD                  25                             	// 25 * 20 * 2 ms
-#define FRONT_HIGH_LIGHT_AVOIDENCE_PERIOD		800								// 800 * 2 * 2 = 3200ms
+#define EXCEPTION_CHECK_PERIOD                  25                             	// 25 * 20 * 2ms
 
 enum _PathFaultProcMode {
 
@@ -58,9 +57,9 @@ enum _PathFaultProcMode {
 #endif
 
 /* Infrared based proximity detection sensitivity */
-const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 150, 150 };
-const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3500, 3500 };
-static u16 gHighLightDetectCnt[IFRD_TxRx_CHAN_NUM] = {0};
+/* FIXME: bottom detection threshold should set lower to adjust sheet, origin bottom detection threshold is 150 */
+const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 100, 100 };
+const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
 static u32 gLWheelTotalCnt = 4, gRWheelTotalCnt = 4, gLastTotalLWheelCnt = 0, gLastTotalRWheelCnt = 0;
 static u16 gWheelCnt[WHEEL_NUM] = {0};
 static u16 gLWheelExpCnt = 0xFFFF, gRWheelExpCnt = 0xFFFF;
@@ -161,7 +160,7 @@ u8 ExceptionStateCheck(void)
 
     /* Update exception sign: left, right, middle brush over loading, wheel floationg and ash tray exist or not */
 //    gExceptionMask |= (WHEEL_FLOAT_SIGN_ALL ? 1 : 0) << EXCEPTION_MASK_WHEEL_FLOAT_POS;
-//	ExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
+//	gExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_FAN_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_LBRUSH_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_RBRUSH_OC_POS;
@@ -183,41 +182,30 @@ void MotionStateProc(void)
         /* Save proximity condition in Tx off */
         for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
-#ifdef DEBUG_LOG
-//			printf("%d\r\n", gIFRDTxOffRxVal[i]);
-#endif
         }
-#ifdef DEBUG_LOG
-//		printf("\r\n");
-#endif
         IFRD_TX_ENABLE();
     }
+
     /* Phase 2 */
     else{
         /* Update front, side and bottom of LEFT proximity condition in Tx on */
-		
-		/* FIXME: add front high light detection function */
-		if(gIFRDTxOffRxVal[IFRD_CHAN_FRONT_L] < gHighLightDetectionThreshold[IFRD_CHAN_FRONT_L] ){
-			if(++gHighLightDetectCnt[IFRD_CHAN_FRONT_L] > FRONT_HIGH_LIGHT_AVOIDENCE_PERIOD){
-				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
-				gHighLightDetectCnt[IFRD_CHAN_FRONT_L] = 0;
-			}
-		}else {
-			gHighLightDetectCnt[IFRD_CHAN_FRONT_L] = 0;
-			if( (gIFRDTxOffRxVal[IFRD_CHAN_FRONT_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_L-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_L]) && (gHomingStage < ROBOT_HOMING_STAGE3) ) {
-				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
-			}
-			else {
-				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
-			}
+		if( (gIFRDTxOffRxVal[IFRD_CHAN_FRONT_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_L-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_L]) && (gHomingStage < ROBOT_HOMING_STAGE3) ) {
+			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
+		}
+		else {
+			gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
 		}
 
-		/* XXX: add bottom high light detection function */
+		/* XXX: add bottom high light detection function and stop motor immediately */
 		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
+			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
+			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
 		}else {
 			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
+				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
+				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
 			}
 			else {
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
@@ -231,6 +219,7 @@ void MotionStateProc(void)
         else {
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_SL_POS);
         }
+
         /* Path adjust for edge mode */
         if( IS_MOTION_PROC_FINISH() ){
 			if( (gRobotMode == ROBOT_WORK_MODE_EDGE) && (gPathFaultProcMode == PATH_FAULT_PROC_MODE_EDGE_L) ){
@@ -302,29 +291,23 @@ void MotionStateProc(void)
         }
 
         /* Update front, side and bottom of RIGHT proximity condition in Tx on */
-		
-		/* FIXME: add front high light detection function */
-		if( gIFRDTxOffRxVal[IFRD_CHAN_FRONT_R] < gHighLightDetectionThreshold[IFRD_CHAN_FRONT_R] ){
-			if(++gHighLightDetectCnt[IFRD_CHAN_FRONT_R] > FRONT_HIGH_LIGHT_AVOIDENCE_PERIOD){
-				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_FR_POS);
-				gHighLightDetectCnt[IFRD_CHAN_FRONT_R] = 0;
-			}
-		}else {
-			gHighLightDetectCnt[IFRD_CHAN_FRONT_R] = 0;
-			if( (gIFRDTxOffRxVal[IFRD_CHAN_FRONT_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_R-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_R]) && (gHomingStage < ROBOT_HOMING_STAGE3) ) {
-				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_FR_POS);
-			}
-			else {
-				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FR_POS);
-			}
+		if( (gIFRDTxOffRxVal[IFRD_CHAN_FRONT_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_FRONT_RX_R-1] > gProximityDetectionThreshold[IFRD_CHAN_FRONT_R]) && (gHomingStage < ROBOT_HOMING_STAGE3) ) {
+			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_FR_POS);
+		}
+		else {
+			gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FR_POS);
 		}
 
-		/* XXX: add bottom high light detection function */
+		/* XXX: add bottom high light detection function and stop motor immediately */
 		if( gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_R] ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
+			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
+			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
 		}else {
 			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R]) ){
 				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
+				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
+				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
 			}
 			else {
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
@@ -431,7 +414,7 @@ void MotionStateProc(void)
 void WheelSpeedAdjustProc(void)
 {
 	if((++gtmpCnt2)%2){
-		
+
 		if(!(gtmpCnt%EXCEPTION_CHECK_PERIOD)){
             gExceptionMask = ExceptionStateCheck();
             if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
@@ -450,7 +433,7 @@ void WheelSpeedAdjustProc(void)
 			}
             gLastExceptionMask = gExceptionMask;
         }
-		
+
 		/* Universal wheel signal check */
         gUniversalWheelActiveVal = FWHEEL_ACTIVE_VAL;
 #ifdef DEBUG_LOG

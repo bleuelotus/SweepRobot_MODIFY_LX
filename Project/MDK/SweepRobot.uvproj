@@ -847,11 +847,6 @@
           <GroupName>User</GroupName>
           <Files>
             <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\main.c</FilePath>
-            </File>
-            <File>
               <FileName>BatteryManage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\BSP\src\BatteryManage.c</FilePath>
@@ -862,39 +857,14 @@
               <FilePath>..\..\User\BSP\src\Buzzer.c</FilePath>
             </File>
             <File>
-              <FileName>IrDA.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\BSP\src\IrDA.c</FilePath>
-            </File>
-            <File>
-              <FileName>Measurement.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\BSP\src\Measurement.c</FilePath>
-            </File>
-            <File>
-              <FileName>MotorCtrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\BSP\src\MotorCtrl.c</FilePath>
-            </File>
-            <File>
-              <FileName>PWM.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\BSP\src\PWM.c</FilePath>
-            </File>
-            <File>
-              <FileName>RTC.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\BSP\src\RTC.c</FilePath>
-            </File>
-            <File>
-              <FileName>PwrManagement.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\Framework\Common\src\PwrManagement.c</FilePath>
-            </File>
-            <File>
               <FileName>CtrlPanel.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\Framework\UI\CtrlPanel.c</FilePath>
+            </File>
+            <File>
+              <FileName>IrDA.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\BSP\src\IrDA.c</FilePath>
             </File>
             <File>
               <FileName>key.c</FileName>
@@ -902,14 +872,44 @@
               <FilePath>..\..\User\Framework\UI\key.c</FilePath>
             </File>
             <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>Measurement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\BSP\src\Measurement.c</FilePath>
+            </File>
+            <File>
               <FileName>MotionCtrl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\Framework\MotionCtrl.c</FilePath>
             </File>
             <File>
+              <FileName>MotorCtrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\BSP\src\MotorCtrl.c</FilePath>
+            </File>
+            <File>
               <FileName>MsgQueue.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\Framework\MsgQueue.c</FilePath>
+            </File>
+            <File>
+              <FileName>PWM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\BSP\src\PWM.c</FilePath>
+            </File>
+            <File>
+              <FileName>PwrManagement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Framework\Common\src\PwrManagement.c</FilePath>
+            </File>
+            <File>
+              <FileName>RTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\BSP\src\RTC.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -930,11 +930,6 @@
               <FileName>boardcfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\User\boardcfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\stm32f10x_conf.h</FilePath>
             </File>
             <File>
               <FileName>delay.c</FileName>
@@ -988,6 +983,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>stm32f10x_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\stm32f10x_conf.h</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_it.c</FileName>
