@@ -801,7 +801,7 @@ I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_it.h)(0x56178DF2)
 I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_UserMEM.h)(0x555C6C4E)
 I (..\..\Libraries\STM32F10x_Ext\inc\usart.h)(0x55B8ABA8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x56175CFD)
-F (..\..\User\main.c)(0x56178C14)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\main.o --omf_browse .\obj\main.crf --depend .\obj\main.d)
+F (..\..\User\main.c)(0x561890C3)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\main.o --omf_browse .\obj\main.crf --depend .\obj\main.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include\stm32f10x.h)(0x5459979B)
 I (..\..\Libraries\CMSIS\CoreSupport\core_cm3.h)(0x4D523B58)
@@ -840,8 +840,8 @@ I (..\..\User\boardcfg.h)(0x55506508)
 I (..\..\User\APP\SweepRobot.h)(0x56061712)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\BSP\inc\IrDA.h)(0x56051964)
 I (..\..\User\Framework\Common\inc\PwrManagement.h)(0x5605FAAB)
 F (..\..\User\BSP\src\BatteryManage.c)(0x5615E237)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\batterymanage.o --omf_browse .\obj\batterymanage.crf --depend .\obj\batterymanage.d)
@@ -883,8 +883,8 @@ I (..\..\User\BSP\inc\Measurement.h)(0x55FCCB28)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
 I (..\..\User\BSP\inc\PWM.h)(0x55B5A0BA)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\BSP\inc\IrDA.h)(0x56051964)
 I (..\..\User\Framework\Common\inc\PwrManagement.h)(0x5605FAAB)
 I (..\..\User\APP\SweepRobot.h)(0x56061712)
@@ -923,7 +923,7 @@ I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_it.h)(0x56178DF2)
 I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_UserMEM.h)(0x555C6C4E)
 I (..\..\Libraries\STM32F10x_Ext\inc\usart.h)(0x55B8ABA8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x56175CFD)
-F (..\..\User\BSP\src\IrDA.c)(0x560518E2)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\irda.o --omf_browse .\obj\irda.crf --depend .\obj\irda.d)
+F (..\..\User\BSP\src\IrDA.c)(0x56187469)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\irda.o --omf_browse .\obj\irda.crf --depend .\obj\irda.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (..\..\User\BSP\inc\IrDA.h)(0x56051964)
 I (..\..\User\stm32f10x_conf.h)(0x55E54B52)
@@ -963,8 +963,8 @@ I (..\..\User\Framework\UI\CtrlPanel.h)(0x56162950)
 I (..\..\User\APP\SweepRobot.h)(0x56061712)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\Framework\Common\inc\PwrManagement.h)(0x5605FAAB)
 F (..\..\User\BSP\src\Measurement.c)(0x56162DF7)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\measurement.o --omf_browse .\obj\measurement.crf --depend .\obj\measurement.d)
 I (..\..\User\BSP\inc\Measurement.h)(0x55FCCB28)
@@ -1000,8 +1000,8 @@ I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_it.h)(0x56178DF2)
 I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_UserMEM.h)(0x555C6C4E)
 I (..\..\Libraries\STM32F10x_Ext\inc\usart.h)(0x55B8ABA8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x56175CFD)
-F (..\..\User\BSP\src\MotorCtrl.c)(0x56175B9A)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\motorctrl.o --omf_browse .\obj\motorctrl.crf --depend .\obj\motorctrl.d)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+F (..\..\User\BSP\src\MotorCtrl.c)(0x561877E8)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\motorctrl.o --omf_browse .\obj\motorctrl.crf --depend .\obj\motorctrl.d)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\stm32f10x_conf.h)(0x55E54B52)
 I (..\..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h)(0x50FD88AD)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include\stm32f10x.h)(0x5459979B)
@@ -1035,7 +1035,7 @@ I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_UserMEM.h)(0x555C6C4E)
 I (..\..\Libraries\STM32F10x_Ext\inc\usart.h)(0x55B8ABA8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x56175CFD)
 I (..\..\User\BSP\inc\PWM.h)(0x55B5A0BA)
-F (..\..\User\BSP\src\PWM.c)(0x56162DF7)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\pwm.o --omf_browse .\obj\pwm.crf --depend .\obj\pwm.d)
+F (..\..\User\BSP\src\PWM.c)(0x56187860)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\pwm.o --omf_browse .\obj\pwm.crf --depend .\obj\pwm.d)
 I (..\..\User\BSP\inc\PWM.h)(0x55B5A0BA)
 I (..\..\User\stm32f10x_conf.h)(0x55E54B52)
 I (..\..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h)(0x50FD88AD)
@@ -1146,8 +1146,8 @@ I (..\..\User\BSP\inc\IrDA.h)(0x56051964)
 I (..\..\User\APP\SweepRobot.h)(0x56061712)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 F (..\..\User\Framework\UI\CtrlPanel.c)(0x55FFC7DD)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\ctrlpanel.o --omf_browse .\obj\ctrlpanel.crf --depend .\obj\ctrlpanel.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (..\..\User\Framework\Common\inc\delay.h)(0x55F7C5EE)
@@ -1187,8 +1187,8 @@ I (..\..\User\Framework\UI\CtrlPanel.h)(0x56162950)
 I (..\..\User\APP\SweepRobot.h)(0x56061712)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\BSP\inc\IrDA.h)(0x56051964)
 I (..\..\User\Framework\Common\inc\PwrManagement.h)(0x5605FAAB)
 I (..\..\User\Framework\UI\key.h)(0x561756A5)
@@ -1233,12 +1233,12 @@ I (..\..\User\Framework\UI\CtrlPanel.h)(0x56162950)
 I (..\..\User\APP\SweepRobot.h)(0x56061712)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\Framework\Common\inc\PwrManagement.h)(0x5605FAAB)
-F (..\..\User\Framework\MotionCtrl.c)(0x561862CB)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\motionctrl.o --omf_browse .\obj\motionctrl.crf --depend .\obj\motionctrl.d)
+F (..\..\User\Framework\MotionCtrl.c)(0x56189CD4)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\motionctrl.o --omf_browse .\obj\motionctrl.crf --depend .\obj\motionctrl.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
 I (..\..\User\stm32f10x_conf.h)(0x55E54B52)
 I (..\..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h)(0x50FD88AD)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include\stm32f10x.h)(0x5459979B)
@@ -1271,7 +1271,7 @@ I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_it.h)(0x56178DF2)
 I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_UserMEM.h)(0x555C6C4E)
 I (..\..\Libraries\STM32F10x_Ext\inc\usart.h)(0x55B8ABA8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x56175CFD)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\BSP\inc\Measurement.h)(0x55FCCB28)
 I (..\..\User\Framework\Common\inc\delay.h)(0x55F7C5EE)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
@@ -1315,13 +1315,13 @@ I (..\..\Libraries\STM32F10x_Ext\inc\stm32f10x_UserMEM.h)(0x555C6C4E)
 I (..\..\Libraries\STM32F10x_Ext\inc\usart.h)(0x55B8ABA8)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x56175CFD)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\BSP\inc\IrDA.h)(0x56051964)
 I (..\..\User\Framework\Common\inc\PwrManagement.h)(0x5605FAAB)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x53463A44)
-F (..\..\User\APP\SweepRobot.c)(0x561863DE)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\sweeprobot.o --omf_browse .\obj\sweeprobot.crf --depend .\obj\sweeprobot.d)
+F (..\..\User\APP\SweepRobot.c)(0x56189B89)(-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\..\User\APP -I..\..\User\BSP\inc -I..\..\User\Framework\Common\inc -I..\..\User\Framework\UI -I..\..\User\Framework -I..\..\Libraries\CMSIS\CoreSupport -I..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include -I..\..\Libraries\CMSIS\Device\ST\STM32F10x -I..\..\Libraries\STM32F10x_Ext\inc -I..\..\Libraries\STM32F10x_StdPeriph_Driver\inc -I..\..\User-I C:\Keil_v5\ARM\RV31\INC-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include-I C:\Keil_v5\ARM\Inc\ST\STM32F10x-DDEBUG_LOG -DNDEBUG -DREVISION_1_1 -DSTM32F10X_HD -DCLOCK_HSE -DUSE_STDPERIPH_DRIVER -DKEY_PROC_WITH_REMOTE -DKEY_PROC_WITH_LED-o .\obj\sweeprobot.o --omf_browse .\obj\sweeprobot.crf --depend .\obj\sweeprobot.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x53463A44)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x55BF35BA)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x53463A44)
@@ -1361,8 +1361,8 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x56175CFD)
 I (..\..\User\APP\SweepRobot.h)(0x56061712)
 I (..\..\User\Framework\MsgQueue.h)(0x56178387)
 I (..\..\User\BSP\inc\BatteryManage.h)(0x56163FF8)
-I (..\..\User\Framework\MotionCtrl.h)(0x56186300)
-I (..\..\User\BSP\inc\MotorCtrl.h)(0x56175B73)
+I (..\..\User\Framework\MotionCtrl.h)(0x561884B1)
+I (..\..\User\BSP\inc\MotorCtrl.h)(0x561884B1)
 I (..\..\User\BSP\inc\IrDA.h)(0x56051964)
 I (..\..\User\Framework\Common\inc\PwrManagement.h)(0x5605FAAB)
 I (..\..\User\Framework\Common\inc\delay.h)(0x55F7C5EE)

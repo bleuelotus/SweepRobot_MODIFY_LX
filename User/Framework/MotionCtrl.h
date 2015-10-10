@@ -161,7 +161,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_TURN_360_CNT                  1400//1500
 #define WHEEL_FAULT_BACK_CNT                180
 
-/* origin definition of robot speed */
+/* original definition of robot speed */
 /*
 #define WHEEL_ESCAPE_SPEED                  20
 #define WHEEL_CRUISE_SPEED					12

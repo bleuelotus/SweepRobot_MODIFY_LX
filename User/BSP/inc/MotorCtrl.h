@@ -18,12 +18,22 @@
 #define MOTOR_BRUSH_CHAN_MAX_SPEED              90
 #define MOTOR_WHEEL_CHAN_MAX_SPEED              80
 
+/* original motor speed definition */
+/*
 #define MOTOR_FAN_CHAN_STARTUP_SPEED            70
 #define MOTOR_LWHEEL_CHAN_STARTUP_SPEED         30
 #define MOTOR_RWHEEL_CHAN_STARTUP_SPEED         30
 #define MOTOR_LBRUSH_CHAN_STARTUP_SPEED         80
 #define MOTOR_RBRUSH_CHAN_STARTUP_SPEED         80
 #define MOTOR_MBRUSH_CHAN_STARTUP_SPEED         80
+*/
+
+#define MOTOR_FAN_CHAN_STARTUP_SPEED            80
+#define MOTOR_LWHEEL_CHAN_STARTUP_SPEED         30
+#define MOTOR_RWHEEL_CHAN_STARTUP_SPEED         30
+#define MOTOR_LBRUSH_CHAN_STARTUP_SPEED         80
+#define MOTOR_RBRUSH_CHAN_STARTUP_SPEED         80
+#define MOTOR_MBRUSH_CHAN_STARTUP_SPEED         90
 
 enum MotorCtrlChannel {
 
