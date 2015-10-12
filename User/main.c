@@ -42,7 +42,6 @@ HALT:
     }
 }
 
-
 #ifdef  USE_FULL_ASSERT
 
 /**

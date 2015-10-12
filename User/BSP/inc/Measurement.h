@@ -67,8 +67,8 @@ enum {
 #define AD_BRUSH_CUR_RIGHT_PIN          GPIO_Pin_1
 #define AD_BRUSH_CUR_MIDDLE_GPIO        GPIOA
 #define AD_BRUSH_CUR_MIDDLE_PIN         GPIO_Pin_7
-#define AD_FUN_CUR_GPIO                 GPIOA
-#define AD_FUN_CUR_PIN                  GPIO_Pin_6
+#define AD_FAN_CUR_GPIO                 GPIOA
+#define AD_FAN_CUR_PIN                  GPIO_Pin_6
 #define AD_BAT_CHARGE_CUR_GPIO          GPIOC
 #define AD_BAT_CHARGE_CUR_PIN           GPIO_Pin_2
 #define AD_BAT_VOL_GPIO                 GPIOC

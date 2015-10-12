@@ -204,6 +204,8 @@ void BM_ConditionUpdate(void)
     gBM_Cond.LastState = gBM_Cond.state;
 
 //    printf("Bat Vol: %2.1f\r\n", (((float)ADC_BatLSB[ADC_BAT_VOL]*3.3f*6.f)/4096.f));
+	printf("vol=%d\r\n", ADC_BatLSB[ADC_BAT_VOL]);
+	printf("cur=%d\r\n", ADC_BatLSB[ADC_BAT_CUR]);
 }
 
 s8 BM_ChargePowerDec(void)

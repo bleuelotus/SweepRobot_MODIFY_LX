@@ -51,8 +51,8 @@ void Meas_Init(void)
     GPIO_Init(AD_BRUSH_CUR_RIGHT_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_BRUSH_CUR_MIDDLE_PIN;
     GPIO_Init(AD_BRUSH_CUR_MIDDLE_GPIO, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = AD_FUN_CUR_PIN;
-    GPIO_Init(AD_FUN_CUR_GPIO, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = AD_FAN_CUR_PIN;
+    GPIO_Init(AD_FAN_CUR_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_BAT_CHARGE_CUR_PIN;
     GPIO_Init(AD_BAT_CHARGE_CUR_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_BAT_VOL_PIN;

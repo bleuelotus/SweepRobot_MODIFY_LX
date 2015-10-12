@@ -452,6 +452,10 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
                 gRobotState = ROBOT_STATE_IDLE;
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
             }
+			
+			/* FIXME: add software reset here to fix exit power station bug */
+			NVIC_SystemReset();
+			
             break;
         case BM_EVT_POWER_LINK:
 #ifdef DEBUG_LOG
@@ -874,6 +878,7 @@ s8 SweepRobot_SendMsg(Msg_t *Msg)
 {
     if(MsgQueue_InQueue(MainMsgQ, ROBOT_MAIN_MSG_Q_SIZE, Msg)){
 #ifdef DEBUG_LOG
+		/* Quene is full , cannot in queue until expire is zero */
         printf("Msg inqueue failed !\r\n");
 #endif
         return -1;
