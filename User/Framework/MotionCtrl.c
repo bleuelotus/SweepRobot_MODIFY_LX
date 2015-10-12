@@ -58,7 +58,7 @@ enum _PathFaultProcMode {
 
 /* Infrared based proximity detection sensitivity */
 /* FIXME: bottom detection threshold should set lower to adjust sheet, origin bottom detection threshold is 150 */
-const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 100, 100 };
+const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
 static u32 gLWheelTotalCnt = 4, gRWheelTotalCnt = 4, gLastTotalLWheelCnt = 0, gLastTotalRWheelCnt = 0;
 static u16 gWheelCnt[WHEEL_NUM] = {0};
@@ -160,7 +160,7 @@ u8 ExceptionStateCheck(void)
 
     /* Update exception sign: left, right, middle brush over loading, wheel floationg and ash tray exist or not */
 //    gExceptionMask |= (WHEEL_FLOAT_SIGN_ALL ? 1 : 0) << EXCEPTION_MASK_WHEEL_FLOAT_POS;
-//	gExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
+	gExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_FAN_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_LBRUSH_OC_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_RBRUSH_OC_POS;
@@ -199,13 +199,13 @@ void MotionStateProc(void)
 		/* XXX: add bottom high light detection function and stop motor immediately */
 		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
-			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
+//			LWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
+//			RWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
 		}else {
 			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
-				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
+//				LWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
+//				RWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
 			}
 			else {
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
@@ -301,13 +301,13 @@ void MotionStateProc(void)
 		/* XXX: add bottom high light detection function and stop motor immediately */
 		if( gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_R] ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
-			MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
+//			LWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
+//			RWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
 		}else {
 			if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R]) ){
 				gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
-				MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
+//				LWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
+//				RWHEEL_EXP_SPEED_SET(WHEEL_FAULT_PROC_SPEED-6);
 			}
 			else {
 				gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
@@ -457,12 +457,12 @@ void WheelSpeedAdjustProc(void)
 #ifdef DEBUG_LOG
                     printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
 #endif
-//                    gMsg.expire = 0;
-//                    gMsg.prio = MSG_PRIO_NORMAL;
-//                    gMsg.type = MSG_TYPE_MOTION;
-//                    gMsg.MsgCB = NULL;
-//                    gMsg.Data.MEvt = MOTION_EVT_TRAPPED;
-//                    SweepRobot_SendMsg(&gMsg);
+                    gMsg.expire = 0;
+                    gMsg.prio = MSG_PRIO_NORMAL;
+                    gMsg.type = MSG_TYPE_MOTION;
+                    gMsg.MsgCB = NULL;
+                    gMsg.Data.MEvt = MOTION_EVT_TRAPPED;
+                    SweepRobot_SendMsg(&gMsg);
                 }
                 FWHEEL_CNT_CLR();
                 gLastWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT;
@@ -998,8 +998,8 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
             pActSequence->RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
             pActSequence->LWheelExpCnt = backCntL;
             pActSequence->RWheelExpCnt = backCntR;
-            pActSequence->LWheelExpSpeed = WHEEL_FAULT_PROC_SPEED;
-            pActSequence->RWheelExpSpeed = WHEEL_FAULT_PROC_SPEED;
+            pActSequence->LWheelExpSpeed = WHEEL_FAULT_FALLBACK_SPEED;
+            pActSequence->RWheelExpSpeed = WHEEL_FAULT_FALLBACK_SPEED;
             pActSequence->LWheelSync = 0;
             pActSequence->RWheelSync = 0;
             pActSequence->PreAct = NULL;

@@ -174,6 +174,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_CRUISE_SPEED					15
 #define WHEEL_MODE_SPOT_SPEED               10
 #define WHEEL_FAULT_PROC_SPEED              9
+#define WHEEL_FAULT_FALLBACK_SPEED			6
 #define WHEEL_HOMING_SPEED                  5
 
 #define PATH_COND_PROXIMITY_FLAG_FL_POS     0

@@ -105,7 +105,7 @@
         <tRSysVw>1</tRSysVw>
         <tPdscDbg>1</tPdscDbg>
         <sRunDeb>0</sRunDeb>
-        <sLrtime>0</sLrtime>
+        <sLrtime>1</sLrtime>
         <nTsel>11</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
