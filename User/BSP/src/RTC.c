@@ -86,7 +86,7 @@ void Time_Display(void)
     /* Compute seconds */
     TSS = (TimeVar % 3600) % 60;
 #ifdef DEBUG_LOG
-    printf("Time: %0.2d:%0.2d:%0.2d\r", THH, TMM, TSS);
+    //printf("Time: %0.2d:%0.2d:%0.2d\r", THH, TMM, TSS);
 #endif
 }
 

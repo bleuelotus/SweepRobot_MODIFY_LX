@@ -87,8 +87,12 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define COLLISION_DETECT_FR_GPIO            GPIOC
 #define COLLISION_DETECT_LEFT_PIN           GPIO_Pin_3
 #define COLLISION_DETECT_FL_PIN             GPIO_Pin_2
-#define COLLISION_DETECT_RIGHT_PIN          GPIO_Pin_8
-#define COLLISION_DETECT_FR_PIN             GPIO_Pin_9
+/* original definition of collision sensor port */
+//#define COLLISION_DETECT_RIGHT_PIN          GPIO_Pin_8
+//#define COLLISION_DETECT_FR_PIN             GPIO_Pin_9
+/* FIXME: exchange port definition to make avoidence action right */
+#define COLLISION_DETECT_RIGHT_PIN          GPIO_Pin_9
+#define COLLISION_DETECT_FR_PIN             GPIO_Pin_8
 #define COLLISION_SIGN_LEFT                 GPIO_ReadInputDataBit(COLLISION_DETECT_LEFT_GPIO, COLLISION_DETECT_LEFT_PIN)
 #define COLLISION_SIGN_FL                   GPIO_ReadInputDataBit(COLLISION_DETECT_FL_GPIO, COLLISION_DETECT_FL_PIN)
 #define COLLISION_SIGN_RIGHT                GPIO_ReadInputDataBit(COLLISION_DETECT_RIGHT_GPIO, COLLISION_DETECT_RIGHT_PIN)

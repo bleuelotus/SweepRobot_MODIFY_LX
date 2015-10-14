@@ -45,7 +45,7 @@ s8 NVRAM_ReadEntry(NVRAM_Entry_t *Entry)
 
     /* READ valid bit */
     tmp = UserMEM_ByteRead(USER_MEM_UNIT*Entry->offset);
-//    printf("--%c--%d--\r\n",tmp, tmp);
+//    //printf("--%c--%d--\r\n",tmp, tmp);
     Entry->valid = (tmp == 'Y') ? 1 : 0;
 
     if( Entry->valid ){

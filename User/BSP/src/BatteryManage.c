@@ -115,7 +115,7 @@ void BM_ConditionUpdate(void)
                     SweepRobot_SendMsg(&Msg);
                 }
 #ifdef DEBUG_LOG
-                printf("Charge Lvl: %d, %d.\r\n", gBM_Cond.level, Counter);
+                //printf("Charge Lvl: %d, %d.\r\n", gBM_Cond.level, Counter);
 #endif
                 break;
             case BAT_STATE_CHARGE_COMPLETE:
@@ -203,9 +203,9 @@ void BM_ConditionUpdate(void)
 
     gBM_Cond.LastState = gBM_Cond.state;
 
-//    printf("Bat Vol: %2.1f\r\n", (((float)ADC_BatLSB[ADC_BAT_VOL]*3.3f*6.f)/4096.f));
-	printf("vol=%d\r\n", ADC_BatLSB[ADC_BAT_VOL]);
-	printf("cur=%d\r\n", ADC_BatLSB[ADC_BAT_CUR]);
+//    //printf("Bat Vol: %2.1f\r\n", (((float)ADC_BatLSB[ADC_BAT_VOL]*3.3f*6.f)/4096.f));
+//	//printf("vol=%d\r\n", ADC_BatLSB[ADC_BAT_VOL]);
+//	//printf("cur=%d\r\n", ADC_BatLSB[ADC_BAT_CUR]);
 }
 
 s8 BM_ChargePowerDec(void)
@@ -235,7 +235,7 @@ s8 BM_ChargePowerInc(void)
 void BM_ChargeStart(void)
 {
 #ifdef DEBUG_LOG
-    printf("Start charging.\r\n");
+    //printf("Start charging.\r\n");
 #endif
     BM_ChargeFlag = 1;
 }
@@ -243,7 +243,7 @@ void BM_ChargeStart(void)
 void BM_ChargeStop(void)
 {
 #ifdef DEBUG_LOG
-    printf("Stop charging %d.\r\n", gBM_Cond.level);
+    //printf("Stop charging %d.\r\n", gBM_Cond.level);
 #endif
     BM_ChargeFlag = 0;
 }

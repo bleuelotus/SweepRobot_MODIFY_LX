@@ -425,7 +425,7 @@ void WheelSpeedAdjustProc(void)
                 }
             }
 			if(gExceptionMask){
-				printf("Exp:%d\r\n", gExceptionMask);
+				//printf("Exp:%d\r\n", gExceptionMask);
 			}
             gLastExceptionMask = gExceptionMask;
         }
@@ -433,7 +433,7 @@ void WheelSpeedAdjustProc(void)
 		/* Universal wheel signal check */
         gUniversalWheelActiveVal = FWHEEL_ACTIVE_VAL;
 #ifdef DEBUG_LOG
-//        printf(":%d\r\n", gUniversalWheelActiveVal);
+//        //printf(":%d\r\n", gUniversalWheelActiveVal);
 #endif
 
         if( (LWHEEL_CUR_SPEED > 1) && (LWHEEL_CUR_SPEED==RWHEEL_CUR_SPEED) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_LWHEEL)==1) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_RWHEEL)==1) ){
@@ -445,13 +445,13 @@ void WheelSpeedAdjustProc(void)
             if(gUniveralWheelDetectPeriodCnt > UNIVERSAL_WHEEL_DETECT_PERIOD){
                 gUniveralWheelDetectPeriodCnt = 0;
 #ifdef DEBUG_LOG
-//                printf("%d\r\n", FWHEEL_CNT);
+//                //printf("%d\r\n", FWHEEL_CNT);
 #endif
                 gDeltaWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_F];
                 if( (gDeltaWheelCnt[WHEEL_IDX_F] < 5) || (gDeltaWheelCnt[WHEEL_IDX_F] > 150) ){
                     /* Send block message */
 #ifdef DEBUG_LOG
-                    printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
+                    //printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
 #endif
                     gMsg.expire = 0;
                     gMsg.prio = MSG_PRIO_NORMAL;

@@ -48,6 +48,7 @@ void SweepRobot_Start(void);
 void SweepRobot_StartupComplete(void);
 void SweepRobot_Stop(void);
 s8 SweepRobot_SendMsg(Msg_t *Msg);
+u8 SweepRobot_SoftwareReset(void);
 
 
 #endif /* !__SWEEP_ROBOT_H__ */

@@ -89,12 +89,12 @@ s8 SweepRobot_Init(void)
 
     gRobotState = ROBOT_STATE_IDLE;
 #ifdef DEBUG_LOG
-    printf("Robot init OK !\r\n");
+    //printf("Robot init OK !\r\n");
 #endif
     return err;
 SWEEPROBOT_INIT_FAIL:
 #ifdef DEBUG_LOG
-    printf("Robot init failed !\r\n");
+    //printf("Robot init failed !\r\n");
 #endif
     return err;
 }
@@ -116,34 +116,34 @@ void SweepRobot_Start(void)
                     switch(MainMsgQ->Msg.type){
                         case MSG_TYPE_PM:
 #ifdef DEBUG_LOG
-                            printf("PM msg %d.\r\n", MainMsgQ->Msg.Data.PMEvt);
+                            //printf("PM msg %d.\r\n", MainMsgQ->Msg.Data.PMEvt);
 #endif
                             SweepRobot_PMMsgProc(MainMsgQ->Msg.Data.PMEvt);
                             break;
                         case MSG_TYPE_BM:
 //                            PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
-                            printf("BM msg %d.\r\n", MainMsgQ->Msg.Data.BatEvt);
+                            //printf("BM msg %d.\r\n", MainMsgQ->Msg.Data.BatEvt);
 #endif
                             SweepRobot_BMMsgProc(MainMsgQ->Msg.Data.BatEvt);
                             break;
                         case MSG_TYPE_CTRL:
                             PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
-                            printf("CTRL msg code: 0x%X.\r\n", MainMsgQ->Msg.Data.ByteVal);
+                            //printf("CTRL msg code: 0x%X.\r\n", MainMsgQ->Msg.Data.ByteVal);
 #endif
                             SweepRobot_CtrlMsgProc(MainMsgQ->Msg.Data.ByteVal);
                             break;
                         case MSG_TYPE_PWR_STATION:
 #ifdef DEBUG_LOG
-//                            printf("PWR_STATION msg Pos: %d, code: 0x%X.\r\n", MainMsgQ->Msg.Data.PSSigDat.src, MainMsgQ->Msg.Data.PSSigDat.sig);
+//                            //printf("PWR_STATION msg Pos: %d, code: 0x%X.\r\n", MainMsgQ->Msg.Data.PSSigDat.src, MainMsgQ->Msg.Data.PSSigDat.sig);
 #endif
                             SweepRobot_PwrStationMsgProc(&MainMsgQ->Msg.Data.PSSigDat);
                             break;
                         case MSG_TYPE_MOTION:
                             PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
-                            printf("MOTION msg 0x%X.\r\n", MainMsgQ->Msg.Data.MEvt);
+                            //printf("MOTION msg 0x%X.\r\n", MainMsgQ->Msg.Data.MEvt);
 #endif
                             SweepRobot_MotionMsgProc(MainMsgQ->Msg.Data.MEvt);
                             break;
@@ -255,7 +255,7 @@ void SweepRobot_StartupComplete(void)
 {
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
-	
+
 	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
 	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
 
@@ -395,6 +395,9 @@ void SweepRobot_IdleStateSync(void)
 
     if(gRobotMode==ROBOT_WORK_MODE_DISHOMING){
         SweepRobot_AutoModeProc();
+
+		/* FIXME: add software reset here to fix exit power station bug */
+		NVIC_SystemReset();
     }
     else{
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
@@ -446,20 +449,21 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
     switch(evt){
         case BM_EVT_POWER_LOSS:
 #ifdef DEBUG_LOG
-            printf("Robot disconnect from power station.\r\n");
+            //printf("Robot disconnect from power station.\r\n");
 #endif
             if(gRobotState == ROBOT_STATE_HOME){
                 gRobotState = ROBOT_STATE_IDLE;
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
             }
-			
-			/* FIXME: add software reset here to fix exit power station bug */
-			NVIC_SystemReset();
-			
+
+			if( (gBM_Cond.state == BAT_STATE_DISCHARGING) && (gRobotMode != ROBOT_WORK_MODE_DISHOMING) ){
+				SweepRobot_SoftwareReset();
+			}
+
             break;
         case BM_EVT_POWER_LINK:
 #ifdef DEBUG_LOG
-            printf("Robot connect to power station.\r\n");
+            //printf("Robot connect to power station.\r\n");
 #endif
             if(gRobotState == ROBOT_STATE_RUNNING && gRobotMode == ROBOT_WORK_MODE_HOMING){
                 SweepRobot_HomingSuccess();
@@ -470,7 +474,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
         case BM_EVT_LOW_LEVEL:
             /* Low battery condition, try to home and get charged */
 #ifdef DEBUG_LOG
-            printf("Robot low battery condition.\r\n");
+            //printf("Robot low battery condition.\r\n");
 #endif
             if(gRobotState==ROBOT_STATE_RUNNING && gRobotMode != ROBOT_WORK_MODE_HOMING && gRobotMode != ROBOT_WORK_MODE_DISHOMING && gRobotMode != ROBOT_WORK_MODE_MANUAL){
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, CTRL_PANEL_LED_BR_LVL);
@@ -481,7 +485,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
             CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
 			Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
 #ifdef DEBUG_LOG
-            printf("Robot finish charging.\r\n");
+            //printf("Robot finish charging.\r\n");
 #endif
             break;
     }
@@ -557,7 +561,7 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
             break;
         case MOTION_EVT_EXCEPTION:
 #ifdef DEBUG_LOG
-            printf("Exception state.\r\n");
+            //printf("Exception state.\r\n");
 #endif
             Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
             if(MotionCtrl_ExceptionHandle()){
@@ -742,7 +746,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
 
             HomingState.Angle = (HomingState.Angle > 180) ? (HomingState.Angle - 360) : HomingState.Angle;
 #ifdef DEBUG_LOG
-            printf("Pos: 0x%X, Ang: %d\r\n", HomingState.Pos, HomingState.Angle);
+            //printf("Pos: 0x%X, Ang: %d\r\n", HomingState.Pos, HomingState.Angle);
 #endif
             HomingDataCnt = 0;
             RepeatCodeFound = 0;
@@ -879,9 +883,16 @@ s8 SweepRobot_SendMsg(Msg_t *Msg)
     if(MsgQueue_InQueue(MainMsgQ, ROBOT_MAIN_MSG_Q_SIZE, Msg)){
 #ifdef DEBUG_LOG
 		/* Quene is full , cannot in queue until expire is zero */
-        printf("Msg inqueue failed !\r\n");
+        //printf("Msg inqueue failed !\r\n");
 #endif
         return -1;
     }
     return 0;
+}
+
+u8 SweepRobot_SoftwareReset(void)
+{
+	//printf("robot software reset\r\n");
+	NVIC_SystemReset();
+	return 0;
 }
