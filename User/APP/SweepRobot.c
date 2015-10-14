@@ -762,6 +762,10 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
 
         if(LastHomingState.Pos!=HomingState.Pos){
             HomingStateConfirmCnt++;
+#ifdef DEBUG_LOG
+			printf("Last_Pos=%d,Now_Pos=%d,\r\n", LastHomingState.Pos, HomingState.Pos);
+			printf("Homing_Cnt=%d\r\n",HomingStateConfirmCnt);			
+#endif
             if(HomingStateConfirmCnt>5){
                 LastHomingState.Pos = HomingState.Pos;
                 LastHomingState.Angle = HomingState.Angle;
