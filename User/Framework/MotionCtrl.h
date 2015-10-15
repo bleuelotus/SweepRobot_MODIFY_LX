@@ -56,6 +56,16 @@ typedef struct MotionCtrl_Action_s{
     u8              (*PostAct)(void);
 } MCtrl_Act_t;
 
+typedef struct MotionException_ErrCnt_s{	
+	u8				AshTrayInsErrCnt;
+	u8				WheelFloatErrCnt;
+	u8				MBrushOCErrCnt;
+	u8				FanOCErrCnt;
+	u8				LBrushOCErrCnt;
+	u8 				RBrushOCErrCnt;
+	u8				WheelStuckErrCnt;
+}MotionException_ErrCnt_t;
+
 extern u8 gProximitySign[IFRD_TxRx_CHAN_NUM];
 extern u8 gActSeqDepth;
 extern u8 gActSeqDepLIndicator;

@@ -76,7 +76,7 @@ s8 SweepRobot_Init(void)
     BM_Init();
     /* Buzzer init */
     Buzzer_Init();
-    /* Motor controller init */
+    /* Motor controller init */ 	
     err = MotorCtrl_Init();
     if(err)
         goto SWEEPROBOT_INIT_FAIL;
@@ -89,7 +89,7 @@ s8 SweepRobot_Init(void)
 
     gRobotState = ROBOT_STATE_IDLE;
 #ifdef DEBUG_LOG
-    //printf("Robot init OK !\r\n");
+    printf("Robot init OK !\r\n");
 #endif
     return err;
 SWEEPROBOT_INIT_FAIL:
@@ -396,7 +396,7 @@ void SweepRobot_IdleStateSync(void)
     if(gRobotMode==ROBOT_WORK_MODE_DISHOMING){
         SweepRobot_AutoModeProc();
 
-		/* FIXME: add software reset here to fix exit power station bug */
+		/* FIXME: add software reset here to fix exit power station bug, should find out why IR_diode disabled instead of doing this */
 		NVIC_SystemReset();
     }
     else{
@@ -550,7 +550,13 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
 {
     switch(evt){
         case MOTION_EVT_PATH_FAULT:
+#ifdef DEBUG_LOG
+            printf("State=%d;", gRobotState);
+#endif
             if(gRobotState == ROBOT_STATE_RUNNING){
+#ifdef DEBUG_LOG
+				printf("Mode=%d.\r\n", gRobotMode);
+#endif				
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
                     MotionCtrl_PathFaultProc(1);
                 }

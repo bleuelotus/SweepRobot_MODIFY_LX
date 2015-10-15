@@ -132,4 +132,17 @@ GETCHAR_PROTOTYPE
 
     return (int)USART_ReceiveData(STDIO_UART);
 }
+
+//// Implementation of sendchar (also used by printf function to output data)
+//int sendchar (int ch) { 
+//	// Write character to Serial Port   
+//	while (USART_GetFlagStatus(STDIO_UART, USART_FLAG_TXE) == RESET);
+//	return (UART4->DR = ch); 
+//} 
+//int getkey (void)  { 
+//	// Read character from Serial Port   
+//	while (USART_GetFlagStatus(STDIO_UART, USART_FLAG_RXNE) == RESET);
+//	return (UART4->DR); 
+//}
+
 /*********************************************END OF FILE**********************/

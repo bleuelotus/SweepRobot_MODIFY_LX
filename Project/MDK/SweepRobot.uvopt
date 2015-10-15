@@ -155,16 +155,32 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>892</LineNumber>
+          <LineNumber>173</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134227792</Address>
+          <Address>134242584</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_usart.c</Filename>
+          <Filename>..\..\User\APP\SweepRobot.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>498</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\User\APP\SweepRobot.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
