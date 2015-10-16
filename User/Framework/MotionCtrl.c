@@ -165,7 +165,6 @@ u8 ExceptionStateCheck(void)
     u8 ExceptionMask = 0;
 
     /* Update exception sign: left, right, middle brush over loading, wheel floating and ash tray exist or not */
-//	printf("AshTray=%d\r\n",ASH_TRAY_INSTALL_SIGN);
 //	ExceptionMask |= (ASH_TRAY_INSTALL_SIGN ? 1 : 0) << EXCEPTION_MASK_ASHTRAY_INS_POS;
     ExceptionMask |= (WHEEL_FLOAT_SIGN_ALL ? 1 : 0) << EXCEPTION_MASK_WHEEL_FLOAT_POS;
     ExceptionMask |= ((ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD) ? 1 : 0) << EXCEPTION_MASK_FAN_OC_POS;
@@ -194,21 +193,38 @@ void MotionStateProc(void)
     u8      i = 0;
 	
 	gExceptionMask = ExceptionStateCheck();
-	if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
-		/* Send exception message */
-		gMsg.expire = 0;
-		gMsg.prio = MSG_PRIO_HIGHEST;
-		gMsg.type = MSG_TYPE_MOTION;
-		gMsg.MsgCB = NULL;
-		gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
-		if(!SweepRobot_SendMsg(&gMsg)){
-			gIsExceptionHandling = 1;
+	if( !(gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS))) ){
+		if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
+			/* Send exception message */
+			gMsg.expire = 0;
+			gMsg.prio = MSG_PRIO_HIGHEST;
+			gMsg.type = MSG_TYPE_MOTION;
+			gMsg.MsgCB = NULL;
+			gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
+			if(!SweepRobot_SendMsg(&gMsg)){
+				gIsExceptionHandling = 1;
+			}
 		}
+		
+		if(gExceptionMask){
+			
+		}else{
+			gMotionExceptionErrCnt.AshTrayInsErrCnt = 0;
+			gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
+			gMotionExceptionErrCnt.FanOCErrCnt = 0;
+			gMotionExceptionErrCnt.MBrushOCErrCnt = 0;
+			gMotionExceptionErrCnt.LBrushOCErrCnt = 0;
+			gMotionExceptionErrCnt.RBrushOCErrCnt = 0;
+		}
+		
+#ifdef DEBUG_LOG
+		if(gExceptionMask){
+			printf("Exp1:0x%X\r\n", gExceptionMask);
+		}
+#endif
+		gLastExceptionMask = gExceptionMask;
+	
 	}
-	if(gExceptionMask){
-		printf("Exp:%d\r\n", gExceptionMask);
-	}
-	gLastExceptionMask = gExceptionMask;
 
     /* Phase 1 */
     if((++gtmpCnt)%2){
@@ -416,12 +432,18 @@ void MotionStateProc(void)
         else {
             gPathCondMap &= ~(1 << PATH_COND_COLLISION_FLAG_FR_POS);
         }
-#ifdef DEBUG_LOG
-		printf("CondMap=0x%X\r\n", gPathCondMap);
-#endif
         IFRD_TX_DISABLE();
 
+#ifdef DEBUG_LOG
+//		if(gPathCondMap)
+//			printf("gPathCondMap=0x%X\r\n", gPathCondMap);
+//		if(IS_MOTION_PROC_FINISH())
+//			printf("LIndi=%d,RIndi=%d\r\n",gActSeqDepLIndicator,gActSeqDepRIndicator);
+#endif
         if( IS_MOTION_PROC_FINISH() && (gPathCondMap & (PATH_FAULT_LEFT_MASK | PATH_FAULT_RIGHT_MASK)) ){
+#ifdef DEBUG_LOG
+//			printf("Send Evt Path Fault\r\n");
+#endif
             if( ((gRobotMode != ROBOT_WORK_MODE_EDGE) && (gRobotMode != ROBOT_WORK_MODE_SPOT))
                ||
                (((gRobotMode == ROBOT_WORK_MODE_EDGE) || (gRobotMode == ROBOT_WORK_MODE_SPOT)) && (gPathCondMap & (PATH_FAULT_PROXIMITY_MASK & PATH_FAULT_BOTTOM_MASK | PATH_FAULT_COLLISION_MASK)))
@@ -443,28 +465,33 @@ void MotionStateProc(void)
 void WheelSpeedAdjustProc(void)
 {
 	gExceptionMask = ExceptionStateWheelStuckCheck();
-	if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionWheelStuckHandling) ){
-		/* Send exception message */
-		gMsg.expire = 0;
-		gMsg.prio = MSG_PRIO_HIGH;
-		gMsg.type = MSG_TYPE_MOTION;
-		gMsg.MsgCB = NULL;
-		gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
-		if(!SweepRobot_SendMsg(&gMsg)){
-			gIsExceptionWheelStuckHandling = 1;
+	if( gExceptionMask & ( (1<<EXCEPTION_MASK_LWHEEL_STUCK_POS) | (1<<EXCEPTION_MASK_RWHEEL_STUCK_POS) ) ){
+		if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionWheelStuckHandling) ){
+			/* Send exception message */
+			gMsg.expire = 0;
+			gMsg.prio = MSG_PRIO_NORMAL;
+			gMsg.type = MSG_TYPE_MOTION;
+			gMsg.MsgCB = NULL;
+			gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
+			if(!SweepRobot_SendMsg(&gMsg)){
+				gIsExceptionWheelStuckHandling = 1;
+			}
 		}
+		if(gExceptionMask){
+			printf("Exp2:0x%X\r\n", gExceptionMask);
+		}
+		
+		gLastExceptionMask = gExceptionMask;
+	}else {
+		gMotionExceptionErrCnt.WheelStuckErrCnt = 0;
 	}
-	if(gExceptionMask){
-		printf("Exp:%d\r\n", gExceptionMask);
-	}
-	gLastExceptionMask = gExceptionMask;
 	
 	if(++gtmpCnt2%2){
 
 		/* Universal wheel signal check */
         gUniversalWheelActiveVal = FWHEEL_ACTIVE_VAL;
 #ifdef DEBUG_LOG
-//        //printf(":%d\r\n", gUniversalWheelActiveVal);
+//        printf(":%d\r\n", gUniversalWheelActiveVal);
 #endif
 
         if( (LWHEEL_CUR_SPEED > 1) && (LWHEEL_CUR_SPEED==RWHEEL_CUR_SPEED) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_LWHEEL)==1) && (MotorCtrl_ChanDirGet(MOTOR_CTRL_CHAN_RWHEEL)==1) ){
@@ -476,13 +503,13 @@ void WheelSpeedAdjustProc(void)
             if(gUniveralWheelDetectPeriodCnt > UNIVERSAL_WHEEL_DETECT_PERIOD){
                 gUniveralWheelDetectPeriodCnt = 0;
 #ifdef DEBUG_LOG
-//                //printf("%d\r\n", FWHEEL_CNT);
+//                printf("%d\r\n", FWHEEL_CNT);
 #endif
                 gDeltaWheelCnt[WHEEL_IDX_F] = FWHEEL_CNT - gLastWheelCnt[WHEEL_IDX_F];
                 if( (gDeltaWheelCnt[WHEEL_IDX_F] < 5) || (gDeltaWheelCnt[WHEEL_IDX_F] > 150) ){
                     /* Send block message */
 #ifdef DEBUG_LOG
-                    //printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
+                    printf("[%d]Robot is trapped.\r\n", gDeltaWheelCnt[WHEEL_IDX_F]);
 #endif
                     gMsg.expire = 0;
                     gMsg.prio = MSG_PRIO_NORMAL;
@@ -962,9 +989,18 @@ u8 MotionCtrl_PathFaultBackProcCompleteCondTest(void)
     return ((!(gPathCondMap & PATH_PROXIMITY_SIDE_L_MASK)) || (!(gPathCondMap & PATH_PROXIMITY_SIDE_R_MASK)));
 }
 
-void MotionCtrl_ExceptionWheelFloatCondTest(struct MotionCtrl_Action_s *node)
+void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
 {
-	if( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK) ){
+	if( ((gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK))\
+		|| (gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS))\
+		|| (gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS))\
+		|| (gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS))\
+		|| (gExceptionMask & (1<<EXCEPTION_MASK_MBRUSH_OC_POS))\
+		){
+#ifdef DEBUG_LOG
+		printf("ExceptionStopCond.\r\n");
+#endif			
+
 		node->LWheelDefDir = 0;
 		node->RWheelDefDir = 0;
 		node->LWheelInitSpeed = 0;
@@ -973,8 +1009,14 @@ void MotionCtrl_ExceptionWheelFloatCondTest(struct MotionCtrl_Action_s *node)
 		node->RWheelExpSpeed = 0;
 		node->LWheelExpCnt = 0;
 		node->RWheelExpCnt = 0;
-		Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
+		node->LWheelSync = 0;
+		node->RWheelSync = 0;
+		node->PreAct = NULL;
+		node->PostAct = NULL;
+		Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_SHORT);
 		SweepRobot_Stop();
+		gIsExceptionHandling = 0;
+		gIsExceptionWheelStuckHandling = 0;
 	}
 }
 
@@ -1008,7 +1050,20 @@ void MotionCtrl_PathFaultTryTurnCondTest(struct MotionCtrl_Action_s *node)
 
 u8 MotionCtrl_PathFaultTurnProcCompleteCondTest(void)
 {
-    return (!(gPathCondMap & PATH_FAULT_PROXIMITY_MASK));
+#ifdef DEBUG_LOG
+	printf("PathFaultTurnProcCompleteCondTest\r\n");
+#endif
+	/* FIXME: may cause avoidence stuck */
+//    return (!(gPathCondMap & PATH_FAULT_PROXIMITY_MASK));
+	if( gPathCondMap & PATH_FAULT_PROXIMITY_MASK ){
+		if(gPathCondMap & PATH_FAULT_COLLISION_MASK){
+			return 1;
+		}else
+			return 0;
+	}else{
+		return 1;
+	}
+		
 }
 
 void MotionCtrl_PathFaultEdgeModeProcAct(struct MotionCtrl_Action_s *node)
@@ -1219,39 +1274,40 @@ void ExceptionHandleFinishCB(void)
 	gIsExceptionHandling = 0;
 }
 
+s8 MotionCtrl_ExceptionStopErrCntr(u8 *ErrCnt, u8 StopCnt)
+{
+	(*ErrCnt)++;
+	if((*ErrCnt) > StopCnt){
+		gIsExceptionHandling = 0;
+		return 1;
+	}else
+		return 0;
+}
+
 s8 MotionCtrl_ExceptionHandle(void)
 {
-	/* FIXME: add cnt to judge whether OC occur two times, if so stop robot and buzzer play sounds to warning */
 	if(gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
-		gMotionExceptionErrCnt.LBrushOCErrCnt++;
-		if(gMotionExceptionErrCnt.LBrushOCErrCnt > 1){
-			gIsExceptionHandling = 0;
+		if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.LBrushOCErrCnt), 1)){
 			return -1;
 		}
     }
     if(gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
-		gMotionExceptionErrCnt.RBrushOCErrCnt++;
-		if(gMotionExceptionErrCnt.RBrushOCErrCnt > 1){
-			gIsExceptionHandling = 0;
+		if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.RBrushOCErrCnt), 1)){
 			return -1;
 		}
     }
     if(gExceptionMask & (1<<EXCEPTION_MASK_MBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
-		gMotionExceptionErrCnt.MBrushOCErrCnt++;
-		if(gMotionExceptionErrCnt.MBrushOCErrCnt > 1){
-			gIsExceptionHandling = 0;
+		if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.MBrushOCErrCnt), 1)){
 			return -1;
 		}
     }
 	
-	/* XXX: this process should be enable by WheelSpeedAdjustProc() */
+	/* XXX: this exception should be processed by WheelSpeedAdjustProc() */
 	if( gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS)) ){
-		gMotionExceptionErrCnt.WheelStuckErrCnt++;
-		if(gMotionExceptionErrCnt.WheelStuckErrCnt > 2){
-			gIsExceptionWheelStuckHandling = 0;
+		if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.WheelStuckErrCnt), 1)){
 			return -1;
 		}
     }
@@ -1261,17 +1317,20 @@ s8 MotionCtrl_ExceptionHandle(void)
         return -1;
     }
 	
-	/* XXX: add wheel floating avoidence process */
-	if( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK) ){
+	/* FIXME: add wheel floating avoidence process */
+	/* left bottom float detected and left wheel float detected */
+	if( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!LWHEEL_FLOAT_SIGN) && (gPathCondMap & (PATH_FAULT_BOTTOM_MASK & PATH_FAULT_LEFT_MASK) ) ){
 		gIsExceptionHandling = 0;
-		gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
 		return -1;
 	}
+	/* right bottom float detected and right wheel float detected */
+	if( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!RWHEEL_FLOAT_SIGN) && (gPathCondMap & (PATH_FAULT_BOTTOM_MASK & PATH_FAULT_RIGHT_MASK) ) ){
+		gIsExceptionHandling = 0;
+		return -1;
+	}
+	
 	if ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!(gPathCondMap & PATH_FAULT_BOTTOM_MASK)) ){
-		gMotionExceptionErrCnt.WheelFloatErrCnt++;
-		if(gMotionExceptionErrCnt.WheelFloatErrCnt > 1){
-			gIsExceptionHandling = 0;
-			gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
+		if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.WheelFloatErrCnt), 1)){
 			return -1;
 		}
 	}
@@ -1305,7 +1364,7 @@ void MotionCtrl_ExceptionProc(void)
 	MotionCtrl_ExceptionProc_Speed_Set(gActSequence);
     gActSequence[0].LWheelSync = 0;
     gActSequence[0].RWheelSync = 0;
-    gActSequence[0].PreAct = MotionCtrl_ExceptionWheelFloatCondTest;
+    gActSequence[0].PreAct = MotionCtrl_ExceptionStopCondTest;
     gActSequence[0].PostAct = NULL;
 	
     gActSequence[1].LWheelDefDir = 0;
@@ -1318,7 +1377,7 @@ void MotionCtrl_ExceptionProc(void)
 	gActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[1].LWheelSync = 0;
     gActSequence[1].RWheelSync = 0;
-    gActSequence[1].PreAct = MotionCtrl_ExceptionWheelFloatCondTest;
+    gActSequence[1].PreAct = MotionCtrl_ExceptionStopCondTest;
     gActSequence[1].PostAct = NULL;
 	
     gActSequence[2].LWheelDefDir = 1;
@@ -1331,7 +1390,7 @@ void MotionCtrl_ExceptionProc(void)
 	gActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[2].LWheelSync = 0;
     gActSequence[2].RWheelSync = 0;
-    gActSequence[2].PreAct = MotionCtrl_ExceptionWheelFloatCondTest;
+    gActSequence[2].PreAct = MotionCtrl_ExceptionStopCondTest;
     gActSequence[2].PostAct = NULL;
 	
     gActSequence[3].LWheelDefDir = 0;
@@ -1343,7 +1402,7 @@ void MotionCtrl_ExceptionProc(void)
     MotionCtrl_ExceptionProc_Speed_Set(gActSequence+3);
     gActSequence[3].LWheelSync = 0;
     gActSequence[3].RWheelSync = 0;
-    gActSequence[3].PreAct = MotionCtrl_ExceptionWheelFloatCondTest;
+    gActSequence[3].PreAct = MotionCtrl_ExceptionStopCondTest;
     gActSequence[3].PostAct = NULL;
 	
     gActSequence[4].LWheelDefDir = 1;
@@ -1356,7 +1415,7 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[4].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
     gActSequence[4].LWheelSync = 0;
     gActSequence[4].RWheelSync = 0;
-    gActSequence[4].PreAct = MotionCtrl_ExceptionWheelFloatCondTest;
+    gActSequence[4].PreAct = MotionCtrl_ExceptionStopCondTest;
     gActSequence[4].PostAct = NULL;
 	
     gActSequence[5].LWheelDefDir = 1;
@@ -1369,7 +1428,7 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[5].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
     gActSequence[5].LWheelSync = 0;
     gActSequence[5].RWheelSync = 0;
-    gActSequence[5].PreAct = MotionCtrl_ExceptionWheelFloatCondTest;
+    gActSequence[5].PreAct = MotionCtrl_ExceptionStopCondTest;
     gActSequence[5].PostAct = NULL;
     gActSeqDepth = 6;
 

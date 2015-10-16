@@ -74,8 +74,10 @@ s8 SweepRobot_Init(void)
     PWM_ControllerStart();
     /* Battery management init */
     BM_Init();
+#ifndef DEBUG_COMMENT
     /* Buzzer init */
     Buzzer_Init();
+#endif
     /* Motor controller init */ 	
     err = MotorCtrl_Init();
     if(err)
@@ -94,7 +96,7 @@ s8 SweepRobot_Init(void)
     return err;
 SWEEPROBOT_INIT_FAIL:
 #ifdef DEBUG_LOG
-    //printf("Robot init failed !\r\n");
+    printf("Robot init failed !\r\n");
 #endif
     return err;
 }
@@ -116,34 +118,34 @@ void SweepRobot_Start(void)
                     switch(MainMsgQ->Msg.type){
                         case MSG_TYPE_PM:
 #ifdef DEBUG_LOG
-                            //printf("PM msg %d.\r\n", MainMsgQ->Msg.Data.PMEvt);
+                            printf("PM msg %d.\r\n", MainMsgQ->Msg.Data.PMEvt);
 #endif
                             SweepRobot_PMMsgProc(MainMsgQ->Msg.Data.PMEvt);
                             break;
                         case MSG_TYPE_BM:
 //                            PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
-                            //printf("BM msg %d.\r\n", MainMsgQ->Msg.Data.BatEvt);
+                            printf("BM msg %d.\r\n", MainMsgQ->Msg.Data.BatEvt);
 #endif
                             SweepRobot_BMMsgProc(MainMsgQ->Msg.Data.BatEvt);
                             break;
                         case MSG_TYPE_CTRL:
                             PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
-                            //printf("CTRL msg code: 0x%X.\r\n", MainMsgQ->Msg.Data.ByteVal);
+                            printf("CTRL msg code: 0x%X.\r\n", MainMsgQ->Msg.Data.ByteVal);
 #endif
                             SweepRobot_CtrlMsgProc(MainMsgQ->Msg.Data.ByteVal);
                             break;
                         case MSG_TYPE_PWR_STATION:
 #ifdef DEBUG_LOG
-//                            //printf("PWR_STATION msg Pos: %d, code: 0x%X.\r\n", MainMsgQ->Msg.Data.PSSigDat.src, MainMsgQ->Msg.Data.PSSigDat.sig);
+//                            printf("PWR_STATION msg Pos: %d, code: 0x%X.\r\n", MainMsgQ->Msg.Data.PSSigDat.src, MainMsgQ->Msg.Data.PSSigDat.sig);
 #endif
                             SweepRobot_PwrStationMsgProc(&MainMsgQ->Msg.Data.PSSigDat);
                             break;
                         case MSG_TYPE_MOTION:
                             PM_ResetSysIdleState();
 #ifdef DEBUG_LOG
-                            //printf("MOTION msg 0x%X.\r\n", MainMsgQ->Msg.Data.MEvt);
+                            printf("MOTION msg 0x%X.\r\n", MainMsgQ->Msg.Data.MEvt);
 #endif
                             SweepRobot_MotionMsgProc(MainMsgQ->Msg.Data.MEvt);
                             break;
@@ -167,7 +169,7 @@ void SweepRobot_StartupInit(void)
     gRobotState = ROBOT_STATE_STARTUP;
     gRobotStartupSeqNum++;
 
-    plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
+    plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
 
     if(1==gRobotStartupSeqNum){
 //        if(WHEEL_FLOAT_SIGN_ALL || ASH_TRAY_INSTALL_SIGN){
@@ -204,13 +206,13 @@ void SweepRobot_StartupInit(void)
 
         switch(gRobotMode){
             case ROBOT_WORK_MODE_AUTO:
-                plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionCtrl_AutoMotionInit);
+                plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_AutoMotionInit);
                 break;
             case ROBOT_WORK_MODE_EDGE:
-                plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionCtrl_EdgeMotionInit);
+                plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_EdgeMotionInit);
                 break;
             case ROBOT_WORK_MODE_SPOT:
-                plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionCtrl_SpotMotionInit);
+                plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_SpotMotionInit);
                 break;
         }
         gRobotStartupSeqNum = 0;
@@ -356,10 +358,14 @@ void SweepRobot_ManualModeProc(enum MotionCtrlManualAct act)
         return;
     }
 
+	/* FIXME: add delay here,but should put this into timer */
     if(gRobotState != ROBOT_STATE_RUNNING){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FAN_CHAN_STARTUP_SPEED);
+		mDelay(20);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+		mDelay(20);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+		mDelay(20);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
     }
     else{
@@ -374,9 +380,12 @@ void SweepRobot_HomingInit(void)
         return;
     }
 
+	/* FIXME: add delay here,but should put this into timer */
     if(gRobotState != ROBOT_STATE_RUNNING){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+		mDelay(20);		
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+		mDelay(20);	
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
     }
     else{
@@ -449,7 +458,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
     switch(evt){
         case BM_EVT_POWER_LOSS:
 #ifdef DEBUG_LOG
-            //printf("Robot disconnect from power station.\r\n");
+            printf("Robot disconnect from power station.\r\n");
 #endif
             if(gRobotState == ROBOT_STATE_HOME){
                 gRobotState = ROBOT_STATE_IDLE;
@@ -463,7 +472,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
             break;
         case BM_EVT_POWER_LINK:
 #ifdef DEBUG_LOG
-            //printf("Robot connect to power station.\r\n");
+            printf("Robot connect to power station.\r\n");
 #endif
             if(gRobotState == ROBOT_STATE_RUNNING && gRobotMode == ROBOT_WORK_MODE_HOMING){
                 SweepRobot_HomingSuccess();
@@ -474,7 +483,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
         case BM_EVT_LOW_LEVEL:
             /* Low battery condition, try to home and get charged */
 #ifdef DEBUG_LOG
-            //printf("Robot low battery condition.\r\n");
+            printf("Robot low battery condition.\r\n");
 #endif
             if(gRobotState==ROBOT_STATE_RUNNING && gRobotMode != ROBOT_WORK_MODE_HOMING && gRobotMode != ROBOT_WORK_MODE_DISHOMING && gRobotMode != ROBOT_WORK_MODE_MANUAL){
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, CTRL_PANEL_LED_BR_LVL);
@@ -485,7 +494,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
             CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
 			Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
 #ifdef DEBUG_LOG
-            //printf("Robot finish charging.\r\n");
+            printf("Robot finish charging.\r\n");
 #endif
             break;
     }
@@ -567,7 +576,7 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
             break;
         case MOTION_EVT_EXCEPTION:
 #ifdef DEBUG_LOG
-            //printf("Exception state.\r\n");
+            printf("Exception state.\r\n");
 #endif
             Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
             if(MotionCtrl_ExceptionHandle()){
@@ -752,7 +761,7 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
 
             HomingState.Angle = (HomingState.Angle > 180) ? (HomingState.Angle - 360) : HomingState.Angle;
 #ifdef DEBUG_LOG
-            //printf("Pos: 0x%X, Ang: %d\r\n", HomingState.Pos, HomingState.Angle);
+            printf("Pos: 0x%X, Ang: %d\r\n", HomingState.Pos, HomingState.Angle);
 #endif
             HomingDataCnt = 0;
             RepeatCodeFound = 0;
@@ -768,10 +777,6 @@ void SweepRobot_PwrStationMsgProc(PwrStationSigData_t *PwrSig)
 
         if(LastHomingState.Pos!=HomingState.Pos){
             HomingStateConfirmCnt++;
-#ifdef DEBUG_LOG
-			printf("Last_Pos=%d,Now_Pos=%d,\r\n", LastHomingState.Pos, HomingState.Pos);
-			printf("Homing_Cnt=%d\r\n",HomingStateConfirmCnt);			
-#endif
             if(HomingStateConfirmCnt>5){
                 LastHomingState.Pos = HomingState.Pos;
                 LastHomingState.Angle = HomingState.Angle;
@@ -893,7 +898,7 @@ s8 SweepRobot_SendMsg(Msg_t *Msg)
     if(MsgQueue_InQueue(MainMsgQ, ROBOT_MAIN_MSG_Q_SIZE, Msg)){
 #ifdef DEBUG_LOG
 		/* Quene is full , cannot in queue until expire is zero */
-        //printf("Msg inqueue failed !\r\n");
+        printf("Msg inqueue failed !\r\n");
 #endif
         return -1;
     }
@@ -902,7 +907,7 @@ s8 SweepRobot_SendMsg(Msg_t *Msg)
 
 u8 SweepRobot_SoftwareReset(void)
 {
-	//printf("robot software reset\r\n");
+	printf("robot software reset\r\n");
 	NVIC_SystemReset();
 	return 0;
 }

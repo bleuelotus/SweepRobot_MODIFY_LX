@@ -230,3 +230,4 @@ pip-log.txt
 *.out
 *.sim
 *obj/
+*.map
