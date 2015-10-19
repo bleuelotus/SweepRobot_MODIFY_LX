@@ -18,10 +18,16 @@
 #define IFRD_TxRx_CHAN_NUM                  8                                   // Total:8, but 2 back lights of bottom are not used
 #elif defined REVISION_1_1
 #define IFRD_TxRx_CHAN_NUM                  6                                   // 2 back lights of bottom are not used
+#elif defined REVISION_1_2
+#define IFRD_TxRx_CHAN_NUM					8
 #endif
 #define IFRD_FRONT_CHAN_NUM                 2
 #define IFRD_SIDE_CHAN_NUM                  2
+#ifdef REVISION_1_1
 #define IFRD_BOTTOM_CHAN_NUM                2
+#elif defined REVISION_1_2
+#define IFRD_BOTTOM_CHAN_NUM                4
+#endif
 #define MCTRL_ACT_MAX_DEPTH                 10
 
 enum MotionEvt {
@@ -139,6 +145,13 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define FWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource5
 #define FWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI9_5_5
 #define FWHEEL_COUNTER_EXTI_IRQN            EXTI9_5_IRQn
+#elif defined REVISION_1_2
+#define FWHEEL_COUNTER_GPIO                 GPIOC
+#define FWHEEL_COUNTER_PIN                  GPIO_Pin_5
+#define FWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOC
+#define FWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource5
+#define FWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI9_5_5
+#define FWHEEL_COUNTER_EXTI_IRQN            EXTI9_5_IRQn
 #endif
 
 #define LWHEEL_COUNTER_GPIO                 GPIOE
@@ -159,6 +172,8 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #ifdef REVISION_1_0
 #define FWHEEL_ACTIVE_VAL                   GPIO_ReadInputDataBit(FWHEEL_COUNTER_GPIO, FWHEEL_COUNTER_PIN)
 #elif REVISION_1_1
+#define FWHEEL_ACTIVE_VAL                   ADCConvertedLSB[MEAS_CHAN_UNIVERSAL_WHEEL_SIG-1]
+#elif REVISION_1_2
 #define FWHEEL_ACTIVE_VAL                   ADCConvertedLSB[MEAS_CHAN_UNIVERSAL_WHEEL_SIG-1]
 #endif
 
@@ -196,12 +211,18 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define PATH_COND_PROXIMITY_FLAG_SL_POS     2
 #define PATH_COND_COLLISION_FLAG_FL_POS     3
 #define PATH_COND_COLLISION_FLAG_SL_POS     4
+#ifdef REVISION_1_2
+#define PATH_COND_PROXIMITY_FLAG_BBL_POS    5
+#endif
 
 #define PATH_COND_PROXIMITY_FLAG_FR_POS     8
 #define PATH_COND_PROXIMITY_FLAG_BR_POS     9
 #define PATH_COND_PROXIMITY_FLAG_SR_POS     10
 #define PATH_COND_COLLISION_FLAG_FR_POS     11
 #define PATH_COND_COLLISION_FLAG_SR_POS     12
+#ifdef REVISION_1_2
+#define PATH_COND_PROXIMITY_FLAG_BBR_POS    13
+#endif
 
 #define PATH_FAULT_LEFT_MASK                0x001B
 #define PATH_FAULT_RIGHT_MASK               0x1B00

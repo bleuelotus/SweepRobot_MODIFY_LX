@@ -1,3 +1,11 @@
+*.patch
+/Doc/
+*.pdf
+*.html
+*.map
+*.bak
+*.dep
+
 #################
 ## Eclipse
 #################
@@ -230,4 +238,10 @@ pip-log.txt
 *.out
 *.sim
 *obj/
-*.map
+*.ewd
+*.ewp
+*.bat
+*.wsdt
+
+#MDK STM32 C
+*.uvopt

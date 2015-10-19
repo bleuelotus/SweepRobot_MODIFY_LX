@@ -28,6 +28,9 @@ enum {
     MEAS_CHAN_IFRD_BOTTOM_RX_BR,
 #elif defined REVISION_1_1
     MEAS_CHAN_UNIVERSAL_WHEEL_SIG,
+#elif defined REVISION_1_2
+	MEAS_CHAN_IFRD_BOTTOM_RX_B,
+	MEAS_CHAN_UNIVERSAL_WHEEL_SIG,
 #endif
     MEAS_CHAN_BRUSH_CUR_LEFT,
     MEAS_CHAN_BRUSH_CUR_RIGHT,
@@ -60,6 +63,14 @@ enum {
 #elif defined REVISION_1_1
 #define AD_UNIVERSAL_WHEEL_SIG_GPIO     GPIOC
 #define AD_UNIVERSAL_WHEEL_SIG_PIN      GPIO_Pin_5
+#elif defined REVISION_1_2
+#define AD_IFRD_BOTTOM_RX_BACK_GPIO		GPIOB
+#define AD_IFRD_BOTTOM_RX_BACK_PIN		GPIO_Pin_0
+#define AD_IFRD_BOTTOM_RX_SWITCH_GPIO_PERIPH_ID	RCC_APB2Periph_GPIOE
+#define AD_IFRD_BOTTOM_RX_SWITCH_GPIO	GPIOE
+#define AD_IFRD_BOTTOM_RX_SWITCH_PIN	GPIO_Pin_13
+#define AD_UNIVERSAL_WHEEL_SIG_GPIO     GPIOC
+#define AD_UNIVERSAL_WHEEL_SIG_PIN      GPIO_Pin_5
 #endif
 #define AD_BRUSH_CUR_LEFT_GPIO          GPIOA
 #define AD_BRUSH_CUR_LEFT_PIN           GPIO_Pin_5
@@ -81,5 +92,6 @@ extern __IO u16 ADCConvertedLSB[MEAS_CHAN_NUM];
 void Meas_Init(void);
 void Meas_Start(void);
 void Meas_Stop(void);
+void Meas_IFRD_BOTTOM_RX_SWITCH(GPIO_TypeDef* GPIOx, u16 GPIO_Pin, u8 GPIO_Switch_Lvl);
 
 #endif /* __MEASUREMENT_H__ */

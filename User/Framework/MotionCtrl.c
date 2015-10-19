@@ -26,8 +26,10 @@
 #define IFRD_CHAN_SIDE_R                        3
 #define IFRD_CHAN_BOTTOM_L                      4
 #define IFRD_CHAN_BOTTOM_R                      5
+#ifdef REVISION_1_2
 #define IFRD_CHAN_BOTTOM_BL                     6
-#define IFRD_CHAN_BOTTOM_BR                     7
+#define IFRD_CHAN_BOTTOM_BR						7
+#endif
 
 /* TODO: use deltaT, gLWheelTotalCnt and gRWheelTotalCnt to implement path planning */
 /* deltaT = deltaRad * Pi * BASE_LEN / 180 / deltaV [ Pre-condition: Vinner != 0 ]; deltaV = Vouter - Vinner */
@@ -59,12 +61,19 @@ enum _PathFaultProcMode {
 #define UNIVERSAL_WHEEL_ACTIVE_THRESHOLD    1
 #elif defined REVISION_1_1
 #define UNIVERSAL_WHEEL_ACTIVE_THRESHOLD    400
+#elif defined REVISION_1_2
+#define UNIVERSAL_WHEEL_ACTIVE_THRESHOLD    400
 #endif
 
 /* Infrared based proximity detection sensitivity */
 /* FIXME: bottom detection threshold should set lower to adjust sheet, origin bottom detection threshold is 150 */
+#ifdef REVISION_1_1
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
+#elif defined REVISION_1_2
+const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120, 120, 120 };
+const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000, 3000, 3000 };
+#endif
 static u32 gLWheelTotalCnt = 4, gRWheelTotalCnt = 4, gLastTotalLWheelCnt = 0, gLastTotalRWheelCnt = 0;
 static u16 gWheelCnt[WHEEL_NUM] = {0};
 static u16 gLWheelExpCnt = 0xFFFF, gRWheelExpCnt = 0xFFFF;
@@ -235,7 +244,6 @@ void MotionStateProc(void)
         }
         IFRD_TX_ENABLE();
     }
-
     /* Phase 2 */
     else{
         /* Update front, side and bottom of LEFT proximity condition in Tx on */
@@ -245,7 +253,10 @@ void MotionStateProc(void)
 		else {
 			gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_FL_POS);
 		}
-
+		
+		/* FIXME: add IFRD_BOTTOM_RX_BACK process */
+//		gIFRDTxOffRxVal[MEAS_CHAN_IFRD_BOTTOM_RX_B]
+		
 		/* XXX: add bottom high light detection function */
 		if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
 			gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
@@ -480,7 +491,7 @@ void WheelSpeedAdjustProc(void)
 		if(gExceptionMask){
 			printf("Exp2:0x%X\r\n", gExceptionMask);
 		}
-		
+
 		gLastExceptionMask = gExceptionMask;
 	}else {
 		gMotionExceptionErrCnt.WheelStuckErrCnt = 0;

@@ -44,6 +44,11 @@ void Meas_Init(void)
 #elif defined REVISION_1_1
     GPIO_InitStructure.GPIO_Pin = AD_UNIVERSAL_WHEEL_SIG_PIN;
     GPIO_Init(AD_UNIVERSAL_WHEEL_SIG_GPIO, &GPIO_InitStructure);
+#elif defined REVISION_1_2
+	GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_BACK_PIN;
+	GPIO_Init(AD_IFRD_BOTTOM_RX_BACK_GPIO, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = AD_UNIVERSAL_WHEEL_SIG_PIN;
+	GPIO_Init(AD_UNIVERSAL_WHEEL_SIG_GPIO, &GPIO_InitStructure);
 #endif
     GPIO_InitStructure.GPIO_Pin = AD_BRUSH_CUR_LEFT_PIN;
     GPIO_Init(AD_BRUSH_CUR_LEFT_GPIO, &GPIO_InitStructure);
@@ -59,6 +64,15 @@ void Meas_Init(void)
     GPIO_Init(AD_BAT_VOL_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_ASH_TRAY_LVL_PIN;
     GPIO_Init(AD_ASH_TRAY_LVL_GPIO, &GPIO_InitStructure);
+	
+#ifdef REVISION_1_2
+	RCC_APB2PeriphClockCmd(AD_IFRD_BOTTOM_RX_SWITCH_GPIO_PERIPH_ID, ENABLE);
+	GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_SWITCH_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, &GPIO_InitStructure);
+	GPIO_ResetBits(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN);
+#endif
 
     /* Enable DMA1 clock */
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
@@ -101,6 +115,9 @@ void Meas_Init(void)
     ADC_RegularChannelConfig(ADC1, ADC_Channel_8,   MEAS_CHAN_IFRD_BOTTOM_RX_BR,    ADC_SampleTime_55Cycles5);
 #elif defined REVISION_1_1
     ADC_RegularChannelConfig(ADC1, ADC_Channel_15,  MEAS_CHAN_UNIVERSAL_WHEEL_SIG,  ADC_SampleTime_55Cycles5);
+#elif defined REVISION_1_2
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_8,   MEAS_CHAN_IFRD_BOTTOM_RX_B, 	ADC_SampleTime_55Cycles5);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_15,  MEAS_CHAN_UNIVERSAL_WHEEL_SIG,  ADC_SampleTime_55Cycles5);
 #endif
     ADC_RegularChannelConfig(ADC1, ADC_Channel_5,   MEAS_CHAN_BRUSH_CUR_LEFT,       ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_9,   MEAS_CHAN_BRUSH_CUR_RIGHT,      ADC_SampleTime_55Cycles5);
@@ -135,4 +152,12 @@ void Meas_Stop(void)
 
     ADC_DMACmd(ADC1, DISABLE);
 	ADC_Cmd(ADC1,DISABLE);
+}
+
+void Meas_IFRD_BOTTOM_RX_SWITCH(GPIO_TypeDef* GPIOx, u16 GPIO_Pin, u8 GPIO_Switch_Lvl)
+{
+	if(GPIO_Switch_Lvl)
+		GPIO_SetBits(GPIOx, GPIO_Pin);
+	else
+		GPIO_ResetBits(GPIOx, GPIO_Pin);
 }

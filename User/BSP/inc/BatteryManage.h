@@ -21,6 +21,10 @@
 #define BM_CHARGE_SW_STATUS_GPIO_PERIPH_ID      RCC_APB2Periph_GPIOB
 #define BM_CHARGE_SW_STATUS_GPIO                GPIOB
 #define BM_CHARGE_SW_STATUS_PIN                 GPIO_Pin_5
+#elif defined REVISION_1_2
+#define BM_CHARGE_SW_STATUS_GPIO_PERIPH_ID      RCC_APB2Periph_GPIOB
+#define BM_CHARGE_SW_STATUS_GPIO                GPIOB
+#define BM_CHARGE_SW_STATUS_PIN                 GPIO_Pin_5
 #endif
 
 #define BAT_MONITOR_TIM_PERIPH_ID               RCC_APB1Periph_TIM5

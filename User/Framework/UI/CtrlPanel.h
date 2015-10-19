@@ -22,6 +22,8 @@
 #define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_6
 #elif defined REVISION_1_1
 #define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_7
+#elif defined REVISION_1_2
+#define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_7
 #endif
 #define CTRL_BTN_ALL_IN_ONE_EXTI_GPIO       GPIO_PortSourceGPIOD
 #define CTRL_BTN_ALL_IN_ONE_EXTI_PIN        GPIO_PinSource6
