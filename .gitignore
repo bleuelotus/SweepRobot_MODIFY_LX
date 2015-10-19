@@ -5,6 +5,7 @@
 *.map
 *.bak
 *.dep
+*.zip
 
 #################
 ## Eclipse
@@ -244,6 +245,8 @@ pip-log.txt
 *.wsdt
 *.dbgdt
 *.dni
+*.wspos
 
 #MDK STM32 C
 *.uvopt
+*.Administrator

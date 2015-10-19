@@ -362,7 +362,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>DEBUG_LOG NDEBUG REVISION_1_1 STM32F10X_HD CLOCK_HSE USE_STDPERIPH_DRIVER KEY_PROC_WITH_REMOTE  KEY_PROC_WITH_LED</Define>
+              <Define>DEBUG_LOG NDEBUG USE_KEIL_MDK REVISION_1_2 STM32F10X_HD CLOCK_HSE USE_STDPERIPH_DRIVER KEY_PROC_WITH_REMOTE  KEY_PROC_WITH_LED</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\User\APP;..\..\User\BSP\inc;..\..\User\Framework\Common\inc;..\..\User\Framework\UI;..\..\User\Framework;..\..\Libraries\CMSIS\CoreSupport;..\..\Libraries\CMSIS\Device\ST\STM32F10x\Include;..\..\Libraries\CMSIS\Device\ST\STM32F10x;..\..\Libraries\STM32F10x_Ext\inc;..\..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\..\User</IncludePath>
             </VariousControls>

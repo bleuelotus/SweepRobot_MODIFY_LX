@@ -126,10 +126,15 @@ void Meas_Init(void)
     ADC_RegularChannelConfig(ADC1, ADC_Channel_12,  MEAS_CHAN_BAT_CHARGE_CUR,       ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_13,  MEAS_CHAN_BAT_VOL,              ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_14,  MEAS_CHAN_ASH_TRAY_LVL,         ADC_SampleTime_55Cycles5);
+#ifdef REVISION_1_2
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_17,  MEAS_CHAN_INTERNAL_REFVOL,		ADC_SampleTime_55Cycles5);
+#endif
 }
 
 void Meas_Start(void)
 {
+	ADC_TempSensorVrefintCmd(ENABLE);
+	
     DMA_Cmd(DMA1_Channel1, ENABLE);
 
     ADC_DMACmd(ADC1, ENABLE);
@@ -145,8 +150,10 @@ void Meas_Start(void)
 }
 
 void Meas_Stop(void)
-{
+{	
 	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
+	
+	ADC_TempSensorVrefintCmd(DISABLE);
 
     DMA_Cmd(DMA1_Channel1, DISABLE);
 

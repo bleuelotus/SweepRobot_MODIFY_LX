@@ -48,6 +48,7 @@ enum BatteryEvt {
     BM_EVT_POWER_LOSS,
     BM_EVT_POWER_LINK,
     BM_EVT_LOW_LEVEL,
+	BM_EVT_WARNING_LOW_LEVEL,
     BM_EVT_CHARGE_COMPLETE,
 };
 
@@ -61,7 +62,8 @@ typedef struct _BatteryCond_s {
 
 extern BatteryCond_t gBM_Cond;
 
-#define BM_BAT_CRITCAL_LVL                      15           /* 15 Percent about 10 minutes */
+#define BM_BAT_WARNING_LVL						5			/* when battery level lower than this value, then stop robot and buzzer to warning */
+#define BM_BAT_CRITCAL_LVL                      15          /* 15 Percent about 10 minutes */
 #define BM_BAT_FULL_LVL                         100         /* 100 Percent */
 
 void BM_Init(void);

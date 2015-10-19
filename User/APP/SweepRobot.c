@@ -91,7 +91,13 @@ s8 SweepRobot_Init(void)
 
     gRobotState = ROBOT_STATE_IDLE;
 #ifdef DEBUG_LOG
+#ifdef REVISION_1_0
+	printf("Robot init OK ! HW_ver: V1.0 SW_ver: V0.1.2\r\n");
+#elif defined REVISION_1_1
+	printf("Robot init OK ! HW_ver: V1.1 SW_ver: V0.1.2\r\n");
+#elif defined REVISION_1_2
     printf("Robot init OK ! HW_ver: V1.2 SW_ver: V0.1.2\r\n");
+#endif
 #endif
     return err;
 SWEEPROBOT_INIT_FAIL:
@@ -406,7 +412,7 @@ void SweepRobot_IdleStateSync(void)
         SweepRobot_AutoModeProc();
 
 		/* FIXME: add software reset here to fix exit power station bug, should find out why IR_diode disabled instead of doing this */
-		NVIC_SystemReset();
+		SweepRobot_SoftwareReset();
     }
     else{
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
@@ -490,6 +496,11 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
                 SweepRobot_HomingInit();
             }
             break;
+		case BM_EVT_WARNING_LOW_LEVEL:
+		  	/* TODO: add Battery warning low process here */
+		  	Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_NORMAL);
+			SweepRobot_Stop();
+		  	break;
         case BM_EVT_CHARGE_COMPLETE:
             CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
 			Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
@@ -560,13 +571,7 @@ void SweepRobot_MotionMsgProc(enum MotionEvt evt)
     switch(evt){
 		
         case MOTION_EVT_PATH_FAULT:
-#ifdef DEBUG_LOG
-            printf("State=%d;", gRobotState);
-#endif
             if(gRobotState == ROBOT_STATE_RUNNING){
-#ifdef DEBUG_LOG
-				printf("Mode=%d.\r\n", gRobotMode);
-#endif				
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
                     MotionCtrl_PathFaultProc(1);
                 }

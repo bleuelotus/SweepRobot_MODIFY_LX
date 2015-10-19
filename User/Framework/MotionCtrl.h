@@ -19,14 +19,14 @@
 #elif defined REVISION_1_1
 #define IFRD_TxRx_CHAN_NUM                  6                                   // 2 back lights of bottom are not used
 #elif defined REVISION_1_2
-#define IFRD_TxRx_CHAN_NUM					8
+#define IFRD_TxRx_CHAN_NUM					10
 #endif
 #define IFRD_FRONT_CHAN_NUM                 2
 #define IFRD_SIDE_CHAN_NUM                  2
 #ifdef REVISION_1_1
 #define IFRD_BOTTOM_CHAN_NUM                2
 #elif defined REVISION_1_2
-#define IFRD_BOTTOM_CHAN_NUM                4
+#define IFRD_BOTTOM_CHAN_NUM                6
 #endif
 #define MCTRL_ACT_MAX_DEPTH                 10
 
@@ -233,6 +233,9 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define PATH_FAULT_FRONT_MASK               0x0909
 #define PATH_FAULT_BOTTOM_MASK              0x0202
 #define PATH_FAULT_SIDE_MASK                0x1414
+#ifdef REVISION_1_2
+#define PATH_FAULT_BACK_BOTTOM_MASK			0x2020
+#endif
 
 #define EXCEPTION_MASK_WHEEL_FLOAT_POS      0
 #define EXCEPTION_MASK_ASHTRAY_INS_POS      1
