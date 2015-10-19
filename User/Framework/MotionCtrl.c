@@ -67,7 +67,10 @@ enum _PathFaultProcMode {
 
 /* Infrared based proximity detection sensitivity */
 /* FIXME: bottom detection threshold should set lower to adjust sheet, origin bottom detection threshold is 150 */
-#ifdef REVISION_1_1
+#ifdef REVISION_1_0
+const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120 };
+const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
+#elif defined REVISION_1_1
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
 #elif defined REVISION_1_2
@@ -232,7 +235,6 @@ void MotionStateProc(void)
 		}
 #endif
 		gLastExceptionMask = gExceptionMask;
-	
 	}
 
     /* Phase 1 */
@@ -1061,10 +1063,7 @@ void MotionCtrl_PathFaultTryTurnCondTest(struct MotionCtrl_Action_s *node)
 
 u8 MotionCtrl_PathFaultTurnProcCompleteCondTest(void)
 {
-#ifdef DEBUG_LOG
-	printf("PathFaultTurnProcCompleteCondTest\r\n");
-#endif
-	/* FIXME: may cause avoidence stuck */
+	/* FIXME: only use PATH_FAULT_PROXIMITY_MASK may cause avoidence stuck */
 //    return (!(gPathCondMap & PATH_FAULT_PROXIMITY_MASK));
 	if( gPathCondMap & PATH_FAULT_PROXIMITY_MASK ){
 		if(gPathCondMap & PATH_FAULT_COLLISION_MASK){
@@ -1074,7 +1073,6 @@ u8 MotionCtrl_PathFaultTurnProcCompleteCondTest(void)
 	}else{
 		return 1;
 	}
-		
 }
 
 void MotionCtrl_PathFaultEdgeModeProcAct(struct MotionCtrl_Action_s *node)

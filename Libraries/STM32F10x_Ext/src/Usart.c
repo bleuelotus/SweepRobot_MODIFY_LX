@@ -19,7 +19,7 @@
 #ifdef USE_KEIL_MDK
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #define GETCHAR_PROTOTYPE int fgetc(FILE *f)
-#elif defined USE_IAR_EWARE
+#elif defined USE_IAR_EWARM
 #define PUTCHAR_PROTOTYPE int putchar(int ch)
 #define GETCHAR_PROTOTYPE int getchar(void)
 #endif

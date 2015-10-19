@@ -242,6 +242,8 @@ pip-log.txt
 *.ewp
 *.bat
 *.wsdt
+*.dbgdt
+*.dni
 
 #MDK STM32 C
 *.uvopt

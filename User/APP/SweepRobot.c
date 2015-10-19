@@ -91,7 +91,7 @@ s8 SweepRobot_Init(void)
 
     gRobotState = ROBOT_STATE_IDLE;
 #ifdef DEBUG_LOG
-    printf("Robot init OK ! HW_ver: V1.2 SW_ver: V0.1.1\r\n");
+    printf("Robot init OK ! HW_ver: V1.2 SW_ver: V0.1.2\r\n");
 #endif
     return err;
 SWEEPROBOT_INIT_FAIL:
