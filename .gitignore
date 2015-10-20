@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.patch
 /Doc/
 *.pdf
@@ -250,3 +251,37 @@ pip-log.txt
 #MDK STM32 C
 *.uvopt
 *.Administrator
+=======
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+>>>>>>> 84a8db902343ea3bea2fe4cb34bc35e45cb549a3

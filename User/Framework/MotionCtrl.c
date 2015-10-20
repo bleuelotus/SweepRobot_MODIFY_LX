@@ -250,7 +250,9 @@ void MotionStateProc(void)
         /* Save proximity condition in Tx off */
         for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
+			printf("%d,",gIFRDTxOffRxVal[i]);
         }
+		printf("\r\n");
         IFRD_TX_ENABLE();
 #else 
 		/* Save proximity condition in Tx off */
