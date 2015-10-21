@@ -257,6 +257,9 @@ pip-log.txt
 *.ko
 *.obj
 *.elf
+*.plg
+*.map
+*.lst
 
 # Precompiled Headers
 *.gch

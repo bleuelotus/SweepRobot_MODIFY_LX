@@ -73,8 +73,8 @@ s8 PM_EnterPwrMode(enum PM_Mode mode)
     switch(mode)
     {
         case PM_MODE_RESUME:
-			/* TODO: add plan time out action here */
-			MotionCtrl_AutoMotionInit();
+            /* TODO: add plan time out action here */
+            MotionCtrl_AutoMotionInit();
             break;
         case PM_MODE_SLEEP:
         case PM_MODE_STOP:
@@ -82,7 +82,7 @@ s8 PM_EnterPwrMode(enum PM_Mode mode)
             /* Prepare for enterring to low power state */
             IrDA_DeInit();
             PM_POWER_SUPPLY_CTRL(PM_OFF);
-			sDelay(1);
+            sDelay(1);
             /* Enter to low power state */
             PWR_EnterSTANDBYMode();
             break;

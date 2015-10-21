@@ -45,10 +45,10 @@ void Meas_Init(void)
     GPIO_InitStructure.GPIO_Pin = AD_UNIVERSAL_WHEEL_SIG_PIN;
     GPIO_Init(AD_UNIVERSAL_WHEEL_SIG_GPIO, &GPIO_InitStructure);
 #elif defined REVISION_1_2
-	GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_BACK_PIN;
-	GPIO_Init(AD_IFRD_BOTTOM_RX_BACK_GPIO, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = AD_UNIVERSAL_WHEEL_SIG_PIN;
-	GPIO_Init(AD_UNIVERSAL_WHEEL_SIG_GPIO, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_BACK_PIN;
+    GPIO_Init(AD_IFRD_BOTTOM_RX_BACK_GPIO, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = AD_UNIVERSAL_WHEEL_SIG_PIN;
+    GPIO_Init(AD_UNIVERSAL_WHEEL_SIG_GPIO, &GPIO_InitStructure);
 #endif
     GPIO_InitStructure.GPIO_Pin = AD_BRUSH_CUR_LEFT_PIN;
     GPIO_Init(AD_BRUSH_CUR_LEFT_GPIO, &GPIO_InitStructure);
@@ -64,14 +64,14 @@ void Meas_Init(void)
     GPIO_Init(AD_BAT_VOL_GPIO, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = AD_ASH_TRAY_LVL_PIN;
     GPIO_Init(AD_ASH_TRAY_LVL_GPIO, &GPIO_InitStructure);
-	
+
 #ifdef REVISION_1_2
-	RCC_APB2PeriphClockCmd(AD_IFRD_BOTTOM_RX_SWITCH_GPIO_PERIPH_ID, ENABLE);
-	GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_SWITCH_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, &GPIO_InitStructure);
-	GPIO_ResetBits(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN);
+    RCC_APB2PeriphClockCmd(AD_IFRD_BOTTOM_RX_SWITCH_GPIO_PERIPH_ID, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = AD_IFRD_BOTTOM_RX_SWITCH_PIN;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, &GPIO_InitStructure);
+    GPIO_ResetBits(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN);
 #endif
 
     /* Enable DMA1 clock */
@@ -94,17 +94,17 @@ void Meas_Init(void)
     /* Enable ADC1 clock */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
     /* 12Mhz */
-	RCC_ADCCLKConfig(RCC_PCLK2_Div6);
+    RCC_ADCCLKConfig(RCC_PCLK2_Div6);
     /* ADC1 Config */
-	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
-	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
-	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
-	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
-	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStructure.ADC_NbrOfChannel = MEAS_CHAN_NUM;
-	ADC_Init(ADC1, &ADC_InitStructure);
+    ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
+    ADC_InitStructure.ADC_ScanConvMode = ENABLE;
+    ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+    ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
+    ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+    ADC_InitStructure.ADC_NbrOfChannel = MEAS_CHAN_NUM;
+    ADC_Init(ADC1, &ADC_InitStructure);
 
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_2,   MEAS_CHAN_IFRD_FRONT_RX_L,      ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2,   MEAS_CHAN_IFRD_FRONT_RX_L,      ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_1,   MEAS_CHAN_IFRD_FRONT_RX_R,      ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_4,   MEAS_CHAN_IFRD_SIDE_RX_L,       ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_10,  MEAS_CHAN_IFRD_SIDE_RX_R,       ADC_SampleTime_55Cycles5);
@@ -116,8 +116,8 @@ void Meas_Init(void)
 #elif defined REVISION_1_1
     ADC_RegularChannelConfig(ADC1, ADC_Channel_15,  MEAS_CHAN_UNIVERSAL_WHEEL_SIG,  ADC_SampleTime_55Cycles5);
 #elif defined REVISION_1_2
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_8,   MEAS_CHAN_IFRD_BOTTOM_RX_B, 	ADC_SampleTime_55Cycles5);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_15,  MEAS_CHAN_UNIVERSAL_WHEEL_SIG,  ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_8,   MEAS_CHAN_IFRD_BOTTOM_RX_B,     ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_15,  MEAS_CHAN_UNIVERSAL_WHEEL_SIG,  ADC_SampleTime_55Cycles5);
 #endif
     ADC_RegularChannelConfig(ADC1, ADC_Channel_5,   MEAS_CHAN_BRUSH_CUR_LEFT,       ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_9,   MEAS_CHAN_BRUSH_CUR_RIGHT,      ADC_SampleTime_55Cycles5);
@@ -127,44 +127,44 @@ void Meas_Init(void)
     ADC_RegularChannelConfig(ADC1, ADC_Channel_13,  MEAS_CHAN_BAT_VOL,              ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_14,  MEAS_CHAN_ASH_TRAY_LVL,         ADC_SampleTime_55Cycles5);
 #ifdef REVISION_1_2
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_17,  MEAS_CHAN_INTERNAL_REFVOL,		ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_17,  MEAS_CHAN_INTERNAL_REFVOL,        ADC_SampleTime_55Cycles5);
 #endif
 }
 
 void Meas_Start(void)
 {
-	ADC_TempSensorVrefintCmd(ENABLE);
-	
+    ADC_TempSensorVrefintCmd(ENABLE);
+
     DMA_Cmd(DMA1_Channel1, ENABLE);
 
     ADC_DMACmd(ADC1, ENABLE);
-	ADC_Cmd(ADC1,ENABLE);
+    ADC_Cmd(ADC1,ENABLE);
 
-	ADC_ResetCalibration(ADC1);
-	while(ADC_GetResetCalibrationStatus(ADC1));
-	ADC_StartCalibration(ADC1);
-	while(ADC_GetCalibrationStatus(ADC1));
+    ADC_ResetCalibration(ADC1);
+    while(ADC_GetResetCalibrationStatus(ADC1));
+    ADC_StartCalibration(ADC1);
+    while(ADC_GetCalibrationStatus(ADC1));
 
     /* Start ADC1 Software Conversion */
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 }
 
 void Meas_Stop(void)
-{	
-	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
-	
-	ADC_TempSensorVrefintCmd(DISABLE);
+{
+    ADC_SoftwareStartConvCmd(ADC1, DISABLE);
+
+    ADC_TempSensorVrefintCmd(DISABLE);
 
     DMA_Cmd(DMA1_Channel1, DISABLE);
 
     ADC_DMACmd(ADC1, DISABLE);
-	ADC_Cmd(ADC1,DISABLE);
+    ADC_Cmd(ADC1,DISABLE);
 }
 
 void Meas_IFRD_BOTTOM_RX_SWITCH(GPIO_TypeDef* GPIOx, u16 GPIO_Pin, u8 GPIO_Switch_Lvl)
 {
-	if(GPIO_Switch_Lvl)
-		GPIO_SetBits(GPIOx, GPIO_Pin);
-	else
-		GPIO_ResetBits(GPIOx, GPIO_Pin);
+    if(GPIO_Switch_Lvl)
+        GPIO_SetBits(GPIOx, GPIO_Pin);
+    else
+        GPIO_ResetBits(GPIOx, GPIO_Pin);
 }

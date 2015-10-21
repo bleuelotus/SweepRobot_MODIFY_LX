@@ -78,7 +78,7 @@ s8 SweepRobot_Init(void)
     /* Buzzer init */
     Buzzer_Init();
 #endif
-    /* Motor controller init */ 	
+    /* Motor controller init */     
     err = MotorCtrl_Init();
     if(err)
         goto SWEEPROBOT_INIT_FAIL;
@@ -92,9 +92,9 @@ s8 SweepRobot_Init(void)
     gRobotState = ROBOT_STATE_IDLE;
 #ifdef DEBUG_LOG
 #ifdef REVISION_1_0
-	printf("Robot init OK ! HW_ver: V1.0 SW_ver: V0.1.2\r\n");
+    printf("Robot init OK ! HW_ver: V1.0 SW_ver: V0.1.2\r\n");
 #elif defined REVISION_1_1
-	printf("Robot init OK ! HW_ver: V1.1 SW_ver: V0.1.2\r\n");
+    printf("Robot init OK ! HW_ver: V1.1 SW_ver: V0.1.2\r\n");
 #elif defined REVISION_1_2
     printf("Robot init OK ! HW_ver: V1.2 SW_ver: V0.1.2\r\n");
 #endif
@@ -117,7 +117,7 @@ void SweepRobot_Start(void)
     }
 
     while(1){
-		/* Message loop */
+        /* Message loop */
         for(i = 0; i < ROBOT_MAIN_MSG_Q_SIZE; i++){
             if(!MainMsgQ->Msg.expire){
                 if(MainMsgQ->Msg.prio == MSG_PRIO_HIGHEST){
@@ -225,17 +225,17 @@ void SweepRobot_StartupInit(void)
     }
 
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
-	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
     TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
-	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
+    TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
     TIM_SetAutoreload(MOTION_MONITOR_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum]);
-	TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum]);
+    TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum]);
     TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
-	TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
+    TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
     TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
-	TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
+    TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
     TIM_Cmd(MOTION_MONITOR_TIM, ENABLE);
-	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
+    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
     return;
 
 STARTUP_FAIL_ON_MB_OC:
@@ -247,11 +247,11 @@ STARTUP_FAIL_ON_LB_OC:
 STARTUP_FAIL_ON_FAN_OC:
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, 0);
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
-	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
+    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
-	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
     plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
-	plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
+    plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
 STARTUP_FAIL_ON_WF_AT:
     gRobotStartupSeqNum = 0;
     Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
@@ -264,11 +264,11 @@ void SweepRobot_StartupComplete(void)
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
 
-	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
-	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
+    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
 
     plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
-	plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
+    plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
 }
 
 void SweepRobot_StartupAbort(void)
@@ -276,12 +276,12 @@ void SweepRobot_StartupAbort(void)
     gRobotStartupSeqNum = 0;
 
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
-	TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
+    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
-	TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
 
     plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
-	plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
+    plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
 
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
@@ -364,14 +364,14 @@ void SweepRobot_ManualModeProc(enum MotionCtrlManualAct act)
         return;
     }
 
-	/* FIXME: add delay here,but should put this into timer */
+    /* FIXME: add delay here,but should put this into timer */
     if(gRobotState != ROBOT_STATE_RUNNING){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FAN_CHAN_STARTUP_SPEED);
-		mDelay(20);
+        mDelay(20);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
-		mDelay(20);
+        mDelay(20);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
-		mDelay(20);
+        mDelay(10);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
     }
     else{
@@ -386,12 +386,12 @@ void SweepRobot_HomingInit(void)
         return;
     }
 
-	/* FIXME: add delay here,but should put this into timer */
+    /* FIXME: add delay here,but should put this into timer */
     if(gRobotState != ROBOT_STATE_RUNNING){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
-		mDelay(20);		
+        mDelay(20);        
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
-		mDelay(20);	
+        mDelay(10);    
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
     }
     else{
@@ -411,8 +411,8 @@ void SweepRobot_IdleStateSync(void)
     if(gRobotMode==ROBOT_WORK_MODE_DISHOMING){
         SweepRobot_AutoModeProc();
 
-		/* FIXME: add software reset here to fix exit power station bug, should find out why IR_diode disabled instead of doing this */
-		SweepRobot_SoftwareReset();
+        /* FIXME: add software reset here to fix exit power station bug, should find out why IR_diode disabled instead of doing this */
+        SweepRobot_SoftwareReset();
     }
     else{
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
@@ -471,9 +471,9 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
             }
 
-			if( (gBM_Cond.state == BAT_STATE_DISCHARGING) && (gRobotMode != ROBOT_WORK_MODE_DISHOMING) ){
-				SweepRobot_SoftwareReset();
-			}
+            if( (gBM_Cond.state == BAT_STATE_DISCHARGING) && (gRobotMode != ROBOT_WORK_MODE_DISHOMING) ){
+                SweepRobot_SoftwareReset();
+            }
 
             break;
         case BM_EVT_POWER_LINK:
@@ -496,14 +496,14 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
                 SweepRobot_HomingInit();
             }
             break;
-		case BM_EVT_WARNING_LOW_LEVEL:
-		  	/* TODO: add Battery warning low process here */
-		  	Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_NORMAL);
-			SweepRobot_Stop();
-		  	break;
+        case BM_EVT_WARNING_LOW_LEVEL:
+            /* TODO: add Battery warning low process here */
+            Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_NORMAL);
+            SweepRobot_Stop();
+            break;
         case BM_EVT_CHARGE_COMPLETE:
             CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
-			Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
+            Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_SHORT);
 #ifdef DEBUG_LOG
             printf("Robot finish charging.\r\n");
 #endif
@@ -569,7 +569,7 @@ void SweepRobot_CtrlMsgProc(u8 CtrlCode)
 void SweepRobot_MotionMsgProc(enum MotionEvt evt)
 {
     switch(evt){
-		
+        
         case MOTION_EVT_PATH_FAULT:
             if(gRobotState == ROBOT_STATE_RUNNING){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
@@ -903,7 +903,7 @@ s8 SweepRobot_SendMsg(Msg_t *Msg)
 {
     if(MsgQueue_InQueue(MainMsgQ, ROBOT_MAIN_MSG_Q_SIZE, Msg)){
 #ifdef DEBUG_LOG
-		/* Quene is full , cannot in queue until expire is zero */
+        /* Quene is full , cannot in queue until expire is zero */
         printf("Msg inqueue failed !\r\n");
 #endif
         return -1;
@@ -913,7 +913,7 @@ s8 SweepRobot_SendMsg(Msg_t *Msg)
 
 u8 SweepRobot_SoftwareReset(void)
 {
-	printf("robot software reset\r\n");
-	NVIC_SystemReset();
-	return 0;
+    printf("robot software reset\r\n");
+    NVIC_SystemReset();
+    return 0;
 }

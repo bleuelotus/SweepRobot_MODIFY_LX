@@ -24,7 +24,7 @@
 
 #define ADC_BAT_VOL                         0
 #define ADC_BAT_CUR                         1
-#define ADC_BAT_INTVOL						2
+#define ADC_BAT_INTVOL                      2
 
 #define BM_CHARGE_POWER_MAX                 300             /* duty cycle */
 #define IS_CHARGE_CONNECTED()               GPIO_ReadInputDataBit(BM_CHARGE_SW_STATUS_GPIO, BM_CHARGE_SW_STATUS_PIN)
@@ -42,11 +42,11 @@
 //    BAT_CHARGE_LEVEL_FULL                   = 0x0D2C,       /* 2.72V  ---  16.3V */
 //};
 
-static const float BAT_LEVEL_LOW = 2.15f;
+static const float BAT_LEVEL_LOW = 2.16f;
 static const float BAT_LEVEL_HIGH = 2.27f;
 static const float BAT_LEVEL_FULL = 2.67f;
 static const float BAT_CHARGE_LEVEL_FULL = 2.72f;
-static float gBatVolt = 0;
+static float ADC2Value_BatLSB[ADC_BAT_CHANNEL_NUM] = {0.f};
 
 BatteryCond_t gBM_Cond = { 100,   BAT_STATE_UNKNOWN,    BAT_STATE_UNKNOWN };
 static u16 TempADC[ADC_BAT_CHANNEL_NUM][ADC_BAT_SAMPLE_AVE_CNT] = {0};
@@ -70,12 +70,12 @@ void BM_ConditionUpdate(void)
     for(i = 0; i < ADC_BAT_SAMPLE_AVE_CNT-1; i++){
         TempADC[ADC_BAT_VOL][i] = TempADC[ADC_BAT_VOL][i+1];
         TempADC[ADC_BAT_CUR][i] = TempADC[ADC_BAT_CUR][i+1];
-		TempADC[ADC_BAT_INTVOL][i] = TempADC[ADC_BAT_INTVOL][i+1];
+        TempADC[ADC_BAT_INTVOL][i] = TempADC[ADC_BAT_INTVOL][i+1];
     }
 
     TempADC[ADC_BAT_VOL][ADC_BAT_SAMPLE_AVE_CNT-1] = ADCConvertedLSB[MEAS_CHAN_BAT_VOL-1];
     TempADC[ADC_BAT_CUR][ADC_BAT_SAMPLE_AVE_CNT-1] = ADCConvertedLSB[MEAS_CHAN_BAT_CHARGE_CUR-1];
-	TempADC[ADC_BAT_INTVOL][ADC_BAT_SAMPLE_AVE_CNT-1] = ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1];
+    TempADC[ADC_BAT_INTVOL][ADC_BAT_SAMPLE_AVE_CNT-1] = ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1];
 
     if(BM_StateInited < ADC_BAT_SAMPLE_AVE_CNT){
         BM_StateInited++;
@@ -84,18 +84,19 @@ void BM_ConditionUpdate(void)
 
     ADC_BatLSB[ADC_BAT_VOL] = 0;
     ADC_BatLSB[ADC_BAT_CUR] = 0;
-	ADC_BatLSB[ADC_BAT_INTVOL] = 0;
+    ADC_BatLSB[ADC_BAT_INTVOL] = 0;
     for(i = 0; i < ADC_BAT_SAMPLE_AVE_CNT; i++){
         ADC_BatLSB[ADC_BAT_VOL] += TempADC[ADC_BAT_VOL][i];
         ADC_BatLSB[ADC_BAT_CUR] += TempADC[ADC_BAT_CUR][i];
-		ADC_BatLSB[ADC_BAT_INTVOL] += TempADC[ADC_BAT_INTVOL][i];
+        ADC_BatLSB[ADC_BAT_INTVOL] += TempADC[ADC_BAT_INTVOL][i];
     }
 
     ADC_BatLSB[ADC_BAT_VOL] /= ADC_BAT_SAMPLE_AVE_CNT;
     ADC_BatLSB[ADC_BAT_CUR] /= ADC_BAT_SAMPLE_AVE_CNT;
-	ADC_BatLSB[ADC_BAT_INTVOL] /= ADC_BAT_SAMPLE_AVE_CNT;
-	
-	gBatVolt = 1.2f*((float)ADC_BatLSB[ADC_BAT_VOL]/(float)ADC_BatLSB[ADC_BAT_INTVOL]);
+    ADC_BatLSB[ADC_BAT_INTVOL] /= ADC_BAT_SAMPLE_AVE_CNT;
+
+    ADC2Value_BatLSB[ADC_BAT_VOL] = 1.2f*((float)ADC_BatLSB[ADC_BAT_VOL]/(float)ADC_BatLSB[ADC_BAT_INTVOL]);
+    ADC2Value_BatLSB[ADC_BAT_CUR] = 1.2f*((float)ADC_BatLSB[ADC_BAT_CUR]/(float)ADC_BatLSB[ADC_BAT_INTVOL]);
 
     /* Update battery state */
     if(IS_CHARGE_CONNECTED()){
@@ -151,15 +152,15 @@ void BM_ConditionUpdate(void)
     else{
         switch(gBM_Cond.LastState){
             case BAT_STATE_DISCHARGING:
-				if(!BM_ChargeFlag && gBM_Cond.level < BM_BAT_WARNING_LVL){
-					/* Send low battery warning condition message */
+                if(!BM_ChargeFlag && gBM_Cond.level < BM_BAT_WARNING_LVL){
+                    /* Send low battery warning condition message */
                     Msg.expire = 0;
                     Msg.type = MSG_TYPE_BM;
                     Msg.prio = MSG_PRIO_LOWEST;
                     Msg.MsgCB = NULL;
                     Msg.Data.BatEvt = BM_EVT_WARNING_LOW_LEVEL;
                     SweepRobot_SendMsg(&Msg);
-				}
+                }
                 if(!BM_ChargeFlag && gBM_Cond.level < BM_BAT_CRITCAL_LVL){
                     /* Send low battery condition message */
                     Msg.expire = 0;
@@ -207,15 +208,15 @@ void BM_ConditionUpdate(void)
         }
     }
 
-    if(gBatVolt > BAT_LEVEL_LOW){
+    if(ADC2Value_BatLSB[ADC_BAT_VOL] > BAT_LEVEL_LOW){
         if(gBM_Cond.state!=BAT_STATE_CHARGING){
-            gBM_Cond.level = (u8)( (float)(gBatVolt - BAT_LEVEL_LOW) / (float)(BAT_LEVEL_FULL - BAT_LEVEL_LOW) * 100.f );
+            gBM_Cond.level = (u8)( (float)(ADC2Value_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_LOW) / (float)(BAT_LEVEL_FULL - BAT_LEVEL_LOW) * 100.f );
         }
         else{
-            gBM_Cond.level = (u8)( (float)(gBatVolt - BAT_LEVEL_LOW) / (float)(BAT_CHARGE_LEVEL_FULL - BAT_LEVEL_LOW) * 100.f );
+            gBM_Cond.level = (u8)( (float)(ADC2Value_BatLSB[ADC_BAT_VOL] - BAT_LEVEL_LOW) / (float)(BAT_CHARGE_LEVEL_FULL - BAT_LEVEL_LOW) * 100.f );
         }
     }
-    else if(gBatVolt > BAT_LEVEL_FULL){
+    else if(ADC2Value_BatLSB[ADC_BAT_VOL] > BAT_LEVEL_FULL){
         gBM_Cond.level = 100;
     }
     else{
@@ -283,7 +284,7 @@ u8 BM_ChargeProc(void)
     }
     LedBrightnessSch += LedBrightnessDir;
 
-    if (gBatVolt <= BAT_LEVEL_HIGH){
+    if (ADC2Value_BatLSB[ADC_BAT_VOL] <= BAT_LEVEL_HIGH){
         if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_100MA-3)){
             BM_ChargePowerInc();
         }
@@ -291,7 +292,7 @@ u8 BM_ChargeProc(void)
             BM_ChargePowerDec();
         }
     }
-    else if (gBatVolt < BAT_CHARGE_LEVEL_FULL){
+    else if (ADC2Value_BatLSB[ADC_BAT_VOL] < BAT_CHARGE_LEVEL_FULL){
         if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_600MA-5)){
             BM_ChargePowerInc();
         }
