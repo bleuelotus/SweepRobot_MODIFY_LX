@@ -14,6 +14,7 @@
 
 
 __IO u16 ADCConvertedLSB[MEAS_CHAN_NUM] = {0};
+__IO float ADC2ValueConvertedLSB[MEAS_CHAN_NUM] = {0};
 
 void Meas_Init(void)
 {
@@ -127,7 +128,7 @@ void Meas_Init(void)
     ADC_RegularChannelConfig(ADC1, ADC_Channel_13,  MEAS_CHAN_BAT_VOL,              ADC_SampleTime_55Cycles5);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_14,  MEAS_CHAN_ASH_TRAY_LVL,         ADC_SampleTime_55Cycles5);
 #ifdef REVISION_1_2
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_17,  MEAS_CHAN_INTERNAL_REFVOL,        ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_17,  MEAS_CHAN_INTERNAL_REFVOL,      ADC_SampleTime_55Cycles5);
 #endif
 }
 
