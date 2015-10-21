@@ -13,7 +13,7 @@
 
 #define RTC_CFG_FLAG                    0xA5A5
 #define RTC_CFG_FLAG_BKP_REG            BKP_DR1
-#define RTC_ALR_EN_BKP_REG             	BKP_DR2
+#define RTC_ALR_EN_BKP_REG              BKP_DR2
 #define RTC_ALR_LSB_BKP_REG             BKP_DR3
 #define RTC_ALR_MSB_BKP_REG             BKP_DR4
 

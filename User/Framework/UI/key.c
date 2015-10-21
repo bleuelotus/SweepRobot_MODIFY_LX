@@ -79,7 +79,7 @@ s8 Key_Register(Key_t *key)
 {
     KeyList_t           *pKeyList = KeyListHead;
     GPIO_InitTypeDef    GPIO_InitStructure;
-	KeyList_t   		*KeyNode = NULL;
+    KeyList_t           *KeyNode = NULL;
 
     if( NULL==key )
         return -1;

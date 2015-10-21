@@ -146,18 +146,18 @@ static void IrDA_ParseEJE(enum IRAD_Light idx)
             }
         }
         PulsCnt[idx]++;
-		if(IRDA_FRAME_LEN==PulsCnt[idx]){
-//            IrDA_FrameFlag[idx] = 1;
-			HeadPuls[idx] = 0;
-			PulsCnt[idx] = 0;
-			if(IS_IRDA_HOMING_CODE(IrDA_FrameData[idx])){
-				PwrStationHomingSigProc(idx, IrDA_FrameData[idx]);
-			}
-			else{
-				IrDA_FrameBuf = IrDA_FrameData[idx];
-				IrDA_FrameBufFlag = 1;
-			}
-		}
+        if(IRDA_FRAME_LEN==PulsCnt[idx]){
+//              IrDA_FrameFlag[idx] = 1;
+            HeadPuls[idx] = 0;
+            PulsCnt[idx] = 0;
+            if(IS_IRDA_HOMING_CODE(IrDA_FrameData[idx])){
+                PwrStationHomingSigProc(idx, IrDA_FrameData[idx]);
+            }
+            else{
+                IrDA_FrameBuf = IrDA_FrameData[idx];
+                IrDA_FrameBufFlag = 1;
+            }
+        }
     }
     /* Falling */
     else{

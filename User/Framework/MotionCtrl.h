@@ -19,7 +19,7 @@
 #elif defined REVISION_1_1
 #define IFRD_TxRx_CHAN_NUM                  6                                   // 2 back lights of bottom are not used
 #elif defined REVISION_1_2
-#define IFRD_TxRx_CHAN_NUM					10
+#define IFRD_TxRx_CHAN_NUM                  10
 #endif
 #define IFRD_FRONT_CHAN_NUM                 2
 #define IFRD_SIDE_CHAN_NUM                  2
@@ -62,14 +62,14 @@ typedef struct MotionCtrl_Action_s{
     u8              (*PostAct)(void);
 } MCtrl_Act_t;
 
-typedef struct MotionException_ErrCnt_s{	
-	u8				AshTrayInsErrCnt;
-	u8				WheelFloatErrCnt;
-	u8				MBrushOCErrCnt;
-	u8				FanOCErrCnt;
-	u8				LBrushOCErrCnt;
-	u8 				RBrushOCErrCnt;
-	u8				WheelStuckErrCnt;
+typedef struct MotionException_ErrCnt_s{    
+    u8                AshTrayInsErrCnt;
+    u8                WheelFloatErrCnt;
+    u8                MBrushOCErrCnt;
+    u8                FanOCErrCnt;
+    u8                LBrushOCErrCnt;
+    u8                 RBrushOCErrCnt;
+    u8                WheelStuckErrCnt;
 }MotionException_ErrCnt_t;
 
 extern u8 gProximitySign[IFRD_TxRx_CHAN_NUM];
@@ -78,12 +78,10 @@ extern u8 gActSeqDepLIndicator;
 extern u8 gActSeqDepRIndicator;
 extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 
-
-#define LBRUSH_CUR_THRESHOLD                    300                             //  0.5A
-#define RBRUSH_CUR_THRESHOLD                    300                             //  0.5A
-#define MBRUSH_CUR_THRESHOLD                    1000                            //  1.6A
-#define FAN_CUR_THRESHOLD                       1000                            //  1.6A
-
+#define LBRUSH_CUR_THRESHOLD                300                             //  0.5A
+#define RBRUSH_CUR_THRESHOLD                300                             //  0.5A
+#define MBRUSH_CUR_THRESHOLD                1000                            //  1.6A
+#define FAN_CUR_THRESHOLD                   1000                            //  1.6A
 
 #define IS_MOTION_PROC_FINISH()             ((gActSeqDepLIndicator==0)&&(gActSeqDepRIndicator==0))
 #define MOTION_PROC_STATE_SET()             do{gActSeqDepLIndicator++;}while(0);
@@ -103,10 +101,6 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define COLLISION_DETECT_FR_GPIO            GPIOC
 #define COLLISION_DETECT_LEFT_PIN           GPIO_Pin_3
 #define COLLISION_DETECT_FL_PIN             GPIO_Pin_2
-/* original definition of collision sensor port */
-//#define COLLISION_DETECT_RIGHT_PIN          GPIO_Pin_8
-//#define COLLISION_DETECT_FR_PIN             GPIO_Pin_9
-/* FIXME: exchange port definition to make avoidence action right */
 #define COLLISION_DETECT_RIGHT_PIN          GPIO_Pin_9
 #define COLLISION_DETECT_FR_PIN             GPIO_Pin_8
 #define COLLISION_SIGN_LEFT                 GPIO_ReadInputDataBit(COLLISION_DETECT_LEFT_GPIO, COLLISION_DETECT_LEFT_PIN)
@@ -190,20 +184,11 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_TURN_360_CNT                  1400//1500
 #define WHEEL_FAULT_BACK_CNT                180
 
-/* original definition of robot speed */
-/*
 #define WHEEL_ESCAPE_SPEED                  20
-#define WHEEL_CRUISE_SPEED					12
+#define WHEEL_CRUISE_SPEED                  12
 #define WHEEL_MODE_SPOT_SPEED               10
 #define WHEEL_FAULT_PROC_SPEED              9
-#define WHEEL_HOMING_SPEED                  5
-*/
-
-#define WHEEL_ESCAPE_SPEED                  20
-#define WHEEL_CRUISE_SPEED					12
-#define WHEEL_MODE_SPOT_SPEED               10
-#define WHEEL_FAULT_PROC_SPEED              9
-#define WHEEL_FAULT_FALLBACK_SPEED			6
+#define WHEEL_FAULT_FALLBACK_SPEED          6
 #define WHEEL_HOMING_SPEED                  5
 
 #define PATH_COND_PROXIMITY_FLAG_FL_POS     0
@@ -212,7 +197,8 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define PATH_COND_COLLISION_FLAG_FL_POS     3
 #define PATH_COND_COLLISION_FLAG_SL_POS     4
 #ifdef REVISION_1_2
-#define PATH_COND_PROXIMITY_FLAG_BBL_POS    5
+#define PATH_COND_PROXIMITY_FLAG_BSL_POS    5
+#define PATH_COND_PROXIMITY_FLAG_BBL_POS    6
 #endif
 
 #define PATH_COND_PROXIMITY_FLAG_FR_POS     8
@@ -221,20 +207,22 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define PATH_COND_COLLISION_FLAG_FR_POS     11
 #define PATH_COND_COLLISION_FLAG_SR_POS     12
 #ifdef REVISION_1_2
-#define PATH_COND_PROXIMITY_FLAG_BBR_POS    13
+#define PATH_COND_PROXIMITY_FLAG_BSR_POS    13
+#define PATH_COND_PROXIMITY_FLAG_BBR_POS    14
 #endif
 
-#define PATH_FAULT_LEFT_MASK                0x001B
-#define PATH_FAULT_RIGHT_MASK               0x1B00
-#define PATH_FAULT_PROXIMITY_MASK           0x0303
+#define PATH_FAULT_LEFT_MASK                0x003B
+#define PATH_FAULT_RIGHT_MASK               0x3B00
+#define PATH_FAULT_PROXIMITY_MASK           0x2323
 #define PATH_FAULT_COLLISION_MASK           0x1818
 #define PATH_PROXIMITY_SIDE_L_MASK          0x0004
 #define PATH_PROXIMITY_SIDE_R_MASK          0x0400
 #define PATH_FAULT_FRONT_MASK               0x0909
-#define PATH_FAULT_BOTTOM_MASK              0x0202
+#define PATH_FAULT_BOTTOM_MASK              0x2222
 #define PATH_FAULT_SIDE_MASK                0x1414
 #ifdef REVISION_1_2
-#define PATH_FAULT_BACK_BOTTOM_MASK			0x2020
+#define PATH_FAULT_BOTTOM_SIDE_MASK         0x2020
+#define PATH_FAULT_BOTTOM_BACK_MASK         0x4040
 #endif
 
 #define EXCEPTION_MASK_WHEEL_FLOAT_POS      0
@@ -253,12 +241,12 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define MOTION_MONITOR_TIM_IRQ_SP           1
 #define MOTION_MONITOR_TIM_INT_IDX          STM32F10x_INT_TIM2
 
-#define MOTION_WHEEL_SPEED_ADJUST_TIM_PERIPH_ID			RCC_APB1Periph_TIM7
-#define MOTION_WHEEL_SPEED_ADJUST_TIM                  	TIM7
-#define MOTION_WHEEL_SPEED_ADJUST_TIM_IRQn             	TIM7_IRQn
-#define MOTION_WHEEL_SPEED_ADJUST_TIM_IRQ_PP           	2
-#define MOTION_WHEEL_SPEED_ADJUST_IRQ_SP          		0
-#define MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX         	STM32F10x_INT_TIM7
+#define MOTION_WHEEL_SPEED_ADJUST_TIM_PERIPH_ID             RCC_APB1Periph_TIM7
+#define MOTION_WHEEL_SPEED_ADJUST_TIM                       TIM7
+#define MOTION_WHEEL_SPEED_ADJUST_TIM_IRQn                  TIM7_IRQn
+#define MOTION_WHEEL_SPEED_ADJUST_TIM_IRQ_PP                2
+#define MOTION_WHEEL_SPEED_ADJUST_IRQ_SP                    0
+#define MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX               STM32F10x_INT_TIM7
 
 void MotionCtrl_Init(void);
 void MotionCtrl_Stop(void);

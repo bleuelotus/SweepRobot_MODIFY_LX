@@ -9,7 +9,7 @@
   */
 
 #ifndef __IRDA_H__
-#define	__IRDA_H__
+#define    __IRDA_H__
 
 #include "stm32f10x_conf.h"
 
