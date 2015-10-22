@@ -265,7 +265,7 @@ void MotionStateProc(void)
     if((++gtmpCnt)%2){
 
         /* Save proximity condition in Tx off */
-        for(i = 0; i < IFRD_TxRx_ACTUAL_CHAN_NUM; i++){
+        for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
         }
         IFRD_TX_ENABLE();
@@ -1547,8 +1547,8 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[3].RWheelDefDir = 0;
     gActSequence[3].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED*2;
     gActSequence[3].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED*2;
-    gActSequence[3].LWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
-    gActSequence[3].RWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
+    gActSequence[3].LWheelExpCnt = WHEEL_FAULT_BACK_CNT;
+    gActSequence[3].RWheelExpCnt = WHEEL_FAULT_BACK_CNT;
     MotionCtrl_ExceptionProc_Speed_Set(gActSequence+3);
     gActSequence[3].LWheelSync = 0;
     gActSequence[3].RWheelSync = 0;
