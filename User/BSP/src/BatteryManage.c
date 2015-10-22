@@ -29,10 +29,15 @@
 #define BM_CHARGE_POWER_MAX                 300             /* duty cycle */
 #define IS_CHARGE_CONNECTED()               GPIO_ReadInputDataBit(BM_CHARGE_SW_STATUS_GPIO, BM_CHARGE_SW_STATUS_PIN)
 
-#define BM_CHARGE_CUR_50MA                  0x1F
-#define BM_CHARGE_CUR_100MA                 0x3E
-#define BM_CHARGE_CUR_600MA                 0x175
-#define BM_CHARGE_CUR_1000MA                0x26C
+//#define BM_CHARGE_CUR_50MA                  0x1F
+//#define BM_CHARGE_CUR_100MA                 0x3E
+//#define BM_CHARGE_CUR_600MA                 0x175
+//#define BM_CHARGE_CUR_1000MA                0x26C
+
+#define BM_CHARGE_CUR_50MA                  0.025f
+#define BM_CHARGE_CUR_100MA                 0.05f
+#define BM_CHARGE_CUR_600MA                 0.3f
+#define BM_CHARGE_CUR_1000MA                0.5f
 
 //enum BatteryLevelLSB {
 //                                                            /* SampleV * 6 = BATV */
@@ -285,24 +290,24 @@ u8 BM_ChargeProc(void)
     LedBrightnessSch += LedBrightnessDir;
 
     if (ADC2Value_BatLSB[ADC_BAT_VOL] <= BAT_LEVEL_HIGH){
-        if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_100MA-3)){
+        if (ADC2Value_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_100MA-0.0025)){
             BM_ChargePowerInc();
         }
-        else if (ADC_BatLSB[ADC_BAT_CUR] > (BM_CHARGE_CUR_100MA+3)){
+        else if (ADC2Value_BatLSB[ADC_BAT_CUR] > (BM_CHARGE_CUR_100MA+0.0025)){
             BM_ChargePowerDec();
         }
     }
     else if (ADC2Value_BatLSB[ADC_BAT_VOL] < BAT_CHARGE_LEVEL_FULL){
-        if (ADC_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_600MA-5)){
+        if (ADC2Value_BatLSB[ADC_BAT_CUR] <= (BM_CHARGE_CUR_600MA-0.004)){
             BM_ChargePowerInc();
         }
-        else if (ADC_BatLSB[ADC_BAT_CUR] > (BM_CHARGE_CUR_600MA+5)){
+        else if (ADC2Value_BatLSB[ADC_BAT_CUR] > (BM_CHARGE_CUR_600MA+0.004)){
             BM_ChargePowerDec();
         }
     }
     else{
         BM_ChargePowerDec();
-        if (ADC_BatLSB[ADC_BAT_CUR] <= BM_CHARGE_CUR_50MA){
+        if (ADC2Value_BatLSB[ADC_BAT_CUR] <= BM_CHARGE_CUR_50MA){
             if ((Counter++) >= 100){
                 return 1;
             }

@@ -89,6 +89,7 @@ enum {
 #define AD_ASH_TRAY_LVL_PIN             GPIO_Pin_4
 
 extern __IO u16 ADCConvertedLSB[MEAS_CHAN_NUM];
+extern __IO float ADC2ValueConvertedLSB[MEAS_CHAN_NUM];
 
 void Meas_Init(void);
 void Meas_Start(void);

@@ -74,10 +74,8 @@ s8 SweepRobot_Init(void)
     PWM_ControllerStart();
     /* Battery management init */
     BM_Init();
-#ifndef DEBUG_COMMENT
     /* Buzzer init */
     Buzzer_Init();
-#endif
     /* Motor controller init */     
     err = MotorCtrl_Init();
     if(err)
@@ -178,36 +176,52 @@ void SweepRobot_StartupInit(void)
     plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
 
     if(1==gRobotStartupSeqNum){
-//        if(WHEEL_FLOAT_SIGN_ALL || ASH_TRAY_INSTALL_SIGN){
-//            goto STARTUP_FAIL_ON_WF_AT;
-//        }
+        if(WHEEL_FLOAT_SIGN_ALL /* || ASH_TRAY_INSTALL_SIGN */){
+            goto STARTUP_FAIL_ON_WF_AT;
+        }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, MOTOR_FAN_CHAN_STARTUP_SPEED);
     }
     else if(2==gRobotStartupSeqNum){
         /* check FAN current */
-        if(ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD){
+        ADC2ValueConvertedLSB[MEAS_CHAN_FAN_CUR-1] = 1.2f*((float)ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
+        if(ADC2ValueConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup Fan OC.\r\n");
+#endif
             goto STARTUP_FAIL_ON_FAN_OC;
+        }
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+    }
+    else if(3==gRobotStartupSeqNum){
+        /* check Mbrush current */
+        ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
+        if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup MBrush OC.\r\n");
+#endif
+            goto STARTUP_FAIL_ON_MB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
     }
-    else if(3==gRobotStartupSeqNum){
+    else if(4==gRobotStartupSeqNum){
         /* check Lbrush current */
-        if(ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD){
+        ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] = 1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
+        if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup LBrush OC.\r\n");
+#endif
             goto STARTUP_FAIL_ON_LB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
     }
-    else if(4==gRobotStartupSeqNum){
-        /* check Rbrush current */
-        if(ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD){
-            goto STARTUP_FAIL_ON_RB_OC;
-        }
-        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
-    }
     else{
-        /* check Mbrush current */
-        if(ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD){
-            goto STARTUP_FAIL_ON_MB_OC;
+        /* check Rbrush current */
+        ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
+        if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup RBrush OC.\r\n");
+#endif
+            goto STARTUP_FAIL_ON_RB_OC;
         }
 
         switch(gRobotMode){

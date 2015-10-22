@@ -19,7 +19,8 @@
 #elif defined REVISION_1_1
 #define IFRD_TxRx_CHAN_NUM                  6                                   // 2 back lights of bottom are not used
 #elif defined REVISION_1_2
-#define IFRD_TxRx_CHAN_NUM                  10
+#define IFRD_TxRx_CHAN_NUM                  10                                  // Total:10, actual:6, 2 back lights of bottom are not used, 2 side lights of bottom are used with front lights of bottom through analog switch
+#define IFRD_TxRx_ACTUAL_CHAN_NUM           6
 #endif
 #define IFRD_FRONT_CHAN_NUM                 2
 #define IFRD_SIDE_CHAN_NUM                  2
@@ -78,10 +79,15 @@ extern u8 gActSeqDepLIndicator;
 extern u8 gActSeqDepRIndicator;
 extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 
-#define LBRUSH_CUR_THRESHOLD                300                             //  0.5A
-#define RBRUSH_CUR_THRESHOLD                300                             //  0.5A
-#define MBRUSH_CUR_THRESHOLD                1000                            //  1.6A
-#define FAN_CUR_THRESHOLD                   1000                            //  1.6A
+//#define LBRUSH_CUR_THRESHOLD                300                             //  0.5A
+//#define RBRUSH_CUR_THRESHOLD                300                             //  0.5A
+//#define MBRUSH_CUR_THRESHOLD                1000                            //  1.6A
+//#define FAN_CUR_THRESHOLD                   1000                            //  1.6A
+
+#define LBRUSH_CUR_THRESHOLD                0.25f                           //  0.5A = 0.25*2
+#define RBRUSH_CUR_THRESHOLD                0.25f                           //  0.5A = 0.25*2
+#define MBRUSH_CUR_THRESHOLD                0.53f                           //  1.6A = 0.53*3
+#define FAN_CUR_THRESHOLD                   0.53f                           //  1.6A = 0.53*3
 
 #define IS_MOTION_PROC_FINISH()             ((gActSeqDepLIndicator==0)&&(gActSeqDepRIndicator==0))
 #define MOTION_PROC_STATE_SET()             do{gActSeqDepLIndicator++;}while(0);
