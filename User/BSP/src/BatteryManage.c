@@ -134,6 +134,7 @@ void BM_ConditionUpdate(void)
                     SweepRobot_SendMsg(&Msg);
                 }
 #ifdef DEBUG_LOG
+                printf("%f, %f, ", ADC2Value_BatLSB[ADC_BAT_VOL]*6, ADC2Value_BatLSB[ADC_BAT_CUR]*2);
                 printf("Charge Lvl: %d, %d.\r\n", gBM_Cond.level, Counter);
 #endif
                 break;

@@ -76,7 +76,7 @@ const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2
 #elif defined REVISION_1_1
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
-#elif defined REVISION_1_2
+#elif defined REVISION_1_2 
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120, 120, 120, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 1000, 1000, 1000, 1000, 1000, 1000 };
 
@@ -245,19 +245,6 @@ void MotionStateProc(void)
             gMotionExceptionErrCnt.LBrushOCErrCnt = 0;
             gMotionExceptionErrCnt.RBrushOCErrCnt = 0;
         }
-
-#ifdef DEBUG_LOG
-        if(gExceptionMask && \
-            (gMotionExceptionErrCnt.AshTrayInsErrCnt > 0 \
-            || gMotionExceptionErrCnt.WheelFloatErrCnt > 0 \
-            || gMotionExceptionErrCnt.FanOCErrCnt > 0 \
-            || gMotionExceptionErrCnt.MBrushOCErrCnt > 0 \
-            || gMotionExceptionErrCnt.LBrushOCErrCnt > 0 \
-            || gMotionExceptionErrCnt.RBrushOCErrCnt > 0) \
-        ){
-            printf("Exp1:0x%X\r\n", gExceptionMask);
-        }
-#endif
         gLastExceptionMask = gExceptionMask;
     }
 
@@ -631,10 +618,6 @@ void WheelSpeedAdjustProc(void)
                 gIsExceptionWheelStuckHandling = 1;
             }
         }
-        if(gExceptionMask && (gMotionExceptionErrCnt.WheelStuckErrCnt >0) ){
-            printf("Exp2:0x%X\r\n", gExceptionMask);
-        }
-
         gLastExceptionMask = gExceptionMask;
     }else {
         gMotionExceptionErrCnt.WheelStuckErrCnt = 0;
@@ -1155,18 +1138,18 @@ void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
         printf("ExceptionStopCond.\r\n");
 #endif
 
-        node->LWheelDefDir = 0;
-        node->RWheelDefDir = 0;
-        node->LWheelInitSpeed = 0;
-        node->RWheelInitSpeed = 0;
-        node->LWheelExpSpeed = 0;
-        node->RWheelExpSpeed = 0;
-        node->LWheelExpCnt = 0;
-        node->RWheelExpCnt = 0;
-        node->LWheelSync = 0;
-        node->RWheelSync = 0;
-        node->PreAct = NULL;
-        node->PostAct = NULL;
+//        node->LWheelDefDir = 0;
+//        node->RWheelDefDir = 0;
+//        node->LWheelInitSpeed = 0;
+//        node->RWheelInitSpeed = 0;
+//        node->LWheelExpSpeed = 0;
+//        node->RWheelExpSpeed = 0;
+//        node->LWheelExpCnt = 0;
+//        node->RWheelExpCnt = 0;
+//        node->LWheelSync = 0;
+//        node->RWheelSync = 0;
+//        node->PreAct = NULL;
+//        node->PostAct = NULL;
         Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_SHORT);
         SweepRobot_Stop();
         gIsExceptionHandling = 0;
@@ -1428,6 +1411,9 @@ s8 MotionCtrl_ExceptionStopErrCntr(u8 *ErrCnt, u8 StopCnt)
 {
     (*ErrCnt)++;
     if((*ErrCnt) > StopCnt){
+#ifdef DEBUG_LOG
+        printf("Exp:0x%X\r\n", gExceptionMask);
+#endif
         gIsExceptionHandling = 0;
         return 1;
     }else
@@ -1435,7 +1421,7 @@ s8 MotionCtrl_ExceptionStopErrCntr(u8 *ErrCnt, u8 StopCnt)
 }
 
 s8 MotionCtrl_ExceptionHandle(void)
-{
+{ 
     if(gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
         if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.LBrushOCErrCnt), 1)){
@@ -1721,6 +1707,9 @@ void MotionCtrl_HomingMotionInit(void)
 {
     gRobotState = ROBOT_STATE_RUNNING;
     gRobotMode = ROBOT_WORK_MODE_HOMING;
+    
+    /* DO NOT FORGET THIS */
+    SweepRobot_StartupComplete();
 
     MotionCtrl_Start();
 

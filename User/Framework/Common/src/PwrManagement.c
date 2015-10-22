@@ -65,7 +65,25 @@ void PM_Init(void)
 
 void PM_DeInit(void)
 {
-
+    IrDA_DeInit();
+    TIM_DeInit(TIM1);
+    TIM_DeInit(TIM2);
+    TIM_DeInit(TIM3);
+    TIM_DeInit(TIM4);
+    TIM_DeInit(TIM5);
+    TIM_DeInit(TIM6);
+    TIM_DeInit(TIM7);
+    TIM_DeInit(TIM8);
+    ADC_DeInit(ADC1);
+    USART_DeInit(UART4);
+    PM_POWER_SUPPLY_CTRL(PM_OFF);
+    mDelay(500);
+//    GPIO_DeInit(GPIOA);
+    GPIO_DeInit(GPIOB);
+    GPIO_DeInit(GPIOC);
+    GPIO_DeInit(GPIOD);
+    GPIO_DeInit(GPIOE);
+    mDelay(500);
 }
 
 s8 PM_EnterPwrMode(enum PM_Mode mode)
@@ -80,9 +98,7 @@ s8 PM_EnterPwrMode(enum PM_Mode mode)
         case PM_MODE_STOP:
         case PM_MODE_STANDBY:
             /* Prepare for enterring to low power state */
-            IrDA_DeInit();
-            PM_POWER_SUPPLY_CTRL(PM_OFF);
-            sDelay(1);
+            PM_DeInit();
             /* Enter to low power state */
             PWR_EnterSTANDBYMode();
             break;

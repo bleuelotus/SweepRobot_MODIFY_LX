@@ -41,7 +41,7 @@ static const s16 HomingSigSrc2AngleMap[] = { 180, 90, 45, 315, 270 };
 enum _RobotHomingStage gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 static enum _RobotHomingStage LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 static u8 gRobotStartupSeqNum = 0;
-static const u32 STARTUP_SEQ_DELAY_TIME[5] = {10000, 5000, 5000, 5000, 5000};
+static const u32 STARTUP_SEQ_DELAY_TIME[5] = {10000, 5000, 5000, 1000, 5000};
 
 void SweepRobot_PMMsgProc(enum PM_Mode mode);
 void SweepRobot_BMMsgProc(enum BatteryEvt evt);
@@ -76,7 +76,7 @@ s8 SweepRobot_Init(void)
     BM_Init();
     /* Buzzer init */
     Buzzer_Init();
-    /* Motor controller init */     
+    /* Motor controller init */
     err = MotorCtrl_Init();
     if(err)
         goto SWEEPROBOT_INIT_FAIL;
@@ -185,9 +185,6 @@ void SweepRobot_StartupInit(void)
         /* check FAN current */
         ADC2ValueConvertedLSB[MEAS_CHAN_FAN_CUR-1] = 1.2f*((float)ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD){
-#ifdef DEBUG_LOG
-            printf("Startup Fan OC.\r\n");
-#endif
             goto STARTUP_FAIL_ON_FAN_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
@@ -196,9 +193,6 @@ void SweepRobot_StartupInit(void)
         /* check Mbrush current */
         ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD){
-#ifdef DEBUG_LOG
-            printf("Startup MBrush OC.\r\n");
-#endif
             goto STARTUP_FAIL_ON_MB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
@@ -207,9 +201,6 @@ void SweepRobot_StartupInit(void)
         /* check Lbrush current */
         ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] = 1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD){
-#ifdef DEBUG_LOG
-            printf("Startup LBrush OC.\r\n");
-#endif
             goto STARTUP_FAIL_ON_LB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
@@ -218,9 +209,6 @@ void SweepRobot_StartupInit(void)
         /* check Rbrush current */
         ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD){
-#ifdef DEBUG_LOG
-            printf("Startup RBrush OC.\r\n");
-#endif
             goto STARTUP_FAIL_ON_RB_OC;
         }
 
@@ -237,34 +225,37 @@ void SweepRobot_StartupInit(void)
         }
         gRobotStartupSeqNum = 0;
     }
-
-    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+    
     TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
-    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
     TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
-    TIM_SetAutoreload(MOTION_MONITOR_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum]);
     TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum]);
-    TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
     TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
-    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
     TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
-    TIM_Cmd(MOTION_MONITOR_TIM, ENABLE);
     TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
     return;
 
 STARTUP_FAIL_ON_MB_OC:
+#ifdef DEBUG_LOG
+    printf("Startup MBrush OC.\r\n");
+#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
 STARTUP_FAIL_ON_RB_OC:
+#ifdef DEBUG_LOG
+            printf("Startup RBrush OC.\r\n");
+#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
 STARTUP_FAIL_ON_LB_OC:
+#ifdef DEBUG_LOG
+            printf("Startup LBrush OC.\r\n");
+#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
 STARTUP_FAIL_ON_FAN_OC:
+#ifdef DEBUG_LOG
+    printf("Startup Fan OC.\r\n");
+#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, 0);
-    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
     TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
-    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
     TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
-    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
     plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
 STARTUP_FAIL_ON_WF_AT:
     gRobotStartupSeqNum = 0;
@@ -275,13 +266,9 @@ STARTUP_FAIL_ON_WF_AT:
 
 void SweepRobot_StartupComplete(void)
 {
-    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
-    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
-
     TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
     TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
 
-    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
     plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
 }
 
@@ -289,12 +276,9 @@ void SweepRobot_StartupAbort(void)
 {
     gRobotStartupSeqNum = 0;
 
-    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
     TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
-    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
     TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
 
-    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
     plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
 
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
@@ -381,9 +365,9 @@ void SweepRobot_ManualModeProc(enum MotionCtrlManualAct act)
     /* FIXME: add delay here,but should put this into timer */
     if(gRobotState != ROBOT_STATE_RUNNING){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FAN_CHAN_STARTUP_SPEED);
-        mDelay(20);
+        mDelay(10);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
-        mDelay(20);
+        mDelay(10);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
         mDelay(10);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
@@ -400,22 +384,85 @@ void SweepRobot_HomingInit(void)
         return;
     }
 
-    /* FIXME: add delay here,but should put this into timer */
+    /* FIXME: add delay here */
     if(gRobotState != ROBOT_STATE_RUNNING){
-        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
-        mDelay(20);        
-        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
-        mDelay(10);    
-        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+        gRobotStartupSeqNum++;
+        
+        plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)SweepRobot_HomingInit);
+
+        if(1==gRobotStartupSeqNum){
+            if(WHEEL_FLOAT_SIGN_ALL /* || ASH_TRAY_INSTALL_SIGN */){
+                goto STARTUP_FAIL_ON_WF_AT;
+            }
+            MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+        }
+        else if(2==gRobotStartupSeqNum){
+            /* check Mbrush current */
+            ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
+            if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD){
+                goto STARTUP_FAIL_ON_MB_OC;
+            }
+            MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+        }
+        else if(3==gRobotStartupSeqNum){
+            /* check Lbrush current */
+            ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] = 1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
+            if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD){
+                goto STARTUP_FAIL_ON_LB_OC;
+            }
+            MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+        }
+        else{
+            /* check Rbrush current */
+            ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
+            if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD){
+                goto STARTUP_FAIL_ON_RB_OC;
+            }
+            
+            plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_HomingMotionInit);
+            gRobotStartupSeqNum = 0;
+        }
+        TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+        TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
+        TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum+1]);
+        TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
+        TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
+        TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
+        
+        gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+        LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+        return;
     }
     else{
-        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, 0);
         MotionCtrl_Stop();
     }
     MotionCtrl_HomingMotionInit();
 
     gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
     LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
+    return;
+
+STARTUP_FAIL_ON_MB_OC:
+#ifdef DEBUG_LOG
+    printf("Startup MBrush OC.\r\n");
+#endif
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
+STARTUP_FAIL_ON_RB_OC:
+#ifdef DEBUG_LOG
+    printf("Startup RBrush OC.\r\n");
+#endif
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
+STARTUP_FAIL_ON_LB_OC:
+#ifdef DEBUG_LOG
+    printf("Startup LBrush OC.\r\n");
+#endif
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
+STARTUP_FAIL_ON_WF_AT:
+    gRobotStartupSeqNum = 0;
+    Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
+    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, CTRL_PANEL_LED_BR_LVL);
+    gRobotState = ROBOT_STATE_IDLE;
 }
 
 void SweepRobot_IdleStateSync(void)
@@ -583,7 +630,7 @@ void SweepRobot_CtrlMsgProc(u8 CtrlCode)
 void SweepRobot_MotionMsgProc(enum MotionEvt evt)
 {
     switch(evt){
-        
+
         case MOTION_EVT_PATH_FAULT:
             if(gRobotState == ROBOT_STATE_RUNNING){
                 if(gRobotMode == ROBOT_WORK_MODE_MANUAL){
