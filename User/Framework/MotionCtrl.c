@@ -46,7 +46,7 @@
 #define EDGE_MODE_ANGLE_360                     3000                            // 3000 * 2 ms // 300 * 20ms
 #define EXCEPTION_CHECK_PERIOD                  2                               // best: 2 * 2 = 4ms, worst: 2 * 2 *2= 8ms
 #define EXCEPTION_WHEEL_STUCK_CHECK_PERIOD      10                              // best: 10 * 20 = 200ms, worst: 10 * 20 * 2 = 400ms
-#define BOTTOM_DETECT_PERIOD                    2                               // 2*2*2*2 = 16ms
+#define BOTTOM_DETECT_PERIOD                    3                               // 3*2*2*2 = 24ms
 
 static void MotionCtrl_ExceptionProc(void);
 
@@ -248,12 +248,12 @@ void MotionStateProc(void)
 
 #ifdef DEBUG_LOG
         if(gExceptionMask && \
-            (gMotionExceptionErrCnt.AshTrayInsErrCnt == 2 \
-            || gMotionExceptionErrCnt.WheelFloatErrCnt == 2 \
-            || gMotionExceptionErrCnt.FanOCErrCnt == 2 \
-            || gMotionExceptionErrCnt.MBrushOCErrCnt == 2 \
-            || gMotionExceptionErrCnt.LBrushOCErrCnt == 2 \
-            || gMotionExceptionErrCnt.RBrushOCErrCnt == 2)\
+            (gMotionExceptionErrCnt.AshTrayInsErrCnt > 0 \
+            || gMotionExceptionErrCnt.WheelFloatErrCnt > 0 \
+            || gMotionExceptionErrCnt.FanOCErrCnt > 0 \
+            || gMotionExceptionErrCnt.MBrushOCErrCnt > 0 \
+            || gMotionExceptionErrCnt.LBrushOCErrCnt > 0 \
+            || gMotionExceptionErrCnt.RBrushOCErrCnt > 0) \
         ){
             printf("Exp1:0x%X\r\n", gExceptionMask);
         }
@@ -265,7 +265,7 @@ void MotionStateProc(void)
     if((++gtmpCnt)%2){
 
         /* Save proximity condition in Tx off */
-        for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
+        for(i = 0; i < IFRD_TxRx_ACTUAL_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
         }
         IFRD_TX_ENABLE();
@@ -593,6 +593,10 @@ void MotionStateProc(void)
             gIfrdBottomDetectSwitchFlag = 1;
         }
 #endif
+        if(gPathCondMap){
+            printf("0x%X\r\n",gPathCondMap);
+        }
+        
         if( IS_MOTION_PROC_FINISH() && (gPathCondMap & (PATH_FAULT_LEFT_MASK | PATH_FAULT_RIGHT_MASK)) ){
             if( ((gRobotMode != ROBOT_WORK_MODE_EDGE) && (gRobotMode != ROBOT_WORK_MODE_SPOT))
                ||
@@ -627,7 +631,7 @@ void WheelSpeedAdjustProc(void)
                 gIsExceptionWheelStuckHandling = 1;
             }
         }
-        if(gExceptionMask && (gMotionExceptionErrCnt.WheelStuckErrCnt == 2) ){
+        if(gExceptionMask && (gMotionExceptionErrCnt.WheelStuckErrCnt >0) ){
             printf("Exp2:0x%X\r\n", gExceptionMask);
         }
 

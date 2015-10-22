@@ -19,7 +19,8 @@
 #elif defined REVISION_1_1
 #define IFRD_TxRx_CHAN_NUM                  6                                   // 2 back lights of bottom are not used
 #elif defined REVISION_1_2
-#define IFRD_TxRx_CHAN_NUM                  10
+#define IFRD_TxRx_CHAN_NUM                  10                                  // Total:10, actual:6, 2 back lights of bottom are not used, 2 side lights of bottom are used with front lights of bottom through analog switch
+#define IFRD_TxRx_ACTUAL_CHAN_NUM           6
 #endif
 #define IFRD_FRONT_CHAN_NUM                 2
 #define IFRD_SIDE_CHAN_NUM                  2
