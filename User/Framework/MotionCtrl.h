@@ -194,7 +194,6 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_CRUISE_SPEED                  12
 #define WHEEL_MODE_SPOT_SPEED               10
 #define WHEEL_FAULT_PROC_SPEED              9
-#define WHEEL_FAULT_FALLBACK_SPEED          6
 #define WHEEL_HOMING_SPEED                  5
 
 #define PATH_COND_PROXIMITY_FLAG_FL_POS     0
@@ -223,13 +222,9 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define PATH_FAULT_COLLISION_MASK           0x1818
 #define PATH_PROXIMITY_SIDE_L_MASK          0x0004
 #define PATH_PROXIMITY_SIDE_R_MASK          0x0400
-#define PATH_FAULT_FRONT_MASK               0x0909
+#define PATH_FAULT_FRONT_MASK               0x0B0B
 #define PATH_FAULT_BOTTOM_MASK              0x2222
 #define PATH_FAULT_SIDE_MASK                0x1414
-#ifdef REVISION_1_2
-#define PATH_FAULT_BOTTOM_SIDE_MASK         0x2020
-#define PATH_FAULT_BOTTOM_BACK_MASK         0x4040
-#endif
 
 #define EXCEPTION_MASK_WHEEL_FLOAT_POS      0
 #define EXCEPTION_MASK_ASHTRAY_INS_POS      1

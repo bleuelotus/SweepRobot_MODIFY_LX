@@ -17,7 +17,7 @@
 #include "CtrlPanel.h"
 #include "Buzzer.h"
 
-#define MOTION_MONITOR_TIM_PERIOD               20                                 // 2ms
+#define MOTION_MONITOR_TIM_PERIOD               10                                 // 1ms
 #define MOTION_WHEEL_SPEED_ADJUST_PERIOD        200                                // 20ms
 
 #define IFRD_CHAN_FRONT_L                       0
@@ -41,12 +41,11 @@
 #define SPOT_MODE_CIRCLE_INC_STEP               55                              // for every 2 units of speed inc
 
 /* original universal_wheel_detect_period */
-//#define UNIVERSAL_WHEEL_DETECT_PERIOD           75                              // 75 * 20 * 2 = 3000ms
+//#define UNIVERSAL_WHEEL_DETECT_PERIOD           75                             // 75 * 20 * 2 = 3000ms
 #define UNIVERSAL_WHEEL_DETECT_PERIOD           55                              // 55 * 20 * 2 = 2200ms
-#define EDGE_MODE_ANGLE_360                     3000                            // 3000 * 2 ms // 300 * 20ms
-#define EXCEPTION_CHECK_PERIOD                  2                               // best: 2 * 2 = 4ms, worst: 2 * 2 *2= 8ms
-#define EXCEPTION_WHEEL_STUCK_CHECK_PERIOD      10                              // best: 10 * 20 = 200ms, worst: 10 * 20 * 2 = 400ms
-#define BOTTOM_DETECT_PERIOD                    3                               // 3*2*2*2 = 24ms
+#define EDGE_MODE_ANGLE_360                     6000                            // 6000 * 1 ms // 300 * 20ms
+#define EXCEPTION_CHECK_PERIOD                  20                              // 1 * 20 = 20ms
+#define EXCEPTION_WHEEL_STUCK_CHECK_PERIOD      1                               // 1 * 20 = 20ms
 
 static void MotionCtrl_ExceptionProc(void);
 
@@ -76,7 +75,7 @@ const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2
 #elif defined REVISION_1_1
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
-#elif defined REVISION_1_2 
+#elif defined REVISION_1_2
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120, 120, 120, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 1000, 1000, 1000, 1000, 1000, 1000 };
 
@@ -134,7 +133,8 @@ u8 gActSeqDepLIndicator = 0, gActSeqDepRIndicator = 0;
 #define LWHEEL_CUR_SPEED                            (gCurLWheelSpeed)
 #define RWHEEL_CUR_SPEED                            (gCurRWheelSpeed)
 
-static u16 gtmpCnt = 0;
+static u16 gtmpAvoidencePeriodCnt = 0;
+static u16 gtmpExceptionPeriodCnt = 0;
 static u16 gtmpCnt2 = 0;
 static u16 gIFRDTxOffRxVal[IFRD_TxRx_CHAN_NUM] = {0};
 static u8 gIFRDEnableCnt[IFRD_TxRx_CHAN_NUM] = {0};
@@ -221,35 +221,37 @@ void MotionStateProc(void)
 {
     u8      i = 0;
 
-    gExceptionMask = ExceptionStateCheck();
-    if( !(gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS))) ){
-        if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
-            /* Send exception message */
-            gMsg.expire = 0;
-            gMsg.prio = MSG_PRIO_HIGHEST;
-            gMsg.type = MSG_TYPE_MOTION;
-            gMsg.MsgCB = NULL;
-            gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
-            if(!SweepRobot_SendMsg(&gMsg)){
-                gIsExceptionHandling = 1;
+    if( (++gtmpExceptionPeriodCnt)%EXCEPTION_CHECK_PERIOD ){
+        gExceptionMask = ExceptionStateCheck();
+        if( !(gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS))) ){
+            if( (gLastExceptionMask & gExceptionMask) && (!gIsExceptionHandling) ){
+                /* Send exception message */
+                gMsg.expire = 0;
+                gMsg.prio = MSG_PRIO_HIGHEST;
+                gMsg.type = MSG_TYPE_MOTION;
+                gMsg.MsgCB = NULL;
+                gMsg.Data.MEvt = MOTION_EVT_EXCEPTION;
+                if(!SweepRobot_SendMsg(&gMsg)){
+                    gIsExceptionHandling = 1;
+                }
             }
-        }
 
-        if(gExceptionMask){
+            if(gExceptionMask){
 
-        }else{
-            gMotionExceptionErrCnt.AshTrayInsErrCnt = 0;
-            gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
-            gMotionExceptionErrCnt.FanOCErrCnt = 0;
-            gMotionExceptionErrCnt.MBrushOCErrCnt = 0;
-            gMotionExceptionErrCnt.LBrushOCErrCnt = 0;
-            gMotionExceptionErrCnt.RBrushOCErrCnt = 0;
+            }else{
+                gMotionExceptionErrCnt.AshTrayInsErrCnt = 0;
+                gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
+                gMotionExceptionErrCnt.FanOCErrCnt = 0;
+                gMotionExceptionErrCnt.MBrushOCErrCnt = 0;
+                gMotionExceptionErrCnt.LBrushOCErrCnt = 0;
+                gMotionExceptionErrCnt.RBrushOCErrCnt = 0;
+            }
+            gLastExceptionMask = gExceptionMask;
         }
-        gLastExceptionMask = gExceptionMask;
     }
 
     /* Phase 1 */
-    if((++gtmpCnt)%2){
+    if((++gtmpAvoidencePeriodCnt)%2){
 
         /* Save proximity condition in Tx off */
         for(i = 0; i < IFRD_TxRx_CHAN_NUM; i++){
@@ -273,21 +275,12 @@ void MotionStateProc(void)
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
 
             if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_SL]) ){
-                gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SL]++;
-                if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SL] > BOTTOM_DETECT_PERIOD){
-                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SL] = 0;
-                }
+                gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
             }else {
                 if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_SL]) ){
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SL]++;
-                    if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SL] > BOTTOM_DETECT_PERIOD){
-                        gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
-                        gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SL] = 0;
-                    }
+                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
                 }
                 else {
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SL] = 0;
                     gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
                 }
             }
@@ -305,21 +298,12 @@ void MotionStateProc(void)
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
 
             if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
-                gIFRDEnableCnt[IFRD_CHAN_BOTTOM_L]++;
-                if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_L] > BOTTOM_DETECT_PERIOD){
-                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_L] = 0;
-                }
+                gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
             }else {
                 if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_L-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_L]++;
-                    if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_L] > BOTTOM_DETECT_PERIOD){
-                        gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
-                        gIFRDEnableCnt[IFRD_CHAN_BOTTOM_L] = 0;
-                    }
+                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
                 }
                 else {
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_L] = 0;
                     gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
                 }
             }
@@ -437,21 +421,12 @@ void MotionStateProc(void)
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
 
             if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_SR]) ){
-                gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SR]++;
-                if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SR] > BOTTOM_DETECT_PERIOD){
-                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSR_POS);
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SR] = 0;
-                }
+                gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSR_POS);
             }else {
                 if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1] < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_SR]) ){
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SR]++;
-                    if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SR] > BOTTOM_DETECT_PERIOD){
-                        gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSR_POS);
-                        gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SR] = 0;
-                    }
+                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSR_POS);
                 }
                 else {
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_SR] = 0;
                     gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BSR_POS);
                 }
             }
@@ -459,21 +434,12 @@ void MotionStateProc(void)
             gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BSR_POS);
 
             if( gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_R] ){
-                gIFRDEnableCnt[IFRD_CHAN_BOTTOM_R]++;
-                if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_R] > BOTTOM_DETECT_PERIOD){
-                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_R] = 0;
-                }
+                gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
             }else {
                 if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_R] - ADCConvertedLSB[MEAS_CHAN_IFRD_BOTTOM_RX_R-1]) < gProximityDetectionThreshold[IFRD_CHAN_BOTTOM_R] ){
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_R]++;
-                    if(gIFRDEnableCnt[IFRD_CHAN_BOTTOM_R] > BOTTOM_DETECT_PERIOD){
-                        gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
-                        gIFRDEnableCnt[IFRD_CHAN_BOTTOM_R] = 0;
-                    }
+                    gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
                 }
                 else {
-                    gIFRDEnableCnt[IFRD_CHAN_BOTTOM_R] = 0;
                     gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
                 }
             }
@@ -580,14 +546,11 @@ void MotionStateProc(void)
             gIfrdBottomDetectSwitchFlag = 1;
         }
 #endif
-        if(gPathCondMap){
-            printf("0x%X\r\n",gPathCondMap);
-        }
-        
+
         if( IS_MOTION_PROC_FINISH() && (gPathCondMap & (PATH_FAULT_LEFT_MASK | PATH_FAULT_RIGHT_MASK)) ){
             if( ((gRobotMode != ROBOT_WORK_MODE_EDGE) && (gRobotMode != ROBOT_WORK_MODE_SPOT))
                ||
-               (((gRobotMode == ROBOT_WORK_MODE_EDGE) || (gRobotMode == ROBOT_WORK_MODE_SPOT)) && (gPathCondMap & (PATH_FAULT_PROXIMITY_MASK & PATH_FAULT_BOTTOM_MASK | PATH_FAULT_COLLISION_MASK)))
+               (((gRobotMode == ROBOT_WORK_MODE_EDGE) || (gRobotMode == ROBOT_WORK_MODE_SPOT)) && (gPathCondMap & ((PATH_FAULT_PROXIMITY_MASK & PATH_FAULT_BOTTOM_MASK) | PATH_FAULT_COLLISION_MASK)))
               ){
                 /* Send path fault message */
                 gMsg.expire = 0;
@@ -741,7 +704,7 @@ void IFRD_PathDetectInit(void)
 
 static void IFRD_PathDetectStart(void)
 {
-    gtmpCnt = 0;
+    gtmpAvoidencePeriodCnt = 0;
     gtmpCnt2 = 0;
 
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
@@ -766,8 +729,10 @@ static void IFRD_PathDetectStop(void)
 {
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
+
     TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
     TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
+
     IFRD_TX_DISABLE();
 }
 
@@ -1138,18 +1103,18 @@ void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
         printf("ExceptionStopCond.\r\n");
 #endif
 
-//        node->LWheelDefDir = 0;
-//        node->RWheelDefDir = 0;
-//        node->LWheelInitSpeed = 0;
-//        node->RWheelInitSpeed = 0;
-//        node->LWheelExpSpeed = 0;
-//        node->RWheelExpSpeed = 0;
-//        node->LWheelExpCnt = 0;
-//        node->RWheelExpCnt = 0;
-//        node->LWheelSync = 0;
-//        node->RWheelSync = 0;
-//        node->PreAct = NULL;
-//        node->PostAct = NULL;
+        node->LWheelDefDir = 0;
+        node->RWheelDefDir = 0;
+        node->LWheelInitSpeed = 0;
+        node->RWheelInitSpeed = 0;
+        node->LWheelExpSpeed = 0;
+        node->RWheelExpSpeed = 0;
+        node->LWheelExpCnt = 0;
+        node->RWheelExpCnt = 0;
+        node->LWheelSync = 0;
+        node->RWheelSync = 0;
+        node->PreAct = NULL;
+        node->PostAct = NULL;
         Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_SHORT);
         SweepRobot_Stop();
         gIsExceptionHandling = 0;
@@ -1217,20 +1182,20 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
     gActSeqDepth = 0;
 
     /* Stage 1 */
-    if(gPathCondMap & (PATH_FAULT_FRONT_MASK | PATH_FAULT_BOTTOM_MASK)){
+    if(gPathCondMap & (PATH_FAULT_FRONT_MASK | PATH_FAULT_BOTTOM_MASK & PATH_FAULT_FRONT_MASK)){
 
         if( ((gRobotMode != ROBOT_WORK_MODE_EDGE) && (gRobotMode != ROBOT_WORK_MODE_SPOT))
             ||
-            (((gRobotMode == ROBOT_WORK_MODE_EDGE) || (gRobotMode == ROBOT_WORK_MODE_SPOT)) && (gPathCondMap & (PATH_FAULT_PROXIMITY_MASK & PATH_FAULT_BOTTOM_MASK | PATH_FAULT_COLLISION_MASK & PATH_FAULT_FRONT_MASK)))
-          ){
+            (((gRobotMode == ROBOT_WORK_MODE_EDGE) || (gRobotMode == ROBOT_WORK_MODE_SPOT)) && (gPathCondMap & ( PATH_FAULT_PROXIMITY_MASK & (PATH_FAULT_BOTTOM_MASK & PATH_FAULT_FRONT_MASK)  | PATH_FAULT_COLLISION_MASK & PATH_FAULT_FRONT_MASK ) )
+          ) ){
             pActSequence->LWheelDefDir = 0;
             pActSequence->RWheelDefDir = 0;
             pActSequence->LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
             pActSequence->RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
             pActSequence->LWheelExpCnt = backCntL;
             pActSequence->RWheelExpCnt = backCntR;
-            pActSequence->LWheelExpSpeed = WHEEL_FAULT_FALLBACK_SPEED;
-            pActSequence->RWheelExpSpeed = WHEEL_FAULT_FALLBACK_SPEED;
+            pActSequence->LWheelExpSpeed = WHEEL_FAULT_PROC_SPEED;
+            pActSequence->RWheelExpSpeed = WHEEL_FAULT_PROC_SPEED;
             pActSequence->LWheelSync = 0;
             pActSequence->RWheelSync = 0;
             pActSequence->PreAct = NULL;
@@ -1421,22 +1386,25 @@ s8 MotionCtrl_ExceptionStopErrCntr(u8 *ErrCnt, u8 StopCnt)
 }
 
 s8 MotionCtrl_ExceptionHandle(void)
-{ 
+{
     if(gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
         if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.LBrushOCErrCnt), 1)){
+            printf("LBRUSH_OC\r\n");
             return -1;
         }
     }
     if(gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
         if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.RBrushOCErrCnt), 1)){
+            printf("RBRUSH_OC\r\n");
             return -1;
         }
     }
     if(gExceptionMask & (1<<EXCEPTION_MASK_MBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
         if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.MBrushOCErrCnt), 1)){
+            printf("MBRUSH_OC\r\n");
             return -1;
         }
     }
@@ -1444,29 +1412,42 @@ s8 MotionCtrl_ExceptionHandle(void)
     /* XXX: this exception should be processed by WheelSpeedAdjustProc() */
     if( gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS)) ){
         if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.WheelStuckErrCnt), 1)){
+            printf("WHEEL_STUCK\r\n");
             return -1;
         }
     }
 
-    if( gExceptionMask & ( (1<<EXCEPTION_MASK_ASHTRAY_INS_POS) | (1<<EXCEPTION_MASK_FAN_OC_POS)) ){
+    if( gExceptionMask & (1<<EXCEPTION_MASK_ASHTRAY_INS_POS) ){
         gIsExceptionHandling = 0;
+        printf("ASH_TRAY_NOT_INS\r\n");
         return -1;
+    }
+
+    if( gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS) ){
+        if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.FanOCErrCnt), 1)){
+            printf("FAN_OC\r\n");
+            return -1;
+        }else
+            return 0;
     }
 
     /* FIXME: add wheel floating avoidence process */
     /* left bottom float detected and left wheel float detected */
     if( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!LWHEEL_FLOAT_SIGN) && (gPathCondMap & (PATH_FAULT_BOTTOM_MASK & PATH_FAULT_LEFT_MASK) ) ){
         gIsExceptionHandling = 0;
+        printf("WHEEL_FLOAT_L\r\n");
         return -1;
     }
     /* right bottom float detected and right wheel float detected */
     if( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!RWHEEL_FLOAT_SIGN) && (gPathCondMap & (PATH_FAULT_BOTTOM_MASK & PATH_FAULT_RIGHT_MASK) ) ){
         gIsExceptionHandling = 0;
+        printf("WHEEL_FLOAT_R\r\n");
         return -1;
     }
 
     if ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!(gPathCondMap & PATH_FAULT_BOTTOM_MASK)) ){
         if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.WheelFloatErrCnt), 1)){
+            printf("WHEEL_FLOAT_NO_BOTTOM\r\n");
             return -1;
         }
     }
@@ -1707,7 +1688,7 @@ void MotionCtrl_HomingMotionInit(void)
 {
     gRobotState = ROBOT_STATE_RUNNING;
     gRobotMode = ROBOT_WORK_MODE_HOMING;
-    
+
     /* DO NOT FORGET THIS */
     SweepRobot_StartupComplete();
 
