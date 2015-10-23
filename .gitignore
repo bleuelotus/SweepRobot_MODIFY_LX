@@ -242,11 +242,13 @@ pip-log.txt
 *obj/
 *.ewd
 *.ewp
+*.eww
 *.bat
 *.wsdt
 *.dbgdt
 *.dni
 *.wspos
+Project/IAR/DB-ROBOT-S1
 
 #MDK STM32 C
 *.uvopt

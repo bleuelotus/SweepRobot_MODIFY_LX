@@ -12,6 +12,7 @@
 #include "delay.h"
 #include "IrDA.h"
 #include "SweepRobot.h"
+#include "CtrlPanel.h"
 
 u8 gSystemIdleCnt = PM_SYS_SB_SEC;
 
@@ -65,7 +66,14 @@ void PM_Init(void)
 
 void PM_DeInit(void)
 {
+    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_RED, 0);
+    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, 0);
+    CtrlPanel_LEDCtrl(CTRL_PANEL_LED_BLUE, 0);
+    
+    __set_PRIMASK(1);
+    
     IrDA_DeInit();
+    
     TIM_DeInit(TIM1);
     TIM_DeInit(TIM2);
     TIM_DeInit(TIM3);
@@ -74,16 +82,34 @@ void PM_DeInit(void)
     TIM_DeInit(TIM6);
     TIM_DeInit(TIM7);
     TIM_DeInit(TIM8);
+    
     ADC_DeInit(ADC1);
+    
     USART_DeInit(UART4);
+    
+    RCC_HCLKConfig(RCC_SYSCLK_Div2);
+//    uDelay(500);      //36Mhz, 2=4ms
+    RCC_HCLKConfig(RCC_SYSCLK_Div4);
+//    uDelay(250);      //18Mhz, 1=4ms
+    RCC_HCLKConfig(RCC_SYSCLK_Div8);
+//    uDelay(125);    //9Mhz, 500=4ms
+    RCC_HCLKConfig(RCC_SYSCLK_Div16);
+//    uDelay(62);    //4.5Mhz, 250=4ms
+    RCC_HCLKConfig(RCC_SYSCLK_Div64);
+//    uDelay(16);     //1.125Mhz, 63=4.032ms
+    RCC_HCLKConfig(RCC_SYSCLK_Div128);
+//    uDelay(8);     //0.5625Mhz, 31=3.968ms
+    RCC_HCLKConfig(RCC_SYSCLK_Div256);
+//    uDelay(4);     //0.28125Mhz, 16=4.096ms
+    RCC_HCLKConfig(RCC_SYSCLK_Div512);
+//    uDelay(2);      //0.140625Mhz, 8=4.096ms
     PM_POWER_SUPPLY_CTRL(PM_OFF);
-    mDelay(500);
-//    GPIO_DeInit(GPIOA);
+    uDelay(14);    //   14*512us = 7.168ms
     GPIO_DeInit(GPIOB);
     GPIO_DeInit(GPIOC);
     GPIO_DeInit(GPIOD);
     GPIO_DeInit(GPIOE);
-    mDelay(500);
+    GPIO_DeInit(GPIOA);
 }
 
 s8 PM_EnterPwrMode(enum PM_Mode mode)
@@ -97,7 +123,7 @@ s8 PM_EnterPwrMode(enum PM_Mode mode)
         case PM_MODE_SLEEP:
         case PM_MODE_STOP:
         case PM_MODE_STANDBY:
-            /* Prepare for enterring to low power state */
+            /* Prepare for entering to low power state */
             PM_DeInit();
             /* Enter to low power state */
             PWR_EnterSTANDBYMode();
