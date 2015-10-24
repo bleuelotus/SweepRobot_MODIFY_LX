@@ -14,6 +14,7 @@
 #include "MsgQueue.h"
 
 #define TIME_PERIOD                                 10000
+
 #define TIME_VAL                                    (BAT_MONITOR_TIM->CNT)
 
 #ifdef IRDA_MODE_EJE

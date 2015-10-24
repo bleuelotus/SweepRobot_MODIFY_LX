@@ -41,6 +41,9 @@ static const s16 HomingSigSrc2AngleMap[] = { 180, 90, 45, 315, 270 };
 enum _RobotHomingStage gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 static enum _RobotHomingStage LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
 static u8 gRobotStartupSeqNum = 0;
+/* origin Delay_Time value 
+static const u32 STARTUP_SEQ_DELAY_TIME[5] = {10000, 5000, 5000, 1000, 5000};
+*/
 static const u32 STARTUP_SEQ_DELAY_TIME[5] = {10000, 5000, 5000, 1000, 5000};
 
 void SweepRobot_PMMsgProc(enum PM_Mode mode);
@@ -54,6 +57,7 @@ s8 SweepRobot_Init(void)
 {
     s8      err = 0;
 
+    RCC_HCLKConfig(RCC_SYSCLK_Div512);
     /* Power management init */
     PM_Init();
     /* Real time clock init */
@@ -173,8 +177,8 @@ void SweepRobot_StartupInit(void)
     gRobotState = ROBOT_STATE_STARTUP;
     gRobotStartupSeqNum++;
 
-    plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
-
+    plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
+    
     if(1==gRobotStartupSeqNum){
         if(WHEEL_FLOAT_SIGN_ALL /* || ASH_TRAY_INSTALL_SIGN */){
             goto STARTUP_FAIL_ON_WF_AT;
@@ -214,24 +218,24 @@ void SweepRobot_StartupInit(void)
 
         switch(gRobotMode){
             case ROBOT_WORK_MODE_AUTO:
-                plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_AutoMotionInit);
+                plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionCtrl_AutoMotionInit);
                 break;
             case ROBOT_WORK_MODE_EDGE:
-                plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_EdgeMotionInit);
+                plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionCtrl_EdgeMotionInit);
                 break;
             case ROBOT_WORK_MODE_SPOT:
-                plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_SpotMotionInit);
+                plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionCtrl_SpotMotionInit);
                 break;
         }
         gRobotStartupSeqNum = 0;
     }
     
-    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
-    TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
-    TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum]);
-    TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
-    TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
-    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
+    TIM_SetAutoreload(MOTION_MONITOR_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum]);
+    TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
+    TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
+    TIM_Cmd(MOTION_MONITOR_TIM, ENABLE);
     return;
 
 STARTUP_FAIL_ON_MB_OC:
@@ -254,9 +258,9 @@ STARTUP_FAIL_ON_FAN_OC:
     printf("Startup Fan OC.\r\n");
 #endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, 0);
-    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
-    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
-    plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
+    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
 STARTUP_FAIL_ON_WF_AT:
     gRobotStartupSeqNum = 0;
     Buzzer_Play(BUZZER_TWO_PULS, BUZZER_SND_NORMAL);
@@ -266,20 +270,20 @@ STARTUP_FAIL_ON_WF_AT:
 
 void SweepRobot_StartupComplete(void)
 {
-    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
-    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
 
-    plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
+    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
 }
 
 void SweepRobot_StartupAbort(void)
 {
     gRobotStartupSeqNum = 0;
 
-    TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, DISABLE);
-    TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
+    TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
+    TIM_SetCounter(MOTION_MONITOR_TIM, 0);
 
-    plat_int_dereg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX);
+    plat_int_dereg_cb(MOTION_MONITOR_TIM_INT_IDX);
 
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
@@ -388,7 +392,7 @@ void SweepRobot_HomingInit(void)
     if(gRobotState != ROBOT_STATE_RUNNING){
         gRobotStartupSeqNum++;
         
-        plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)SweepRobot_HomingInit);
+        plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)SweepRobot_HomingInit);
 
         if(1==gRobotStartupSeqNum){
             if(WHEEL_FLOAT_SIGN_ALL /* || ASH_TRAY_INSTALL_SIGN */){
@@ -419,15 +423,15 @@ void SweepRobot_HomingInit(void)
                 goto STARTUP_FAIL_ON_RB_OC;
             }
             
-            plat_int_reg_cb(MOTION_WHEEL_SPEED_ADJUST_TIM_INT_IDX, (void*)MotionCtrl_HomingMotionInit);
+            plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)MotionCtrl_HomingMotionInit);
             gRobotStartupSeqNum = 0;
         }
-        TIM_SetCounter(MOTION_WHEEL_SPEED_ADJUST_TIM, 0);
-        TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, DISABLE);
-        TIM_SetAutoreload(MOTION_WHEEL_SPEED_ADJUST_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum+1]);
-        TIM_ClearFlag(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_FLAG_Update);
-        TIM_ITConfig(MOTION_WHEEL_SPEED_ADJUST_TIM, TIM_IT_Update, ENABLE);
-        TIM_Cmd(MOTION_WHEEL_SPEED_ADJUST_TIM, ENABLE);
+        TIM_SetCounter(MOTION_MONITOR_TIM, 0);
+        TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, DISABLE);
+        TIM_SetAutoreload(MOTION_MONITOR_TIM, STARTUP_SEQ_DELAY_TIME[gRobotStartupSeqNum+1]);
+        TIM_ClearFlag(MOTION_MONITOR_TIM, TIM_FLAG_Update);
+        TIM_ITConfig(MOTION_MONITOR_TIM, TIM_IT_Update, ENABLE);
+        TIM_Cmd(MOTION_MONITOR_TIM, ENABLE);
         
         gHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;
         LastHomingStage = ROBOT_HOMING_STAGE_UNKNOWN;

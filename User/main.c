@@ -26,7 +26,7 @@ int main(void)
     SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
     /* Priority Group devide */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-
+    
 #ifdef DEBUG_LOG
     UART4_Config();
 #endif
@@ -35,7 +35,7 @@ int main(void)
         goto HALT;
 
     SweepRobot_Start();
-
+    
 HALT:
     while (1)
     {

@@ -60,8 +60,14 @@ void PM_Init(void)
 
     /* Powered on by default */
     PM_POWER_SUPPLY_CTRL(PM_ON);
-
-    mDelay(500);
+    
+    /* origin delay time */
+    //mDelay(500);
+    uDelay(4);
+    
+    RCC_HCLKConfig(RCC_SYSCLK_Div1);
+    
+    uDelay(100);
 }
 
 void PM_DeInit(void)
