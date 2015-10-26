@@ -67,7 +67,7 @@ void PM_Init(void)
     
     RCC_HCLKConfig(RCC_SYSCLK_Div1);
     
-    uDelay(100);
+    mDelay(500);
 }
 
 void PM_DeInit(void)

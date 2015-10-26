@@ -134,6 +134,3 @@ void CtrlPanel_Init(void)
 
     Key_StartListen();
 }
-
-
-

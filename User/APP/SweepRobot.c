@@ -180,7 +180,7 @@ void SweepRobot_StartupInit(void)
     plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
     
     if(1==gRobotStartupSeqNum){
-        if(WHEEL_FLOAT_SIGN_ALL /* || ASH_TRAY_INSTALL_SIGN */){
+        if(WHEEL_FLOAT_SIGN_ALL || ASH_TRAY_INSTALL_SIGN){
             goto STARTUP_FAIL_ON_WF_AT;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, MOTOR_FAN_CHAN_STARTUP_SPEED);
@@ -369,11 +369,11 @@ void SweepRobot_ManualModeProc(enum MotionCtrlManualAct act)
     /* FIXME: add delay here,but should put this into timer */
     if(gRobotState != ROBOT_STATE_RUNNING){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    MOTOR_FAN_CHAN_STARTUP_SPEED);
-        mDelay(10);
+        mDelay(5);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
-        mDelay(10);
+        mDelay(5);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
-        mDelay(10);
+        mDelay(1);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
     }
     else{
