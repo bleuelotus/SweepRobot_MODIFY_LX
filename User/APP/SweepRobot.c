@@ -476,8 +476,8 @@ void SweepRobot_IdleStateSync(void)
     if(gRobotMode==ROBOT_WORK_MODE_DISHOMING){
         SweepRobot_AutoModeProc();
 
-        /* FIXME: add software reset here to fix exit power station bug, should find out why IR_diode disabled instead of doing this */
-        SweepRobot_SoftwareReset();
+//        /* FIXME: add software reset here to fix exit power station bug, should find out why IR_diode disabled instead of doing this */
+//        SweepRobot_SoftwareReset();
     }
     else{
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
