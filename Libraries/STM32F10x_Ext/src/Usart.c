@@ -124,15 +124,23 @@ PUTCHAR_PROTOTYPE
 {
     USART_SendData(STDIO_UART, (u8) ch);
 
+#ifdef USE_SIMULATOR
+    
+#else
     while (USART_GetFlagStatus(STDIO_UART, USART_FLAG_TXE) == RESET);
-
+#endif
+    
     return (ch);
 }
 
 GETCHAR_PROTOTYPE
 {
+#ifdef USE_SIMULATOR
+    
+#else
     while (USART_GetFlagStatus(STDIO_UART, USART_FLAG_RXNE) == RESET);
-
+#endif
+    
     return (int)USART_ReceiveData(STDIO_UART);
 }
 

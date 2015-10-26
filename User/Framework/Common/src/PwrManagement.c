@@ -67,7 +67,11 @@ void PM_Init(void)
     
     RCC_HCLKConfig(RCC_SYSCLK_Div1);
     
+#ifdef USE_SIMULATOR
+
+#else
     mDelay(500);
+#endif
 }
 
 void PM_DeInit(void)

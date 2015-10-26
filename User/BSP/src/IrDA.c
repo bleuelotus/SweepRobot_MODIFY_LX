@@ -275,7 +275,11 @@ void IrDA_Init(void)
     plat_int_reg_cb(IRDA_FRONT_R_LIGHT_INT_INDEX,    (void*)IrDA_FrontRLightIsr);
     plat_int_reg_cb(IRDA_RIGHT_LIGHT_INT_INDEX,      (void*)IrDA_RightLightIsr);
 
+#ifdef USE_SIMULATOR
+
+#else
     mDelay(100);
+#endif
 }
 
 void IrDA_DeInit(void)
