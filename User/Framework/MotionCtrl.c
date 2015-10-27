@@ -17,7 +17,7 @@
 #include "CtrlPanel.h"
 #include "Buzzer.h"
 
-#define MOTION_MONITOR_TIM_PERIOD               50                                 // 5ms
+#define MOTION_MONITOR_TIM_PERIOD               200                                // 20ms
 #define MOTION_WHEEL_SPEED_ADJUST_PERIOD        200                                // 20ms
 
 #define IFRD_CHAN_FRONT_L                       0
@@ -42,9 +42,9 @@
 
 #define UNIVERSAL_WHEEL_DETECT_PERIOD           110                             // 110 * 20 = 2200ms
 #define EDGE_MODE_ANGLE_360                     1200                            // 1200 * 5 ms == 300 * 20ms
-#define EXCEPTION_CHECK_PERIOD                  8                               // 5 * 8 = 40ms
+#define EXCEPTION_CHECK_PERIOD                  2                               // 2 * 20 = 40ms
 #define EXCEPTION_WHEEL_STUCK_CHECK_PERIOD      1                               // 1 * 20 = 20ms
-#define UNIVERSAL_WHEEL_CHECK_PERIOD            4                               // 5 * 4 = 20ms
+#define UNIVERSAL_WHEEL_CHECK_PERIOD            1                               // 1 * 20 = 20ms
 
 #define IFRD_CHAN_BOTTOM_SWITCH_TIME_PERIOD     10000
 #define IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT        (BAT_MONITOR_TIM->CNT)
@@ -79,7 +79,7 @@ const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 25
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
 #elif defined REVISION_1_2
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120, 120, 120 };
-const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 400, 400, 400 ,400 };
+const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 150, 150, 150 , 150 };
 
 static u8 gIfrdBottomDetectSwitchFlag = 0;
 #endif
@@ -105,6 +105,8 @@ static enum _PathFaultProcMode gPathFaultProcMode = PATH_FAULT_PROC_MODE_NORMAL;
 static s16 gLastPathCondSLDiff = 0, gLastPathCondSRDiff = 0;
 static s16 gCurPathCondSLDiff = 0, gCurPathCondSRDiff = 0;
 static u16 gEdgeModeAngleCnt = 0;
+
+static Msg_t *PwrStationMsg = NULL;
 
 MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH] = {0};
 u8 gActSeqDepth = 0;
@@ -1037,7 +1039,7 @@ void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
 {
     gExceptionMask = ExceptionStateCheck();
     
-    if( (    (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK))\
+    if( ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS) ) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK) )\
         ||     (gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS))\
         ||     (gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS))\
         ||     (gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS))\
@@ -1048,18 +1050,11 @@ void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
 #endif
         node->LWheelDefDir = 0;
         node->RWheelDefDir = 0;
-        node->LWheelInitSpeed = 0;
-        node->RWheelInitSpeed = 0;
         node->LWheelExpSpeed = 0;
         node->RWheelExpSpeed = 0;
-        node->LWheelExpCnt = 0;
-        node->RWheelExpCnt = 0;
-        node->LWheelSync = 0;
-        node->RWheelSync = 0;
-        node->PreAct = NULL;
-        node->PostAct = NULL;
+        gActSeqDepLIndicator = 1;
+        gActSeqDepRIndicator = 1;
         Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_SHORT);
-        SweepRobot_Stop();
     }
 }
 
@@ -1622,6 +1617,36 @@ void MotionCtrl_MoveDirectly(void)
     MotionCtrl_Proc();
 }
 
+s8 MotionCtrl_SendMsg(Msg_t *Msg)
+{
+    if( IS_IRDA_HOMING_CODE(PwrStationMsg->Data.PSSigDat.sig) ){
+
+        return -1;
+    }
+    return 0;
+}
+
+void MotionCtrl_HomingSigCaptureCondTest(struct MotionCtrl_Action_s *node)
+{
+    if( IS_IRDA_HOMING_CODE(1) ){
+#ifdef DEBUG_LOG
+        printf("HomingSignalCaptured.\r\n");
+#endif
+        gActSequence[1].LWheelDefDir = 1;
+        gActSequence[1].RWheelDefDir = 1;
+        gActSequence[1].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
+        gActSequence[1].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
+        gActSequence[1].LWheelExpCnt = 0x1;
+        gActSequence[1].RWheelExpCnt = 0x2;
+        gActSequence[1].LWheelExpSpeed = WHEEL_HOMING_SPEED;
+        gActSequence[1].RWheelExpSpeed = WHEEL_HOMING_SPEED;
+        gActSequence[1].LWheelSync = 0;
+        gActSequence[1].RWheelSync = 0;
+        gActSequence[1].PreAct = NULL;
+        gActSequence[1].PostAct = NULL;
+    }
+}
+
 void MotionCtrl_HomingMotionInit(void)
 {
     gRobotState = ROBOT_STATE_RUNNING;
@@ -1632,19 +1657,31 @@ void MotionCtrl_HomingMotionInit(void)
 
     MotionCtrl_Start();
 
-    gActSequence[0].LWheelDefDir = 1;
+    gActSequence[0].LWheelDefDir = 0;
     gActSequence[0].RWheelDefDir = 1;
     gActSequence[0].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
     gActSequence[0].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
-    gActSequence[0].LWheelExpCnt = 0x1;
-    gActSequence[0].RWheelExpCnt = 0x2;
-    gActSequence[0].LWheelExpSpeed = WHEEL_CRUISE_SPEED;
-    gActSequence[0].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[0].LWheelExpCnt = WHEEL_TURN_360_CNT;
+    gActSequence[0].RWheelExpCnt = WHEEL_TURN_360_CNT;
+    gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED-1;
+    gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED-1;
     gActSequence[0].LWheelSync = 0;
     gActSequence[0].RWheelSync = 0;
-    gActSequence[0].PreAct = NULL;
+    gActSequence[0].PreAct = MotionCtrl_HomingSigCaptureCondTest;
     gActSequence[0].PostAct = NULL;
-    gActSeqDepth = 1;
+    gActSequence[1].LWheelDefDir = 1;
+    gActSequence[1].RWheelDefDir = 1;
+    gActSequence[1].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[1].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
+    gActSequence[1].LWheelExpCnt = 0x1;
+    gActSequence[1].RWheelExpCnt = 0x2;
+    gActSequence[1].LWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[1].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
+    gActSequence[1].LWheelSync = 0;
+    gActSequence[1].RWheelSync = 0;
+    gActSequence[1].PreAct = NULL;
+    gActSequence[1].PostAct = NULL;
+    gActSeqDepth = 2;
 
     MotionCtrl_Proc();
 }

@@ -26,6 +26,7 @@ static u32 IrDA_FrameData[IRDA_LIGHT_NUM] = {0};
 #endif
 //static u8  IrDA_FrameFlag[IRDA_LIGHT_NUM] = {0};
 static u8  IrDA_FrameBuf = 0, IrDA_FrameBufFlag = 0;
+u8 gIrDA_PwrStationCapFlag;
 
 static u8  PulsCnt[IRDA_LIGHT_NUM] = {0};
 static u8  PulsStart[IRDA_LIGHT_NUM] = {0};
@@ -153,6 +154,7 @@ static void IrDA_ParseEJE(enum IRAD_Light idx)
             PulsCnt[idx] = 0;
             if(IS_IRDA_HOMING_CODE(IrDA_FrameData[idx])){
                 PwrStationHomingSigProc(idx, IrDA_FrameData[idx]);
+                gIrDA_PwrStationCapFlag = 1;
             }
             else{
                 IrDA_FrameBuf = IrDA_FrameData[idx];

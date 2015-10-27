@@ -180,7 +180,10 @@ void SweepRobot_StartupInit(void)
     plat_int_reg_cb(MOTION_MONITOR_TIM_INT_IDX, (void*)SweepRobot_StartupInit);
     
     if(1==gRobotStartupSeqNum){
-        if(WHEEL_FLOAT_SIGN_ALL || ASH_TRAY_INSTALL_SIGN){
+        if(WHEEL_FLOAT_SIGN_ALL /*|| ASH_TRAY_INSTALL_SIGN */){
+#ifdef DEBUG_LOG
+            printf("Wheel Float. or Ash Tray Ins. \r\n");
+#endif
             goto STARTUP_FAIL_ON_WF_AT;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, MOTOR_FAN_CHAN_STARTUP_SPEED);
@@ -189,6 +192,9 @@ void SweepRobot_StartupInit(void)
         /* check FAN current */
         ADC2ValueConvertedLSB[MEAS_CHAN_FAN_CUR-1] = 1.2f*((float)ADCConvertedLSB[MEAS_CHAN_FAN_CUR-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_FAN_CUR-1] > FAN_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup Fan OC.\r\n");
+#endif
             goto STARTUP_FAIL_ON_FAN_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
@@ -197,6 +203,9 @@ void SweepRobot_StartupInit(void)
         /* check Mbrush current */
         ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_MIDDLE-1] > MBRUSH_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup MBrush OC.\r\n");
+#endif
             goto STARTUP_FAIL_ON_MB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
@@ -205,6 +214,9 @@ void SweepRobot_StartupInit(void)
         /* check Lbrush current */
         ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] = 1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_LEFT-1] > LBRUSH_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup LBrush OC.\r\n");
+#endif
             goto STARTUP_FAIL_ON_LB_OC;
         }
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
@@ -213,6 +225,9 @@ void SweepRobot_StartupInit(void)
         /* check Rbrush current */
         ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] =  1.2f*((float)ADCConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1]/(float)ADCConvertedLSB[MEAS_CHAN_INTERNAL_REFVOL-1]);
         if(ADC2ValueConvertedLSB[MEAS_CHAN_BRUSH_CUR_RIGHT-1] > RBRUSH_CUR_THRESHOLD){
+#ifdef DEBUG_LOG
+            printf("Startup RBrush OC.\r\n");
+#endif
             goto STARTUP_FAIL_ON_RB_OC;
         }
 
@@ -239,24 +254,12 @@ void SweepRobot_StartupInit(void)
     return;
 
 STARTUP_FAIL_ON_MB_OC:
-#ifdef DEBUG_LOG
-    printf("Startup MBrush OC.\r\n");
-#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
 STARTUP_FAIL_ON_RB_OC:
-#ifdef DEBUG_LOG
-            printf("Startup RBrush OC.\r\n");
-#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
 STARTUP_FAIL_ON_LB_OC:
-#ifdef DEBUG_LOG
-            printf("Startup LBrush OC.\r\n");
-#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
 STARTUP_FAIL_ON_FAN_OC:
-#ifdef DEBUG_LOG
-    printf("Startup Fan OC.\r\n");
-#endif
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, 0);
     TIM_Cmd(MOTION_MONITOR_TIM, DISABLE);
     TIM_SetCounter(MOTION_MONITOR_TIM, 0);
@@ -480,6 +483,7 @@ void SweepRobot_IdleStateSync(void)
 //        SweepRobot_SoftwareReset();
     }
     else{
+        /* FIXME: should stop the motor in sequence */
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN,    0);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
