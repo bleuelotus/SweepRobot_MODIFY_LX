@@ -18,7 +18,6 @@
 #include "Buzzer.h"
 
 #define MOTION_MONITOR_TIM_PERIOD               200                                // 20ms
-#define MOTION_WHEEL_SPEED_ADJUST_PERIOD        200                                // 20ms
 
 #define IFRD_CHAN_FRONT_L                       0
 #define IFRD_CHAN_FRONT_R                       1
@@ -41,7 +40,7 @@
 #define SPOT_MODE_CIRCLE_INC_STEP               220                             // for every 2 units of speed inc , 55 * 4
 
 #define UNIVERSAL_WHEEL_DETECT_PERIOD           110                             // 110 * 20 = 2200ms
-#define EDGE_MODE_ANGLE_360                     1200                            // 1200 * 5 ms == 300 * 20ms
+#define EDGE_MODE_ANGLE_360                     300                             // 300 * 20 ms == 300 * 20ms
 #define EXCEPTION_CHECK_PERIOD                  2                               // 2 * 20 = 40ms
 #define EXCEPTION_WHEEL_STUCK_CHECK_PERIOD      1                               // 1 * 20 = 20ms
 #define UNIVERSAL_WHEEL_CHECK_PERIOD            1                               // 1 * 20 = 20ms
@@ -78,10 +77,8 @@ const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2
 const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120 };
 const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 3000, 3000 };
 #elif defined REVISION_1_2
-const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 800, 800, 250, 250, 120, 120, 120, 120 };
-const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 150, 150, 150 , 150 };
-
-static u8 gIfrdBottomDetectSwitchFlag = 0;
+const u16 gProximityDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 1000, 1000, 250, 250, 120, 120, 120, 120 };
+const u16 gHighLightDetectionThreshold[IFRD_TxRx_CHAN_NUM] = { 198, 198, 2500, 2500, 150, 150, 150, 150 };
 #endif
 
 static u32 gLWheelTotalCnt = 4, gRWheelTotalCnt = 4, gLastTotalLWheelCnt = 0, gLastTotalRWheelCnt = 0;
@@ -93,6 +90,7 @@ typedef void (*WheelExpFunc_t)(void);
 static WheelExpFunc_t  gLWheelExpCB = NULL;
 static WheelExpFunc_t  gRWheelExpCB = NULL;
 static WheelExpFunc_t  gWheelProcExitCB = NULL;
+static WheelExpFunc_t  gWheelProcCB = NULL;
 static u16 gLastWheelCnt[WHEEL_NUM] = {0};
 static u16 gDeltaWheelCnt[WHEEL_NUM] = {0};
 static u8 gCurLWheelSpeed = WHEEL_CRUISE_SPEED, gCurRWheelSpeed = WHEEL_CRUISE_SPEED;
@@ -106,7 +104,7 @@ static s16 gLastPathCondSLDiff = 0, gLastPathCondSRDiff = 0;
 static s16 gCurPathCondSLDiff = 0, gCurPathCondSRDiff = 0;
 static u16 gEdgeModeAngleCnt = 0;
 
-static Msg_t *PwrStationMsg = NULL;
+static u8 gHomingSigCapturedFlag = 0;
 
 MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH] = {0};
 u8 gActSeqDepth = 0;
@@ -128,6 +126,7 @@ u8 gActSeqDepLIndicator = 0, gActSeqDepRIndicator = 0;
 #define LWHEEL_EXP_CB_REG(f)                        do{gLWheelExpCB=f;}while(0)
 #define RWHEEL_EXP_CB_REG(f)                        do{gRWheelExpCB=f;}while(0)
 #define WHEEL_PROC_EXIT_CB_REG(f)                   do{gWheelProcExitCB=f;}while(0)
+#define WHEEL_PROC_CB_REG(f)                        do{gWheelProcCB=f;}while(0)
 #define LWHEEL_EXP_SPEED_SET(s)                     do{gCurLWheelSpeed=s;}while(0)
 #define RWHEEL_EXP_SPEED_SET(s)                     do{gCurRWheelSpeed=s;}while(0)
 #define LWHEEL_EXP_SPEED_INC(s)                     do{gCurLWheelSpeed+=s;}while(0)
@@ -137,12 +136,13 @@ u8 gActSeqDepLIndicator = 0, gActSeqDepRIndicator = 0;
 #define LWHEEL_CUR_SPEED                            (gCurLWheelSpeed)
 #define RWHEEL_CUR_SPEED                            (gCurRWheelSpeed)
 
+
+
 static u16 gtmpAvoidencePeriodCnt = 0;
 static u16 gtmpExceptionPeriodCnt = 0;
 static u16 gtmpUniversalWheelPeriodCnt = 0;
 
 static u16 gIFRDTxOffRxVal[IFRD_TxRx_CHAN_NUM] = {0};
-static u8 gIFRDEnableCnt[IFRD_TxRx_CHAN_NUM] = {0};
 static u32 gPathCondMap = 0;
 static u8 gLastExceptionMask = 0, gExceptionMask = 0, gIsExceptionHandling = 0;
 static MotionException_ErrCnt_t gMotionExceptionErrCnt;
@@ -158,15 +158,19 @@ void LWheelCounterISR(void)
 {
     LWHEEL_CNT++;
     gLWheelTotalCnt++;
+    if(NULL != gWheelProcCB){
+        gWheelProcCB();
+    }
     if(LWHEEL_CNT == WHEEL_BODY_THROUGH_CNT){
         gLastPathFault = 0;
         gConsecutivePathFaultCnt = 0;
+        gHomingSigCapturedFlag = 0;
         gMotionExceptionErrCnt.AshTrayInsErrCnt = 0;
         gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
         gMotionExceptionErrCnt.FanOCErrCnt = 0;
         gMotionExceptionErrCnt.MBrushOCErrCnt = 0;
         gMotionExceptionErrCnt.LBrushOCErrCnt = 0;
-        gMotionExceptionErrCnt.RBrushOCErrCnt = 0; 
+        gMotionExceptionErrCnt.RBrushOCErrCnt = 0;
         gMotionExceptionErrCnt.WheelStuckErrCnt = 0;
     }
     if(LWHEEL_CNT == gLWheelExpCnt){
@@ -180,15 +184,19 @@ void RWheelCounterISR(void)
 {
     RWHEEL_CNT++;
     gRWheelTotalCnt++;
+    if(NULL != gWheelProcCB){
+        gWheelProcCB();
+    }
     if(RWHEEL_CNT == WHEEL_BODY_THROUGH_CNT){
         gLastPathFault = 0;
         gConsecutivePathFaultCnt = 0;
+        gHomingSigCapturedFlag = 0;
         gMotionExceptionErrCnt.AshTrayInsErrCnt = 0;
         gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
         gMotionExceptionErrCnt.FanOCErrCnt = 0;
         gMotionExceptionErrCnt.MBrushOCErrCnt = 0;
         gMotionExceptionErrCnt.LBrushOCErrCnt = 0;
-        gMotionExceptionErrCnt.RBrushOCErrCnt = 0; 
+        gMotionExceptionErrCnt.RBrushOCErrCnt = 0;
         gMotionExceptionErrCnt.WheelStuckErrCnt = 0;
     }
     if(RWHEEL_CNT == gRWheelExpCnt){
@@ -252,22 +260,22 @@ void MotionStateProc(void)
 
     /* Phase 1 */
     if((++gtmpAvoidencePeriodCnt)%2){
-        
+
         /* Save proximity condition in Tx off */
         for(i = 0; i < IFRD_TxRx_ACTUAL_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i];
         }
-        
+
         /* FIXME: add bottom sensor switch process here */
         Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, 1);
 //        gLastTimeCnt = IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT;
 //        while( ( (gLastTimeCnt > IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT) ? gLastTimeCnt - IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT : IFRD_CHAN_BOTTOM_SWITCH_TIME_PERIOD - gLastTimeCnt + IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT ) < 10 );
         uDelay(100);
-        
+
         for(i = IFRD_TxRx_ACTUAL_CHAN_NUM; i < IFRD_TxRx_CHAN_NUM; i++){
             gIFRDTxOffRxVal[i] = ADCConvertedLSB[i-(IFRD_TxRx_CHAN_NUM-IFRD_TxRx_ACTUAL_CHAN_NUM)];
         }
-        
+
         IFRD_TX_ENABLE();
     }
     /* Phase 2 */
@@ -281,7 +289,7 @@ void MotionStateProc(void)
         }
 
 #ifdef REVISION_1_2
-        
+
         if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_SL] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_SL]) ){
             gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
         }else {
@@ -292,13 +300,13 @@ void MotionStateProc(void)
                 gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BSL_POS);
             }
         }
-        
+
         /* FIXME: add bottom sensor switch process here */
         Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, 0);
 //        gLastTimeCnt = IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT;
 //        while( ( (gLastTimeCnt > IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT) ? gLastTimeCnt - IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT : IFRD_CHAN_BOTTOM_SWITCH_TIME_PERIOD - gLastTimeCnt + IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT ) < 10 );
         uDelay(100);
-        
+
         if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_L] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_L]) ){
             gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BL_POS);
         }else {
@@ -418,13 +426,13 @@ void MotionStateProc(void)
                 gPathCondMap &= ~(1 << PATH_COND_PROXIMITY_FLAG_BR_POS);
             }
         }
-        
+
         /* FIXME: add bottom sensor switch process here */
         Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, 1);
 //        gLastTimeCnt = IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT;
 //        while( ( (gLastTimeCnt > IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT) ? gLastTimeCnt - IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT : IFRD_CHAN_BOTTOM_SWITCH_TIME_PERIOD - gLastTimeCnt + IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT ) < 10 );
         uDelay(100);
-        
+
         if( (gIFRDTxOffRxVal[IFRD_CHAN_BOTTOM_SR] < gHighLightDetectionThreshold[IFRD_CHAN_BOTTOM_SR]) ){
             gPathCondMap |= (1 << PATH_COND_PROXIMITY_FLAG_BSR_POS);
         }else {
@@ -549,7 +557,7 @@ void MotionStateProc(void)
             }
         }
     }
-    
+
     if( (++gtmpUniversalWheelPeriodCnt) == UNIVERSAL_WHEEL_CHECK_PERIOD ){
         /* Universal wheel signal check */
         gUniversalWheelActiveVal = FWHEEL_ACTIVE_VAL;
@@ -608,7 +616,7 @@ void MotionStateProc(void)
             MotorCtrl_ChanSpeedInc(MOTOR_CTRL_CHAN_RWHEEL);
         }
         gtmpUniversalWheelPeriodCnt = 0;
-    }else 
+    }else
         ;
 }
 
@@ -1017,14 +1025,14 @@ void MotionCtrl_Stop(void)
     gActSeqDepRIndicator = 0;
     gLastPathFault = 0;
     gPathFaultProcEdgeModeCnt = 0;
-    
+
     gIsExceptionHandling = 0;
     gMotionExceptionErrCnt.AshTrayInsErrCnt = 0;
     gMotionExceptionErrCnt.WheelFloatErrCnt = 0;
     gMotionExceptionErrCnt.FanOCErrCnt = 0;
     gMotionExceptionErrCnt.MBrushOCErrCnt = 0;
     gMotionExceptionErrCnt.LBrushOCErrCnt = 0;
-    gMotionExceptionErrCnt.RBrushOCErrCnt = 0; 
+    gMotionExceptionErrCnt.RBrushOCErrCnt = 0;
     gMotionExceptionErrCnt.WheelStuckErrCnt = 0;
 
     CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
@@ -1038,7 +1046,7 @@ u8 MotionCtrl_PathFaultBackProcCompleteCondTest(void)
 void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
 {
     gExceptionMask = ExceptionStateCheck();
-    
+
     if( ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS) ) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK) )\
         ||     (gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS))\
         ||     (gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS))\
@@ -1048,13 +1056,20 @@ void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
 #ifdef DEBUG_LOG
         printf("ExceptionStopCond=0x%X.\r\n", gExceptionMask);
 #endif
-        node->LWheelDefDir = 0;
-        node->RWheelDefDir = 0;
-        node->LWheelExpSpeed = 0;
-        node->RWheelExpSpeed = 0;
-        gActSeqDepLIndicator = 1;
-        gActSeqDepRIndicator = 1;
-        Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_SHORT);
+        LWHEEL_EXP_CB_REG(NULL);
+        RWHEEL_EXP_CB_REG(NULL);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
+        gActSeqDepLIndicator = 0;
+        gActSeqDepRIndicator = 0;
+        MotionCtrl_Stop();
+        /* Notify main process make the further stop */
+        gMsg.expire = 0;
+        gMsg.prio = MSG_PRIO_HIGHEST;
+        gMsg.type = MSG_TYPE_MOTION;
+        gMsg.MsgCB = NULL;
+        gMsg.Data.MEvt = MOTION_EVT_IDLE_SYNC;
+        SweepRobot_SendMsg(&gMsg);
     }
 }
 
@@ -1108,7 +1123,6 @@ void MotionCtrl_PathFaultEdgeModeProcAct(struct MotionCtrl_Action_s *node)
     }
 }
 
-/* FIXME: avoidence stuck bug should be fixed */
 void MotionCtrl_PathFaultProc(u8 StopOnFinish)
 {
     MCtrl_Act_t *pActSequence = gActSequence;
@@ -1380,7 +1394,7 @@ s8 MotionCtrl_ExceptionHandle(void)
 
     if ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!(gPathCondMap & PATH_FAULT_BOTTOM_MASK)) ){
         if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.WheelFloatErrCnt), 1)){
-            printf("WHEEL_FLOAT_NO_BOTTOM\r\n");
+            printf("WHEEL_FLOAT_WITH_NO_BOTTOM_FLOAT_DETECT\r\n");
             return -1;
         }
     }
@@ -1617,33 +1631,38 @@ void MotionCtrl_MoveDirectly(void)
     MotionCtrl_Proc();
 }
 
-s8 MotionCtrl_SendMsg(Msg_t *Msg)
-{
-    if( IS_IRDA_HOMING_CODE(PwrStationMsg->Data.PSSigDat.sig) ){
-
-        return -1;
-    }
-    return 0;
+void MotionCtrl_HomingSigCaptureCondTest(void){
+    gHomingSigCapturedFlag = 1;
 }
 
-void MotionCtrl_HomingSigCaptureCondTest(struct MotionCtrl_Action_s *node)
+void MotionCtrl_HomingSigCapturedProc(void)
 {
-    if( IS_IRDA_HOMING_CODE(1) ){
+    if(gHomingSigCapturedFlag){
 #ifdef DEBUG_LOG
         printf("HomingSignalCaptured.\r\n");
 #endif
-        gActSequence[1].LWheelDefDir = 1;
-        gActSequence[1].RWheelDefDir = 1;
-        gActSequence[1].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
-        gActSequence[1].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
-        gActSequence[1].LWheelExpCnt = 0x1;
-        gActSequence[1].RWheelExpCnt = 0x2;
-        gActSequence[1].LWheelExpSpeed = WHEEL_HOMING_SPEED;
-        gActSequence[1].RWheelExpSpeed = WHEEL_HOMING_SPEED;
-        gActSequence[1].LWheelSync = 0;
-        gActSequence[1].RWheelSync = 0;
-        gActSequence[1].PreAct = NULL;
-        gActSequence[1].PostAct = NULL;
+        WHEEL_PROC_CB_REG(NULL);
+        LWHEEL_EXP_CB_REG(NULL);
+        RWHEEL_EXP_CB_REG(NULL);
+        MotionCtrl_Stop();
+
+        MotionCtrl_Start();
+
+        gActSequence[0].LWheelDefDir = 1;
+        gActSequence[0].RWheelDefDir = 1;
+        gActSequence[0].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
+        gActSequence[0].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED;
+        gActSequence[0].LWheelExpCnt = 0x1;
+        gActSequence[0].RWheelExpCnt = 0x2;
+        gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED;
+        gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED;
+        gActSequence[0].LWheelSync = 0;
+        gActSequence[0].RWheelSync = 0;
+        gActSequence[0].PreAct = NULL;
+        gActSequence[0].PostAct = NULL;
+        gActSeqDepth = 1;
+
+        MotionCtrl_Proc();
     }
 }
 
@@ -1657,6 +1676,8 @@ void MotionCtrl_HomingMotionInit(void)
 
     MotionCtrl_Start();
 
+    gHomingSigCapturedFlag = 0;
+
     gActSequence[0].LWheelDefDir = 0;
     gActSequence[0].RWheelDefDir = 1;
     gActSequence[0].LWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED;
@@ -1667,7 +1688,7 @@ void MotionCtrl_HomingMotionInit(void)
     gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED-1;
     gActSequence[0].LWheelSync = 0;
     gActSequence[0].RWheelSync = 0;
-    gActSequence[0].PreAct = MotionCtrl_HomingSigCaptureCondTest;
+    gActSequence[0].PreAct = NULL;
     gActSequence[0].PostAct = NULL;
     gActSequence[1].LWheelDefDir = 1;
     gActSequence[1].RWheelDefDir = 1;
@@ -1684,6 +1705,8 @@ void MotionCtrl_HomingMotionInit(void)
     gActSeqDepth = 2;
 
     MotionCtrl_Proc();
+
+    WHEEL_PROC_CB_REG(MotionCtrl_HomingSigCapturedProc);
 }
 
 void MotionCtrl_DishomingMotionInit(void)

@@ -252,6 +252,7 @@ void MotionCtrl_AutoMotionInit(void);
 void MotionCtrl_SpotMotionInit(void);
 void MotionCtrl_EdgeMotionInit(void);
 void MotionCtrl_DishomingMotionInit(void);
+void MotionCtrl_HomingSigCaptureCondTest(void);
 void MotionCtrl_HomingMotionInit(void);
 void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act);
 void MotionCtrl_PathFaultProc(u8 StopOnFinish);

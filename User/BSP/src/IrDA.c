@@ -327,7 +327,7 @@ void PwrStationHomingSigProc(u8 idx, u8 code)
     Msg.expire = 0;
     Msg.prio = MSG_PRIO_HIGH;
     Msg.type = MSG_TYPE_PWR_STATION;
-    Msg.MsgCB = NULL;
+    Msg.MsgCB = MotionCtrl_HomingSigCaptureCondTest;
     Msg.Data.PSSigDat.src = (enum IrDARecvPos)idx;
     Msg.Data.PSSigDat.sig = (enum PwrStationSignal)code;
     SweepRobot_SendMsg(&Msg);

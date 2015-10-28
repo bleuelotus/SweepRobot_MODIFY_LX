@@ -391,7 +391,7 @@ void SweepRobot_HomingInit(void)
         return;
     }
 
-    /* FIXME: add delay here */
+    /* FIXME: add motor start sequence here when robot entering homing mode */
     if(gRobotState != ROBOT_STATE_RUNNING){
         gRobotStartupSeqNum++;
         
@@ -479,7 +479,7 @@ void SweepRobot_IdleStateSync(void)
     if(gRobotMode==ROBOT_WORK_MODE_DISHOMING){
         SweepRobot_AutoModeProc();
 
-//        /* FIXME: add software reset here to fix exit power station bug, should find out why IR_diode disabled instead of doing this */
+//        /* FIXME: add software reset here to avoid IR receivers become invalid, should find out why IR receivers become invalid instead of doing this */
 //        SweepRobot_SoftwareReset();
     }
     else{
@@ -540,9 +540,10 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
                 CtrlPanel_LEDCtrl(CTRL_PANEL_LED_GREEN, CTRL_PANEL_LED_BR_LVL);
             }
 
-            if( (gBM_Cond.state == BAT_STATE_DISCHARGING) && (gRobotMode != ROBOT_WORK_MODE_DISHOMING) ){
-                SweepRobot_SoftwareReset();
-            }
+            /* FIXME: add software reset here to avoid IR receivers become invalid */
+//            if( (gBM_Cond.state == BAT_STATE_DISCHARGING) && (gRobotMode != ROBOT_WORK_MODE_DISHOMING) ){
+//                SweepRobot_SoftwareReset();
+//            }
 
             break;
         case BM_EVT_POWER_LINK:
@@ -566,7 +567,7 @@ void SweepRobot_BMMsgProc(enum BatteryEvt evt)
             }
             break;
         case BM_EVT_WARNING_LOW_LEVEL:
-            /* TODO: add Battery warning low process here */
+            /* FIXME: add Battery warning low process here */
             Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_NORMAL);
             SweepRobot_Stop();
             break;
