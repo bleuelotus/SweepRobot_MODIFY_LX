@@ -67,6 +67,7 @@ u8 BM_ChargeExit(void);
 u8 BM_ChargeProc(void);
 void BM_ChargeStart(void);
 void BM_ChargeStop(void);
+void BM_ReturnPwrStation(void);
 
 void BM_ConditionUpdate(void)
 {
@@ -194,7 +195,8 @@ void BM_ConditionUpdate(void)
                 Msg.expire = 0;
                 Msg.type = MSG_TYPE_BM;
                 Msg.prio = MSG_PRIO_LOW;
-                Msg.MsgCB = BM_ChargeStop;
+//                Msg.MsgCB = BM_ChargeStop;
+                Msg.MsgCB = BM_ReturnPwrStation;
                 Msg.Data.BatEvt = BM_EVT_POWER_LOSS;
                 SweepRobot_SendMsg(&Msg);
                 break;
@@ -277,6 +279,12 @@ u8 BM_ChargeExit(void)
 {
     Counter = 0;
     return PWM_DutyCycleSet(PWM_CHAN_CHARGE, 0);
+}
+
+void BM_ReturnPwrStation(void)
+{
+    BM_ChargeFlag = 0;
+    MotionCtrl_RtrnHomingMotionInit();
 }
 
 u8 BM_ChargeProc(void)

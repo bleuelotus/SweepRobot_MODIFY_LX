@@ -181,6 +181,8 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 
 #define WHEEL_GEAR_RATIO                    62.5
 #define WHEEL_1CYCLE_CNT                    500                                 //(WHEEL_GEAR_RATIO*8)
+#define WHEEL_HALF_CYCLE_CNT                250
+#define WHEEL_1QUARTER_CYCLE_CNT            125
 #define WHEEL_BASE_LEN                      204                                 // mm
 #define WHEEL_DIAMETER                      68                                  // mm
 #define WHEEL_TURN_15_CNT                   60//63
@@ -254,6 +256,7 @@ void MotionCtrl_EdgeMotionInit(void);
 void MotionCtrl_DishomingMotionInit(void);
 void MotionCtrl_HomingSigCaptureCondTest(void);
 void MotionCtrl_HomingMotionInit(void);
+void MotionCtrl_RtrnHomingMotionInit(void);
 void MotionCtrl_ManualCtrlProc(enum MotionCtrlManualAct act);
 void MotionCtrl_PathFaultProc(u8 StopOnFinish);
 s8 MotionCtrl_ExceptionHandle(void);

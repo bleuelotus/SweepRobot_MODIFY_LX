@@ -1757,6 +1757,52 @@ void MotionCtrl_DishomingMotionInit(void)
     MotionCtrl_Proc();
 }
 
+
+u8 MotionCtrl_RtrnHomingWheelForwardProc(void)
+{
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
+    MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
+    
+    return 1;
+}
+
+void MotionCtrl_RtrnHomingMotionInit(void)
+{
+    gRobotState = ROBOT_STATE_RUNNING;
+    gRobotMode = ROBOT_WORK_MODE_HOMING;
+
+    MotionCtrl_Start();
+
+    gActSequence[0].LWheelDefDir = 0;
+    gActSequence[0].RWheelDefDir = 0;
+    gActSequence[0].LWheelInitSpeed = 10;
+    gActSequence[0].RWheelInitSpeed = 10;
+    gActSequence[0].LWheelExpCnt = WHEEL_1QUARTER_CYCLE_CNT;
+    gActSequence[0].RWheelExpCnt = WHEEL_1QUARTER_CYCLE_CNT;
+    gActSequence[0].LWheelExpSpeed = WHEEL_HOMING_SPEED;
+    gActSequence[0].RWheelExpSpeed = WHEEL_HOMING_SPEED;
+    gActSequence[0].LWheelSync = 0;
+    gActSequence[0].RWheelSync = 0;
+    gActSequence[0].PreAct = NULL;
+    gActSequence[0].PostAct = MotionCtrl_RtrnHomingWheelForwardProc;
+    gActSequence[1].LWheelDefDir = 1;
+    gActSequence[1].RWheelDefDir = 1;
+    gActSequence[1].LWheelInitSpeed = 10;
+    gActSequence[1].RWheelInitSpeed = 10;
+    gActSequence[1].LWheelExpCnt = 0x1;
+    gActSequence[1].RWheelExpCnt = 0x2;
+    gActSequence[1].LWheelExpSpeed = WHEEL_HOMING_SPEED-1;
+    gActSequence[1].RWheelExpSpeed = WHEEL_HOMING_SPEED-1;
+    gActSequence[1].LWheelSync = 0;
+    gActSequence[1].RWheelSync = 0;
+    gActSequence[1].PreAct = NULL;
+    gActSequence[1].PostAct = NULL;
+    gActSeqDepth = 2;
+
+    MotionCtrl_Proc();
+}
+
 void MotionCtrl_AutoMotionInit(void)
 {
     gRobotState = ROBOT_STATE_RUNNING;
