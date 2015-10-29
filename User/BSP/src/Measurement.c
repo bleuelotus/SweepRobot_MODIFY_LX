@@ -164,8 +164,5 @@ void Meas_Stop(void)
 
 void Meas_IFRD_BOTTOM_RX_SWITCH(GPIO_TypeDef* GPIOx, u16 GPIO_Pin, u8 GPIO_Switch_Lvl)
 {
-    if(GPIO_Switch_Lvl)
-        GPIO_SetBits(GPIOx, GPIO_Pin);
-    else
-        GPIO_ResetBits(GPIOx, GPIO_Pin);
+    GPIO_WriteBit(GPIOx, GPIO_Pin, GPIO_Switch_Lvl);
 }

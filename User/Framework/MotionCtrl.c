@@ -144,7 +144,7 @@ static u16 gIFRDTxOffRxVal[IFRD_TxRx_CHAN_NUM] = {0};
 static u32 gPathCondMap = 0;
 static u8 gLastExceptionMask = 0, gExceptionMask = 0, gIsExceptionHandling = 0;
 static MotionException_ErrCnt_t gMotionExceptionErrCnt;
-static u16 gUniversalWheelActiveVal = 0, gUniversalWheelActiveValLast = 0, gUniveralWheelDetectPeriodCnt = 0;
+static u16 gUniversalWheelActiveVal = 0, gUniversalWheelActiveValLast = 0, gUniversalWheelDetectPeriodCnt = 0;
 static Msg_t gMsg;
 
 //void FWheelCounterISR(void)
@@ -265,7 +265,7 @@ void MotionStateProc(void)
         }
 
         /* FIXME: add bottom sensor switch process here */
-        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, 1);
+        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, Bit_SET);
 //        gLastTimeCnt = IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT;
 //        while( ( (gLastTimeCnt > IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT) ? gLastTimeCnt - IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT : IFRD_CHAN_BOTTOM_SWITCH_TIME_PERIOD - gLastTimeCnt + IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT ) < 10 );
         uDelay(100);
@@ -300,7 +300,7 @@ void MotionStateProc(void)
         }
 
         /* FIXME: add bottom sensor switch process here */
-        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, 0);
+        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, Bit_RESET);
 //        gLastTimeCnt = IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT;
 //        while( ( (gLastTimeCnt > IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT) ? gLastTimeCnt - IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT : IFRD_CHAN_BOTTOM_SWITCH_TIME_PERIOD - gLastTimeCnt + IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT ) < 10 );
         uDelay(100);
@@ -426,7 +426,7 @@ void MotionStateProc(void)
         }
 
         /* FIXME: add bottom sensor switch process here */
-        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, 1);
+        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, Bit_SET);
 //        gLastTimeCnt = IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT;
 //        while( ( (gLastTimeCnt > IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT) ? gLastTimeCnt - IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT : IFRD_CHAN_BOTTOM_SWITCH_TIME_PERIOD - gLastTimeCnt + IFRD_CHAN_BOTTOM_SWITCH_TIME_CNT ) < 10 );
         uDelay(100);
@@ -535,7 +535,7 @@ void MotionStateProc(void)
         IFRD_TX_DISABLE();
 
 #ifdef REVISION_1_2
-        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, 0);
+        Meas_IFRD_BOTTOM_RX_SWITCH(AD_IFRD_BOTTOM_RX_SWITCH_GPIO, AD_IFRD_BOTTOM_RX_SWITCH_PIN, Bit_RESET);
 #endif
 
         if( IS_MOTION_PROC_FINISH() && (gPathCondMap & (PATH_FAULT_LEFT_MASK | PATH_FAULT_RIGHT_MASK)) ){
@@ -567,9 +567,9 @@ void MotionStateProc(void)
                 FWHEEL_CNT++;
                 gUniversalWheelActiveValLast = gUniversalWheelActiveVal;
             }
-            gUniveralWheelDetectPeriodCnt++;
-            if(gUniveralWheelDetectPeriodCnt > UNIVERSAL_WHEEL_DETECT_PERIOD){
-                gUniveralWheelDetectPeriodCnt = 0;
+            gUniversalWheelDetectPeriodCnt++;
+            if(gUniversalWheelDetectPeriodCnt > UNIVERSAL_WHEEL_DETECT_PERIOD){
+                gUniversalWheelDetectPeriodCnt = 0;
     #ifdef DEBUG_LOG
     //                printf("%d\r\n", FWHEEL_CNT);
     #endif
@@ -592,7 +592,7 @@ void MotionStateProc(void)
         }
         else{
             FWHEEL_CNT_CLR();
-            gUniveralWheelDetectPeriodCnt = 0;
+            gUniversalWheelDetectPeriodCnt = 0;
         }
         gLastWheelCnt[WHEEL_IDX_L] = LWHEEL_CNT;
         gLastWheelCnt[WHEEL_IDX_R] = RWHEEL_CNT;
@@ -1334,30 +1334,35 @@ s8 MotionCtrl_ExceptionHandle(void)
     if(gExceptionMask){
         printf("gExp=0x%X\r\n",gExceptionMask);
     }
+    if( gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS) ){
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_FAN, 0);
+        printf("FAN_OC\r\n");
+            return -1;
+    }
     if(gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, 0);
-        if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.LBrushOCErrCnt), 1)){
+        if(MotionCtrl_ExceptionStopErrCntr( &(gMotionExceptionErrCnt.LBrushOCErrCnt), 1 ) ){
             printf("LBRUSH_OC\r\n");
             return -1;
         }
     }
     if(gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, 0);
-        if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.RBrushOCErrCnt), 1)){
+        if(MotionCtrl_ExceptionStopErrCntr( &(gMotionExceptionErrCnt.RBrushOCErrCnt), 1 ) ){
             printf("RBRUSH_OC\r\n");
             return -1;
         }
     }
     if(gExceptionMask & (1<<EXCEPTION_MASK_MBRUSH_OC_POS)){
         MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, 0);
-        if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.MBrushOCErrCnt), 1)){
+        if(MotionCtrl_ExceptionStopErrCntr( &(gMotionExceptionErrCnt.MBrushOCErrCnt), 1 ) ){
             printf("MBRUSH_OC\r\n");
             return -1;
         }
     }
 
     if( gExceptionMask & ((1<<EXCEPTION_MASK_LWHEEL_STUCK_POS)|(1<<EXCEPTION_MASK_RWHEEL_STUCK_POS)) ){
-        if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.WheelStuckErrCnt), 1)){
+        if(MotionCtrl_ExceptionStopErrCntr( &(gMotionExceptionErrCnt.WheelStuckErrCnt), 1 ) ){
             printf("WHEEL_STUCK\r\n");
             return -1;
         }
@@ -1367,14 +1372,6 @@ s8 MotionCtrl_ExceptionHandle(void)
         gIsExceptionHandling = 0;
         printf("ASH_TRAY_NOT_INS\r\n");
         return -1;
-    }
-
-    if( gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS) ){
-        if(MotionCtrl_ExceptionStopErrCntr(&(gMotionExceptionErrCnt.FanOCErrCnt), 1)){
-            printf("FAN_OC\r\n");
-            return -1;
-        }else
-            return 0;
     }
 
     /* FIXME: add wheel floating avoidence process */
