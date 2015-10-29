@@ -61,16 +61,7 @@
 #define IRDA_RIGHT_LIGHT_EXTI_IRQ                   EXTI9_5_IRQn
 #define IRDA_RIGHT_LIGHT_EXTI_LINE                  EXTI_Line8
 #define IRDA_RIGHT_LIGHT_INT_INDEX                  STM32F10x_INT_EXTI9_5_8
-#elif defined REVISION_1_1
-#define IRDA_RIGHT_LIGHT_GPIO_PERIPH_ID             RCC_APB2Periph_GPIOD
-#define IRDA_RIGHT_LIGHT_GPIO                       GPIOD
-#define IRDA_RIGHT_LIGHT_PIN                        GPIO_Pin_6
-#define IRDA_RIGHT_LIGHT_EXTI_GPIO                  GPIO_PortSourceGPIOD
-#define IRDA_RIGHT_LIGHT_EXTI_PIN                   GPIO_PinSource6
-#define IRDA_RIGHT_LIGHT_EXTI_IRQ                   EXTI9_5_IRQn
-#define IRDA_RIGHT_LIGHT_EXTI_LINE                  EXTI_Line6
-#define IRDA_RIGHT_LIGHT_INT_INDEX                  STM32F10x_INT_EXTI9_5_6
-#elif defined REVISION_1_2
+#else
 #define IRDA_RIGHT_LIGHT_GPIO_PERIPH_ID             RCC_APB2Periph_GPIOD
 #define IRDA_RIGHT_LIGHT_GPIO                       GPIOD
 #define IRDA_RIGHT_LIGHT_PIN                        GPIO_Pin_6

@@ -62,9 +62,7 @@ enum _PathFaultProcMode {
 
 #ifdef REVISION_1_0
 #define UNIVERSAL_WHEEL_ACTIVE_THRESHOLD    1
-#elif defined REVISION_1_1
-#define UNIVERSAL_WHEEL_ACTIVE_THRESHOLD    400
-#elif defined REVISION_1_2
+#else
 #define UNIVERSAL_WHEEL_ACTIVE_THRESHOLD    400
 #endif
 
@@ -1405,21 +1403,9 @@ s8 MotionCtrl_ExceptionHandle(void)
     return 0;
 }
 
-void MotionCtrl_ExceptionProc_Speed_Set(MCtrl_Act_t *sActSequence)
-{
-    if ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS)) && (!(gPathCondMap & PATH_FAULT_BOTTOM_MASK)) ){
-        sActSequence->LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
-        sActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
-    }
-    else {
-        sActSequence->LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
-        sActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
-    }
-}
-
 void MotionCtrl_ExceptionProc(void)
 {
-    gExceptionMask &= 0;
+    gExceptionMask &= 0x00;
     
     MotionCtrl_Start();
     gActSequence[0].LWheelDefDir = 0;
@@ -1428,7 +1414,8 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[0].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED*2;
     gActSequence[0].LWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
     gActSequence[0].RWheelExpCnt = WHEEL_FAULT_BACK_CNT*2;
-    MotionCtrl_ExceptionProc_Speed_Set(gActSequence);
+    gActSequence[0].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[0].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[0].LWheelSync = 0;
     gActSequence[0].RWheelSync = 0;
     gActSequence[0].PreAct = NULL;
@@ -1440,8 +1427,8 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[1].RWheelInitSpeed = MOTOR_LWHEEL_CHAN_STARTUP_SPEED*2;
     gActSequence[1].LWheelExpCnt = WHEEL_TURN_45_CNT;
     gActSequence[1].RWheelExpCnt = WHEEL_TURN_45_CNT;
-    gActSequence->LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
-    gActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[1].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[1].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[1].LWheelSync = 0;
     gActSequence[1].RWheelSync = 0;
     gActSequence[1].PreAct = NULL;
@@ -1453,8 +1440,8 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[2].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED*2;
     gActSequence[2].LWheelExpCnt = WHEEL_TURN_45_CNT;
     gActSequence[2].RWheelExpCnt = WHEEL_TURN_45_CNT;
-    gActSequence->LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
-    gActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[2].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[2].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[2].LWheelSync = 0;
     gActSequence[2].RWheelSync = 0;
     gActSequence[2].PreAct = NULL;
@@ -1466,7 +1453,8 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[3].RWheelInitSpeed = MOTOR_RWHEEL_CHAN_STARTUP_SPEED*2;
     gActSequence[3].LWheelExpCnt = WHEEL_FAULT_BACK_CNT;
     gActSequence[3].RWheelExpCnt = WHEEL_FAULT_BACK_CNT;
-    MotionCtrl_ExceptionProc_Speed_Set(gActSequence+3);
+    gActSequence[3].LWheelExpSpeed = WHEEL_ESCAPE_SPEED;
+    gActSequence[3].RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[3].LWheelSync = 0;
     gActSequence[3].RWheelSync = 0;
     gActSequence[3].PreAct = NULL;

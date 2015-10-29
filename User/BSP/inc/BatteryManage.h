@@ -17,11 +17,7 @@
 #define BM_CHARGE_SW_STATUS_GPIO_PERIPH_ID      RCC_APB2Periph_GPIOD
 #define BM_CHARGE_SW_STATUS_GPIO                GPIOD
 #define BM_CHARGE_SW_STATUS_PIN                 GPIO_Pin_7
-#elif defined REVISION_1_1
-#define BM_CHARGE_SW_STATUS_GPIO_PERIPH_ID      RCC_APB2Periph_GPIOB
-#define BM_CHARGE_SW_STATUS_GPIO                GPIOB
-#define BM_CHARGE_SW_STATUS_PIN                 GPIO_Pin_5
-#elif defined REVISION_1_2
+#else
 #define BM_CHARGE_SW_STATUS_GPIO_PERIPH_ID      RCC_APB2Periph_GPIOB
 #define BM_CHARGE_SW_STATUS_GPIO                GPIOB
 #define BM_CHARGE_SW_STATUS_PIN                 GPIO_Pin_5

@@ -20,9 +20,7 @@
 #define CTRL_BTN_ALL_IN_ONE_GPIO            GPIOD
 #ifdef REVISION_1_0
 #define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_6
-#elif defined REVISION_1_1
-#define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_7
-#elif defined REVISION_1_2
+#else
 #define CTRL_BTN_ALL_IN_ONE_PIN             GPIO_Pin_7
 #endif
 #define CTRL_BTN_ALL_IN_ONE_EXTI_GPIO       GPIO_PortSourceGPIOD

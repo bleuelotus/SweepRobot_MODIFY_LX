@@ -140,14 +140,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define FWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource12
 #define FWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI15_10_12
 #define FWHEEL_COUNTER_EXTI_IRQN            EXTI15_10_IRQn
-#elif defined REVISION_1_1
-#define FWHEEL_COUNTER_GPIO                 GPIOC
-#define FWHEEL_COUNTER_PIN                  GPIO_Pin_5
-#define FWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOC
-#define FWHEEL_COUNTER_EXTI_PIN_SOURCE      GPIO_PinSource5
-#define FWHEEL_COUNTER_INT_INDEX            STM32F10x_INT_EXTI9_5_5
-#define FWHEEL_COUNTER_EXTI_IRQN            EXTI9_5_IRQn
-#elif defined REVISION_1_2
+#else
 #define FWHEEL_COUNTER_GPIO                 GPIOC
 #define FWHEEL_COUNTER_PIN                  GPIO_Pin_5
 #define FWHEEL_COUNTER_EXTI_GPIO_SOURCE     GPIO_PortSourceGPIOC
@@ -173,9 +166,7 @@ extern MCtrl_Act_t gActSequence[MCTRL_ACT_MAX_DEPTH];
 #define WHEEL_CNT_EXTI_LINES                (EXTI_Line7|EXTI_Line14)            //(EXTI_Line7|EXTI_Line12|EXTI_Line14)
 #ifdef REVISION_1_0
 #define FWHEEL_ACTIVE_VAL                   GPIO_ReadInputDataBit(FWHEEL_COUNTER_GPIO, FWHEEL_COUNTER_PIN)
-#elif REVISION_1_1
-#define FWHEEL_ACTIVE_VAL                   ADCConvertedLSB[MEAS_CHAN_UNIVERSAL_WHEEL_SIG-1]
-#elif REVISION_1_2
+#else
 #define FWHEEL_ACTIVE_VAL                   ADCConvertedLSB[MEAS_CHAN_UNIVERSAL_WHEEL_SIG-1]
 #endif
 
