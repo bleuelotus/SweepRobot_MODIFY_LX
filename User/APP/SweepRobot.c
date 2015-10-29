@@ -630,7 +630,8 @@ void SweepRobot_CtrlMsgProc(u8 CtrlCode)
         default:
             if(CtrlCode >= REMOTE_CMD_PLAN_23P5H || CtrlCode <= REMOTE_CMD_PLAN_0P5H){
                 RTC_AlarmSet((REMOTE_CMD_PLAN_0P5H-CtrlCode+1)*1800);
-                Buzzer_Play(BUZZER_ONE_PULS, BUZZER_SND_SHORT);
+                /* FIXME: comment this to avoid noise ,but should fix ir receive error code problem; */
+//                Buzzer_Play(BUZZER_ONE_PULS, BUZZER_SND_SHORT);
             }
             break;
     }

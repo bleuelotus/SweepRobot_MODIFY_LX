@@ -1043,36 +1043,6 @@ u8 MotionCtrl_PathFaultBackProcCompleteCondTest(void)
     return ((!(gPathCondMap & PATH_PROXIMITY_SIDE_L_MASK)) || (!(gPathCondMap & PATH_PROXIMITY_SIDE_R_MASK)));
 }
 
-void MotionCtrl_ExceptionStopCondTest(struct MotionCtrl_Action_s *node)
-{
-    gExceptionMask = ExceptionStateCheck();
-
-    if( ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS) ) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK) )\
-        ||     (gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS))\
-        ||     (gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS))\
-        ||     (gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS))\
-        ||     (gExceptionMask & (1<<EXCEPTION_MASK_MBRUSH_OC_POS))\
-        ){
-#ifdef DEBUG_LOG
-        printf("ExceptionStopCond=0x%X.\r\n", gExceptionMask);
-#endif
-        LWHEEL_EXP_CB_REG(NULL);
-        RWHEEL_EXP_CB_REG(NULL);
-        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
-        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
-        gActSeqDepLIndicator = 0;
-        gActSeqDepRIndicator = 0;
-        MotionCtrl_Stop();
-        /* Notify main process make the further stop */
-        gMsg.expire = 0;
-        gMsg.prio = MSG_PRIO_HIGHEST;
-        gMsg.type = MSG_TYPE_MOTION;
-        gMsg.MsgCB = NULL;
-        gMsg.Data.MEvt = MOTION_EVT_IDLE_SYNC;
-        SweepRobot_SendMsg(&gMsg);
-    }
-}
-
 void MotionCtrl_PathFaultTryTurnCondTest(struct MotionCtrl_Action_s *node)
 {
     if(gPathCondMap & (PATH_PROXIMITY_SIDE_L_MASK | PATH_PROXIMITY_SIDE_R_MASK)){
@@ -1312,8 +1282,39 @@ void MotionCtrl_PathFaultProc(u8 StopOnFinish)
     MotionCtrl_Proc();
 }
 
+void ExceptionProcStopCondTestCB(void)
+{
+    if( ( (gExceptionMask & (1<<EXCEPTION_MASK_WHEEL_FLOAT_POS) ) && (gPathCondMap & PATH_FAULT_BOTTOM_MASK) )\
+        ||     (gExceptionMask & (1<<EXCEPTION_MASK_FAN_OC_POS))\
+        ||     (gExceptionMask & (1<<EXCEPTION_MASK_LBRUSH_OC_POS))\
+        ||     (gExceptionMask & (1<<EXCEPTION_MASK_RBRUSH_OC_POS))\
+        ||     (gExceptionMask & (1<<EXCEPTION_MASK_MBRUSH_OC_POS))\
+        ){
+#ifdef DEBUG_LOG
+        printf("ExceptionStopCond=0x%X,0x%X\r\n", gExceptionMask, gPathCondMap);
+#endif
+        Buzzer_Play(BUZZER_TRI_PULS, BUZZER_SND_NORMAL);
+        LWHEEL_EXP_CB_REG(NULL);
+        RWHEEL_EXP_CB_REG(NULL);
+        WHEEL_PROC_CB_REG(NULL);
+        WHEEL_PROC_EXIT_CB_REG(NULL);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LWHEEL, 0);
+        MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RWHEEL, 0);
+        MotionCtrl_Stop();
+        /* Notify main process make the further stop */
+        gMsg.expire = 0;
+        gMsg.prio = MSG_PRIO_HIGHEST;
+        gMsg.type = MSG_TYPE_MOTION;
+        gMsg.MsgCB = NULL;
+        gMsg.Data.MEvt = MOTION_EVT_IDLE_SYNC;
+        SweepRobot_SendMsg(&gMsg);
+    }
+}
+
 void ExceptionHandleFinishCB(void)
 {
+    WHEEL_PROC_CB_REG(NULL);
+    
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_MBRUSH, MOTOR_MBRUSH_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_LBRUSH, MOTOR_LBRUSH_CHAN_STARTUP_SPEED);
     MotorCtrl_ChanSpeedLevelSet(MOTOR_CTRL_CHAN_RBRUSH, MOTOR_RBRUSH_CHAN_STARTUP_SPEED);
@@ -1418,6 +1419,8 @@ void MotionCtrl_ExceptionProc_Speed_Set(MCtrl_Act_t *sActSequence)
 
 void MotionCtrl_ExceptionProc(void)
 {
+    gExceptionMask &= 0;
+    
     MotionCtrl_Start();
     gActSequence[0].LWheelDefDir = 0;
     gActSequence[0].RWheelDefDir = 0;
@@ -1428,7 +1431,7 @@ void MotionCtrl_ExceptionProc(void)
     MotionCtrl_ExceptionProc_Speed_Set(gActSequence);
     gActSequence[0].LWheelSync = 0;
     gActSequence[0].RWheelSync = 0;
-    gActSequence[0].PreAct = MotionCtrl_ExceptionStopCondTest;
+    gActSequence[0].PreAct = NULL;
     gActSequence[0].PostAct = NULL;
 
     gActSequence[1].LWheelDefDir = 0;
@@ -1441,7 +1444,7 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[1].LWheelSync = 0;
     gActSequence[1].RWheelSync = 0;
-    gActSequence[1].PreAct = MotionCtrl_ExceptionStopCondTest;
+    gActSequence[1].PreAct = NULL;
     gActSequence[1].PostAct = NULL;
 
     gActSequence[2].LWheelDefDir = 1;
@@ -1454,7 +1457,7 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence->RWheelExpSpeed = WHEEL_ESCAPE_SPEED;
     gActSequence[2].LWheelSync = 0;
     gActSequence[2].RWheelSync = 0;
-    gActSequence[2].PreAct = MotionCtrl_ExceptionStopCondTest;
+    gActSequence[2].PreAct = NULL;
     gActSequence[2].PostAct = NULL;
 
     gActSequence[3].LWheelDefDir = 0;
@@ -1466,7 +1469,7 @@ void MotionCtrl_ExceptionProc(void)
     MotionCtrl_ExceptionProc_Speed_Set(gActSequence+3);
     gActSequence[3].LWheelSync = 0;
     gActSequence[3].RWheelSync = 0;
-    gActSequence[3].PreAct = MotionCtrl_ExceptionStopCondTest;
+    gActSequence[3].PreAct = NULL;
     gActSequence[3].PostAct = NULL;
 
     gActSequence[4].LWheelDefDir = 1;
@@ -1479,7 +1482,7 @@ void MotionCtrl_ExceptionProc(void)
     gActSequence[4].RWheelExpSpeed = WHEEL_CRUISE_SPEED;
     gActSequence[4].LWheelSync = 0;
     gActSequence[4].RWheelSync = 0;
-    gActSequence[4].PreAct = MotionCtrl_ExceptionStopCondTest;
+    gActSequence[4].PreAct = NULL;
     gActSequence[4].PostAct = NULL;
 
     gActSequence[5].LWheelDefDir = 1;
@@ -1498,6 +1501,7 @@ void MotionCtrl_ExceptionProc(void)
 
     MotionCtrl_Proc();
 
+    WHEEL_PROC_CB_REG(ExceptionProcStopCondTestCB);
     WHEEL_PROC_EXIT_CB_REG(ExceptionHandleFinishCB);
 }
 
